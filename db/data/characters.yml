@@ -13,7 +13,7 @@ characters:
   - アウトロー
   ability_tags: []
 - name: 銀織の雷使い(AS)(異時層プレメア(AS))
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -30,7 +30,7 @@ characters:
   - 異時層キャラ
 - name: クラグホーン
   rarity: ☆5
-  element: Shadow
+  element: Shade
   weapon_type: Lance
   light_shadow_type: Shadow
   notes: ZONE(月光陣)
@@ -55,7 +55,7 @@ characters:
   - ZONE
   - ZONE(極・月光陣)
 - name: 夢吟の詩人(AS)(異時層デュナリス(AS))
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -87,7 +87,7 @@ characters:
   - ZONE(極・輝晶陣)
 - name: 蒼色の忠臣(ヴァレス)
   rarity: ☆5
-  element: Shadow
+  element: Shade
   weapon_type: Axe
   light_shadow_type: Shadow
   notes: ''
@@ -97,7 +97,7 @@ characters:
   - 斧
   ability_tags: []
 - name: ミュルス(ES)
-  rarity: ☆5
+  rarity: ES
   element: Water
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -110,7 +110,7 @@ characters:
   - ZONE
   - ZONE(星海陣)
 - name: 黒衣の刀使い(AS)(異時層イスカ(AS))
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -124,7 +124,7 @@ characters:
   - ZONE(絶・刻陰陣)
   - 異時層キャラ
 - name: レイヴン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -148,7 +148,7 @@ characters:
   - 刀
   ability_tags: []
 - name: 茜袖の旅商人(異時層シグレ)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -165,7 +165,7 @@ characters:
   - ZONE(煌斬陣)
   - 異時層キャラ
 - name: 碧光の鎌使い(AS)(異時層シュゼット(AS))
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -193,7 +193,7 @@ characters:
   - ZONE
   - ZONE(極・双撃陣・斬突)
 - name: 義侠の猟人(異時層ラクレア)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -207,7 +207,7 @@ characters:
   - ZONE(極・瞬突陣)
   - 異時層キャラ
 - name: 赤套の炎使い(AS)(異時層デューイ(AS))
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -223,7 +223,7 @@ characters:
   - ZONE(絶・輝晶陣)
   - 異時層キャラ
 - name: ヴェレット(AS)
-  rarity: ☆5
+  rarity: AS
   element: Thunder
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -237,7 +237,7 @@ characters:
   - ZONE
   - ZONE(極・招雷陣)
 - name: アルド(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -255,7 +255,7 @@ characters:
   - アルカディア
   ability_tags: []
 - name: シオン(ES)
-  rarity: ☆5
+  rarity: ES
   element: Thunder
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -287,7 +287,7 @@ characters:
   - ZONE
   - ZONE(輝晶陣)
 - name: センヤ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -303,7 +303,7 @@ characters:
   - ZONE
   - ZONE(絶・烈火陣)
 - name: 墨染の軍師(AS)(異時層シオン(AS))
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -320,7 +320,7 @@ characters:
   - ZONE(絶・烈火陣)
   - 異時層キャラ
 - name: コマチ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -332,7 +332,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: 氷塵の歌姫(異時層ユキノ)
-  rarity: ☆5
+  rarity: Alter
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -347,7 +347,7 @@ characters:
   - ZONE(水天陣)
   - 異時層キャラ
 - name: クレルヴォ(AS)
-  rarity: ☆5
+  rarity: AS
   element: None
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -377,7 +377,7 @@ characters:
   ability_tags: []
 - name: カグラメ
   rarity: ☆5
-  element: Shadow
+  element: Shade
   weapon_type: Hammer
   light_shadow_type: Shadow
   notes: ''
@@ -389,7 +389,7 @@ characters:
   - 妖し
   ability_tags: []
 - name: 寂寞の舞台人(異時層ロキド)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -403,7 +403,7 @@ characters:
   - ZONE(地裂陣)
   - 異時層キャラ
 - name: ねここ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Wind
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -419,7 +419,7 @@ characters:
   - ZONE
   - ZONE(極・風王陣)
 - name: エルシール(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -496,7 +496,7 @@ characters:
   - ZONE
   - ZONE(招雷陣)
 - name: ルーフス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -508,7 +508,7 @@ characters:
   - ZONE
   - ZONE(極・烈火陣)
 - name: 烏夜の隠密(異時層ツバメ)
-  rarity: ☆5
+  rarity: Alter
   element: Wind
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -524,7 +524,7 @@ characters:
   - ZONE(極・風王陣)
   - 異時層キャラ
 - name: セスタ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -548,7 +548,7 @@ characters:
   - フード
   ability_tags: []
 - name: シグレ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -565,7 +565,7 @@ characters:
   - ZONE
   - ZONE(煌斬陣)
 - name: リンリー(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -628,7 +628,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: 茨呪の艶女(異時層シェイネ)
-  rarity: ☆5
+  rarity: Alter
   element: Wind
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -644,7 +644,7 @@ characters:
   - ZONE(風王陣)
   - 異時層キャラ
 - name: ジルバー(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -671,7 +671,7 @@ characters:
   - ZONE
   - ZONE(極・招雷陣)
 - name: 韜晦の討手(異時層レンリ)
-  rarity: ☆5
+  rarity: Alter
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -687,7 +687,7 @@ characters:
   - ZONE(烈火陣)
   - 異時層キャラ
 - name: ミナルカ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -716,7 +716,7 @@ characters:
   - ZONE
   - ZONE(極・水天陣)
 - name: フィーネ(AS)
-  rarity: ☆5
+  rarity: AS
   element: None
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -748,8 +748,8 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: ヤクモ(AS)
-  rarity: ☆5
-  element: Shadow
+  rarity: AS
+  element: Shade
   weapon_type: Staff
   light_shadow_type: Shadow
   notes: ZONE(極・幻魔陣)
@@ -762,7 +762,7 @@ characters:
   - ZONE
   - ZONE(極・幻魔陣)
 - name: 電影の明星(異時層シエル)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -803,7 +803,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: アナベル(ES)
-  rarity: ☆5
+  rarity: ES
   element: Fire
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -845,7 +845,7 @@ characters:
   - ZONE
   - ZONE(極・地裂陣)
 - name: ヒナギク(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -859,7 +859,7 @@ characters:
   - ZONE
   - ZONE(極・轟打陣)
 - name: イウェラ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -914,7 +914,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: 菊花の剣客(異時層アカネ)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -928,7 +928,7 @@ characters:
   - ZONE(極・地裂陣)
   - 異時層キャラ
 - name: チルリル(ES)
-  rarity: ☆5
+  rarity: ES
   element: Crystal
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -942,7 +942,7 @@ characters:
   - ZONE
   - ZONE(輝晶陣)
 - name: アルマ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Crystal
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1035,7 +1035,7 @@ characters:
   - ZONE
   - ZONE(瞬突陣)
 - name: ポム(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1049,7 +1049,7 @@ characters:
   - ZONE
   - ZONE(幻魔陣)
 - name: オルレイア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1061,7 +1061,7 @@ characters:
   - ZONE
   - ZONE(招雷陣)
 - name: 白磁の魔人(異時層ミュンファ)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1103,7 +1103,7 @@ characters:
   - ZONE
   - ZONE(招雷陣)
 - name: パリサ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1114,7 +1114,7 @@ characters:
   - 呪い
   ability_tags: []
 - name: 夢吟の詩人(異時層デュナリス)
-  rarity: ☆5
+  rarity: Alter
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1130,7 +1130,7 @@ characters:
   - ZONE(極・水天陣)
   - 異時層キャラ
 - name: ノクシス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -1140,7 +1140,7 @@ characters:
   - 槌
   ability_tags: []
 - name: メロディ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1153,7 +1153,7 @@ characters:
   - ZONE
   - ZONE(極・風王陣)
 - name: フェルミナ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Water
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1193,7 +1193,7 @@ characters:
   - 木こり
   ability_tags: []
 - name: プレメア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1205,7 +1205,7 @@ characters:
   - ロストラボ
   ability_tags: []
 - name: 深緋の刈人(異時層イルルゥ)
-  rarity: ☆5
+  rarity: Alter
   element: Water
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1219,7 +1219,7 @@ characters:
   - ZONE(煌斬陣)
   - 異時層キャラ
 - name: ピチカ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1242,7 +1242,7 @@ characters:
   - ZONE
   - ZONE(極・風王陣)
 - name: トゥーヴァ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Water
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -1254,7 +1254,7 @@ characters:
   - フューネラル
   ability_tags: []
 - name: ノーナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1268,7 +1268,7 @@ characters:
   - ZONE
   - ZONE(煌斬陣)
 - name: ラブリ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -1282,7 +1282,7 @@ characters:
   - ZONE
   - ZONE(轟打陣)
 - name: 残影の佳人(異時層シャノン)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -1297,7 +1297,7 @@ characters:
   - ZONE(極・地裂陣)
   - 異時層キャラ
 - name: シェリーヌ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -1312,7 +1312,7 @@ characters:
   - ZONE(閃撃陣)
 - name: ヤクモ
   rarity: ☆5
-  element: Shadow
+  element: Shade
   weapon_type: Staff
   light_shadow_type: Shadow
   notes: ''
@@ -1335,7 +1335,7 @@ characters:
   - ZONE
   - ZONE(刻陰陣)
 - name: デューイ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -1351,7 +1351,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: 銀朱の九尾(異時層ホオズキ)
-  rarity: ☆5
+  rarity: Alter
   element: Fire
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1367,7 +1367,7 @@ characters:
   - ZONE(瞬突陣)
   - 異時層キャラ
 - name: マリエル(ES)
-  rarity: ☆5
+  rarity: ES
   element: Crystal
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -1393,7 +1393,7 @@ characters:
   - ZONE
   - ZONE(烈火陣)
 - name: 月華の令嬢(異時層ヒスメナ)
-  rarity: ☆5
+  rarity: Alter
   element: Water
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -1441,7 +1441,7 @@ characters:
   - コンチェルトアーツ
   ability_tags: []
 - name: ヒイナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -1452,7 +1452,7 @@ characters:
   - マシナリー
   ability_tags: []
 - name: ガラムバレル(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1464,7 +1464,7 @@ characters:
   - タイタン
   ability_tags: []
 - name: フラムラピス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1519,7 +1519,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: 花咲の姫君(異時層ツキハ)
-  rarity: ☆5
+  rarity: Alter
   element: Fire
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1535,7 +1535,7 @@ characters:
   - ZONE(烈火陣)
   - 異時層キャラ
 - name: ねここ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1551,7 +1551,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: ヴィアッカ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -1564,7 +1564,7 @@ characters:
   - 銃
   ability_tags: []
 - name: シンシア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -1580,7 +1580,7 @@ characters:
   - ZONE
   - ZONE(煌斬陣)
 - name: クロード(ES)
-  rarity: ☆5
+  rarity: ES
   element: Earth
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -1608,7 +1608,7 @@ characters:
   - ZONE
   - ZONE(烈火陣)
 - name: ソイラ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1628,7 +1628,7 @@ characters:
   - 拳
   ability_tags: []
 - name: ユキノ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1641,7 +1641,7 @@ characters:
   - ZONE
   - ZONE(瞬突陣)
 - name: レレ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1667,7 +1667,7 @@ characters:
   - ZONE
   - ZONE(輝晶陣)
 - name: イーファ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -1682,7 +1682,7 @@ characters:
   - ZONE
   - ZONE(風王陣)
 - name: アザミ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -1694,7 +1694,7 @@ characters:
   - 恋わずらい
   ability_tags: []
 - name: 墨染の軍師(異時層シオン)
-  rarity: ☆5
+  rarity: Alter
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -1720,7 +1720,7 @@ characters:
   - 時の傷痕の輪舞
   ability_tags: []
 - name: ラディアス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -1755,7 +1755,7 @@ characters:
   - 槌
   ability_tags: []
 - name: ミーユ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1768,7 +1768,7 @@ characters:
   - ZONE
   - ZONE(招雷陣)
 - name: フィロ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1778,7 +1778,7 @@ characters:
   - 木こり
   ability_tags: []
 - name: ミルシャ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1792,7 +1792,7 @@ characters:
   - ZONE
   - ZONE(月海陣)
 - name: オトハ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -1831,7 +1831,7 @@ characters:
   - ZONE
   - ZONE(幻魔陣)
 - name: シュゼット(ES)
-  rarity: ☆5
+  rarity: ES
   element: Fire
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -1857,7 +1857,7 @@ characters:
   - ZONE
   - ZONE(星海陣)
 - name: 銀織の雷使い(異時層プレメア)
-  rarity: ☆5
+  rarity: Alter
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1871,7 +1871,7 @@ characters:
   - ZONE(瞬突陣)
   - 異時層キャラ
 - name: 紫装の槍使い(異時層トゥーヴァ)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -1948,7 +1948,7 @@ characters:
   - 時の傷痕の輪舞
   ability_tags: []
 - name: ミストレア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -1961,7 +1961,7 @@ characters:
   - 読書家
   ability_tags: []
 - name: 碧光の鎌使い(異時層シュゼット)
-  rarity: ☆5
+  rarity: Alter
   element: Wind
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -1976,7 +1976,7 @@ characters:
   - ZONE(風王陣)
   - 異時層キャラ
 - name: 赤套の炎使い(異時層デューイ)
-  rarity: ☆5
+  rarity: Alter
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -1992,7 +1992,7 @@ characters:
   - ZONE(烈火陣)
   - 異時層キャラ
 - name: 黒衣の刀使い(異時層イスカ)
-  rarity: ☆5
+  rarity: Alter
   element: Earth
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -2006,7 +2006,7 @@ characters:
   - ZONE(煌斬陣)
   - 異時層キャラ
 - name: イスカ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -2034,7 +2034,7 @@ characters:
   - 煉獄界
   ability_tags: []
 - name: ゼヴィーロ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -2048,7 +2048,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: ナギ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2062,7 +2062,7 @@ characters:
   - ZONE
   - ZONE(星海陣)
 - name: リヴァイア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2075,7 +2075,7 @@ characters:
   - 封印
   ability_tags: []
 - name: キキョウ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -2088,7 +2088,7 @@ characters:
   - 騎乗
   ability_tags: []
 - name: シーラ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2113,7 +2113,7 @@ characters:
   - 弓
   ability_tags: []
 - name: ハーディー(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -2130,7 +2130,7 @@ characters:
   - ZONE
   - ZONE(閃撃陣)
 - name: チヨ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2142,7 +2142,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: ヴィクト(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -2167,7 +2167,7 @@ characters:
   - 恋わずらい
   ability_tags: []
 - name: ミュンファ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -2193,7 +2193,7 @@ characters:
   - タイタン
   ability_tags: []
 - name: ツキハ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Wind
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -2238,7 +2238,7 @@ characters:
   - 魔剣
   ability_tags: []
 - name: ツバメ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -2262,7 +2262,7 @@ characters:
   - 槌
   ability_tags: []
 - name: クラルテ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2274,7 +2274,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: チルリル(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -2310,7 +2310,7 @@ characters:
   - ZONE
   - ZONE(閃撃陣)
 - name: ティラミス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2323,7 +2323,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: シグレ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -2340,7 +2340,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: メリナ(ES)
-  rarity: ☆5
+  rarity: ES
   element: Water
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -2379,7 +2379,7 @@ characters:
   - コンチェルトアーツ
   ability_tags: []
 - name: デュナリス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2424,7 +2424,7 @@ characters:
   - 槍
   ability_tags: []
 - name: ミーユ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -2435,7 +2435,7 @@ characters:
   - 王族
   ability_tags: []
 - name: ラディカ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2473,7 +2473,7 @@ characters:
   - 銃
   ability_tags: []
 - name: ヒスメナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2495,7 +2495,7 @@ characters:
   - 魚人
   ability_tags: []
 - name: ユーイン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -2509,7 +2509,7 @@ characters:
   - 呪い
   ability_tags: []
 - name: イルルゥ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -2535,7 +2535,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: ホオズキ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -2563,7 +2563,7 @@ characters:
   - ZONE
   - ZONE(轟打陣)
 - name: ベルトラン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2574,7 +2574,7 @@ characters:
   - 盾
   ability_tags: []
 - name: ロゼッタ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2611,7 +2611,7 @@ characters:
   - 妖し
   ability_tags: []
 - name: ツキハ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -2672,7 +2672,7 @@ characters:
   - 剣
   ability_tags: []
 - name: フォラン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2685,7 +2685,7 @@ characters:
   - ZONE
   - ZONE(瞬突陣)
 - name: シエル(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -2726,7 +2726,7 @@ characters:
   - ZONE
   - ZONE(烈火陣)
 - name: シャノン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -2752,7 +2752,7 @@ characters:
   - 封印
   ability_tags: []
 - name: ヴェイナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2779,7 +2779,7 @@ characters:
   - 煉獄界
   ability_tags: []
 - name: アナベル(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -2844,7 +2844,7 @@ characters:
   - 銃
   ability_tags: []
 - name: ミュルス(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -2867,7 +2867,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: レンリ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -2902,7 +2902,7 @@ characters:
   - 精霊対話
   ability_tags: []
 - name: エルガ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -2914,7 +2914,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: フェルミナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -2941,7 +2941,7 @@ characters:
   - ZONE
   - ZONE(地裂陣)
 - name: セティー(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Lance
   light_shadow_type: Shadow
@@ -2978,7 +2978,7 @@ characters:
   - 魔剣
   ability_tags: []
 - name: ニケ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -3013,7 +3013,7 @@ characters:
   - 騎乗
   ability_tags: []
 - name: クロード(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -3028,7 +3028,7 @@ characters:
   - ZONE
   - ZONE(風王陣)
 - name: ガリユ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3040,7 +3040,7 @@ characters:
   - ZONE
   - ZONE(烈火陣)
 - name: ユナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3054,7 +3054,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: シェイネ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -3078,7 +3078,7 @@ characters:
   - 動物対話
   ability_tags: []
 - name: ルイナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Sword
   light_shadow_type: Shadow
@@ -3101,7 +3101,7 @@ characters:
   - 槍
   ability_tags: []
 - name: マリエル(AS)
-  rarity: ☆5
+  rarity: AS
   element: None
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3122,7 +3122,7 @@ characters:
   - 弓
   ability_tags: []
 - name: ロキド(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Fists
   light_shadow_type: Shadow
@@ -3170,7 +3170,7 @@ characters:
   - マシナリー
   ability_tags: []
 - name: ナギ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Axe
   light_shadow_type: Shadow
@@ -3197,7 +3197,7 @@ characters:
   - ZONE
   - ZONE(烈火陣)
 - name: アカネ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -3234,7 +3234,7 @@ characters:
   - 大食い
   ability_tags: []
 - name: メリナ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Hammer
   light_shadow_type: Shadow
@@ -3287,7 +3287,7 @@ characters:
   - 呪い
   ability_tags: []
 - name: ラクレア(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Bow
   light_shadow_type: Shadow
@@ -3338,7 +3338,7 @@ characters:
   - ZONE
   - ZONE(水天陣)
 - name: シオン(AS)
-  rarity: ☆5
+  rarity: AS
   element: Fire
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -3402,7 +3402,7 @@ characters:
   - 記憶喪失
   ability_tags: []
 - name: トゥーヴァ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Earth
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3448,7 +3448,7 @@ characters:
   - KMS社
   ability_tags: []
 - name: イスカ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Katana
   light_shadow_type: Shadow
@@ -3462,7 +3462,7 @@ characters:
   - 万能の支配者
   ability_tags: []
 - name: サキ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3500,7 +3500,7 @@ characters:
   - 読書家
   ability_tags: []
 - name: マイティ(AS)
-  rarity: ☆5
+  rarity: AS
   element: Water
   weapon_type: Staff
   light_shadow_type: Shadow
@@ -3564,7 +3564,7 @@ characters:
   - アルカディア
   ability_tags: []
 - name: シュゼット(AS)
-  rarity: ☆5
+  rarity: AS
   element: Wind
   weapon_type: Lance
   light_shadow_type: Shadow
