@@ -1,0 +1,364 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-4xl font-bold text-gray-900"><%= @character.name %></h1>
+    <div class="flex space-x-2">
+      <% if logged_in? %>
+        <% owned = current_user.owns_character?(@character) %>
+        <%= button_to toggle_ownership_character_path(@character), method: :post, class: "#{owned ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white px-4 py-2 rounded font-semibold" do %>
+          <%= owned ? '所持から削除' : '所持に追加' %>
+        <% end %>
+      <% end %>
+      <%= link_to "一覧に戻る", characters_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded" %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6" data-controller="image-modal image-gallery">
+    <!-- メイン画像 -->
+    <% display_url = @character.display_image_for(current_user) %>
+    <% current_image = nil %>
+    <% if logged_in? %>
+      <% favorite = current_user.user_favorite_character_images.find_by(character: @character) %>
+      <% current_image = favorite&.character_image %>
+    <% end %>
+    <% current_image ||= @character.character_images.approved.sample %>
+
+    <% if display_url.present? %>
+      <div class="w-full h-64 bg-gray-200">
+        <img data-image-gallery-target="mainImage" src="<%= display_url %>" alt="<%= @character.name %>" class="w-full h-full object-contain">
+      </div>
+      <!-- 投稿者とアクションボタン -->
+      <div class="px-4 py-2 border-t border-gray-200 flex justify-between items-center">
+        <div class="text-sm text-gray-600" data-image-gallery-target="imageInfo">
+          <% if current_image %>
+            投稿: <%= current_image.user.username %>
+            <span class="ml-3 text-red-500">❤️ <%= render 'character_images/likes_count', character_image: current_image %></span>
+          <% else %>
+            画像未投稿
+          <% end %>
+        </div>
+        <% if logged_in? && current_image %>
+          <div class="flex gap-2">
+            <!-- いいねボタン -->
+            <% user_liked = current_user.character_image_likes.exists?(character_image: current_image) %>
+            <%= render 'character_images/like_button', character: @character, character_image: current_image, user_liked: user_liked %>
+
+            <!-- お気に入りボタン -->
+            <div data-image-gallery-target="favoriteButton">
+              <% favorite = current_user.user_favorite_character_images.find_by(character: @character) %>
+              <% is_favorite = favorite&.character_image_id == current_image.id %>
+              <%= button_to set_favorite_character_character_image_path(@character, current_image),
+                  method: :post,
+                  class: "text-sm px-3 py-1 rounded #{is_favorite ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-200 text-gray-700'} hover:opacity-80",
+                  data: { image_gallery_image_id: current_image.id } do %>
+                <%= is_favorite ? '★ お気に入り中' : '☆ お気に入りに設定' %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="w-full h-64 bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+        <span class="text-6xl text-white">?</span>
+      </div>
+      <div class="px-4 py-2 border-t border-gray-200">
+        <div class="text-sm text-gray-600">画像未投稿</div>
+      </div>
+    <% end %>
+
+    <!-- サムネイルとアップロードボタン -->
+    <div class="p-4 border-t border-gray-200">
+      <% approved_images = @character.character_images.approved.order(likes_count: :desc, created_at: :desc) %>
+      <div class="flex items-start gap-4">
+        <!-- サムネイルグリッド -->
+        <div class="flex-1">
+          <% if approved_images.any? %>
+            <div class="flex flex-wrap gap-2">
+              <% approved_images.take(12).each do |char_image| %>
+                <div class="relative group bg-gray-200 rounded overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500"
+                     style="width: 64px; height: 64px;"
+                     data-action="click->image-gallery#selectImage"
+                     data-image-url="<%= char_image.display_url %>"
+                     data-image-id="<%= char_image.id %>"
+                     data-image-username="<%= char_image.user.username %>"
+                     data-image-likes-count="<%= char_image.likes_count %>"
+                     data-like-url="<%= like_character_character_image_path(@character, char_image) %>"
+                     data-user-liked="<%= logged_in? && current_user.character_image_likes.exists?(character_image: char_image) %>"
+                     data-favorite-url="<%= set_favorite_character_character_image_path(@character, char_image) %>"
+                     data-is-favorite="<%= logged_in? && current_user.user_favorite_character_images.find_by(character: @character)&.character_image_id == char_image.id %>">
+                  <img src="<%= char_image.display_url %>" alt="<%= @character.name %>" class="w-full h-full object-cover">
+
+                  <!-- ホバーでいいね数表示 -->
+                  <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs px-1 py-0.5 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    ❤️ <%= char_image.likes_count %>
+                  </div>
+
+                  <% if logged_in? && (char_image.user == current_user || current_user.admin?) %>
+                    <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100">
+                      <%= button_to character_character_image_path(@character, char_image),
+                          method: :delete,
+                          data: { confirm: "削除しますか？" },
+                          class: "text-white text-xs px-1 py-0.5 bg-red-600 rounded",
+                          onclick: "event.stopPropagation()" do %>
+                        🗑️
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <% if approved_images.count > 12 %>
+              <p class="text-xs text-gray-500 mt-2">他 <%= approved_images.count - 12 %> 件</p>
+            <% end %>
+          <% else %>
+            <p class="text-sm text-gray-500">画像がまだ投稿されていません</p>
+          <% end %>
+        </div>
+
+        <!-- アップロードボタン -->
+        <% if logged_in? %>
+          <button type="button" data-action="click->image-modal#open" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold whitespace-nowrap">
+            アップロード
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- アップロードモーダル -->
+    <div data-image-modal-target="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" data-action="click->image-modal#closeOnBackdrop">
+      <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4" data-image-modal-target="content" data-controller="image-upload">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-900">画像を投稿</h3>
+            <button type="button" data-action="click->image-modal#close" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <%= form_with model: [@character, CharacterImage.new], url: character_character_images_path(@character), method: :post do |f| %>
+            <div
+              data-image-upload-target="dropzone"
+              data-action="click->image-upload#clickInput dragover->image-upload#handleDragOver dragleave->image-upload#handleDragLeave drop->image-upload#handleDrop"
+              class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-400 transition-colors mb-4"
+            >
+              <div class="text-gray-600">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p class="mt-2"><span class="font-semibold">クリックして画像を選択</span> またはドラッグ&ドロップ</p>
+                <p class="text-sm text-gray-500 mt-1">PNG, JPG, GIF (最大10MB)</p>
+              </div>
+              <%= f.file_field :image,
+                  accept: "image/*",
+                  class: "hidden",
+                  data: {
+                    image_upload_target: "input",
+                    action: "change->image-upload#handleFileSelect"
+                  } %>
+            </div>
+
+            <div data-image-upload-target="preview" class="hidden mb-4 text-center"></div>
+
+            <%= f.submit "投稿", class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded font-semibold" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">基本情報</h2>
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div>
+        <p class="text-sm text-gray-600 font-semibold">レアリティ</p>
+        <p class="text-2xl text-gray-900"><%= @character.rarity %></p>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-600 font-semibold">属性</p>
+        <p class="text-3xl"><%= element_with_icon(@character.element) %></p>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-600 font-semibold">武器種</p>
+        <p class="text-3xl"><%= weapon_with_icon(@character.weapon_type) %></p>
+      </div>
+
+      <div>
+        <p class="text-sm text-gray-600 font-semibold">天冥</p>
+        <p class="text-3xl"><%= light_shadow_with_icon(@character.light_shadow_type) %></p>
+      </div>
+    </div>
+
+    <% if @character.personality_tags.any? %>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 font-semibold mb-2">パーソナリティ</p>
+        <div class="flex flex-wrap gap-2">
+          <% @character.personality_tags.each do |tag| %>
+            <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full"><%= tag.name %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @character.ability_tags.any? %>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 font-semibold mb-2">能力タグ</p>
+        <div class="flex flex-wrap gap-2">
+          <% @character.ability_tags.each do |tag| %>
+            <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full" title="<%= tag.category %>">
+              <%= tag.name %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @character.notes.present? %>
+      <div>
+        <p class="text-sm text-gray-600 font-semibold mb-2">備考</p>
+        <p class="text-gray-900 whitespace-pre-wrap"><%= @character.notes %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-900">人気のシナジー</h2>
+      <% if @popular_synergies.any? %>
+        <%= link_to "もっと見る →", synergy_posts_path(character_id: @character.id), class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+      <% end %>
+    </div>
+
+    <% if @popular_synergies.any? %>
+      <div class="space-y-4">
+        <% @popular_synergies.each do |synergy| %>
+          <div class="border-b border-gray-200 pb-4 last:border-b-0">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-lg font-semibold text-gray-900">
+                <%= link_to synergy.title, synergy_post_path(synergy), class: "hover:text-indigo-600" %>
+              </h3>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">👍 <%= synergy.votes_count %></span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-2">
+              <% synergy.characters.each do |char| %>
+                <%= link_to character_path(char), class: "block" do %>
+                  <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 hover:border-blue-400 rounded-lg px-2 py-1 transition">
+                    <% image_url = char.display_image_for(current_user) %>
+                    <% if image_url.present? %>
+                      <img src="<%= image_url %>" alt="<%= char.name %>" class="w-6 h-6 object-cover rounded">
+                    <% else %>
+                      <div class="w-6 h-6 bg-gradient-to-br from-blue-400 to-cyan-500 rounded flex items-center justify-center flex-shrink-0">
+                        <span class="text-xs text-white">?</span>
+                      </div>
+                    <% end %>
+                    <span class="text-sm font-medium text-blue-900"><%= char.name %></span>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+
+            <p class="text-gray-700 text-sm line-clamp-2"><%= synergy.description %></p>
+
+            <% if synergy.use_case_tags.any? %>
+              <div class="mt-2 flex flex-wrap gap-1">
+                <% synergy.use_case_tags.each do |tag| %>
+                  <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"><%= tag.name %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <p class="text-gray-500">このキャラクターを使ったシナジーはまだ投稿されていません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-900">人気のパーティ編成</h2>
+      <% if @popular_parties.any? %>
+        <%= link_to "もっと見る →", party_posts_path(character_id: @character.id), class: "text-indigo-600 hover:text-indigo-800 font-medium" %>
+      <% end %>
+    </div>
+
+    <% if @popular_parties.any? %>
+      <div class="space-y-4">
+        <% @popular_parties.each do |party| %>
+          <div class="border-b border-gray-200 pb-4 last:border-b-0">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-lg font-semibold text-gray-900">
+                <%= link_to party.title, party_post_path(party), class: "hover:text-indigo-600" %>
+              </h3>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">👍 <%= party.votes_count %></span>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <div class="text-sm text-gray-600 mb-1">メイン:</div>
+              <div class="flex flex-wrap gap-2 mb-2">
+                <% party.main_members.each do |membership| %>
+                  <%= link_to character_path(membership.character), class: "block" do %>
+                    <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 hover:border-indigo-400 rounded-lg px-2 py-1 transition">
+                      <% image_url = membership.character.display_image_for(current_user) %>
+                      <% if image_url.present? %>
+                        <img src="<%= image_url %>" alt="<%= membership.character.name %>" class="w-6 h-6 object-cover rounded">
+                      <% else %>
+                        <div class="w-6 h-6 bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center flex-shrink-0">
+                          <span class="text-xs text-white">?</span>
+                        </div>
+                      <% end %>
+                      <span class="text-sm font-medium text-indigo-900"><%= membership.character.name %></span>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="text-sm text-gray-600 mb-1">サブ:</div>
+              <div class="flex flex-wrap gap-2">
+                <% party.sub_members.each do |membership| %>
+                  <%= link_to character_path(membership.character), class: "block" do %>
+                    <div class="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 hover:border-purple-400 rounded-lg px-2 py-1 transition">
+                      <% image_url = membership.character.display_image_for(current_user) %>
+                      <% if image_url.present? %>
+                        <img src="<%= image_url %>" alt="<%= membership.character.name %>" class="w-6 h-6 object-cover rounded">
+                      <% else %>
+                        <div class="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-500 rounded flex items-center justify-center flex-shrink-0">
+                          <span class="text-xs text-white">?</span>
+                        </div>
+                      <% end %>
+                      <span class="text-sm font-medium text-purple-900"><%= membership.character.name %></span>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <p class="text-gray-700 text-sm line-clamp-2"><%= party.description %></p>
+
+            <% if party.use_case_tags.any? %>
+              <div class="mt-2 flex flex-wrap gap-1">
+                <% party.use_case_tags.each do |tag| %>
+                  <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"><%= tag.name %></span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <p class="text-gray-500">このキャラクターを使ったパーティ編成はまだ投稿されていません</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,170 @@
+<div class="max-w-4xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4"><%= @party_post.title %></h1>
+
+    <div class="flex justify-between items-center mb-4">
+      <%= link_to "← #{@party_post.synergy? ? 'シナジー' : 'パーティ'}一覧に戻る", @party_post.synergy? ? synergy_posts_path : party_posts_path, class: "text-indigo-600 hover:text-indigo-800" %>
+      <%= render 'votes/buttons', votable: @party_post %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900"><%= @party_post.synergy? ? 'キャラクター' : 'パーティ編成' %></h2>
+
+    <% if @party_post.full_party? %>
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">メインメンバー</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <% @party_post.main_members.each do |membership| %>
+            <%= link_to character_path(membership.character), class: "block" do %>
+              <div class="bg-indigo-50 border-2 border-indigo-200 rounded-lg hover:border-indigo-400 transition overflow-hidden">
+                <div class="flex items-center gap-3 p-2">
+                  <% image_url = membership.character.display_image_for(current_user) %>
+                  <% if image_url.present? %>
+                    <img src="<%= image_url %>" alt="<%= membership.character.name %>" class="w-16 h-16 object-cover rounded">
+                  <% else %>
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center">
+                      <span class="text-2xl text-white">?</span>
+                    </div>
+                  <% end %>
+                  <div class="flex-1">
+                    <div class="font-semibold text-indigo-900"><%= membership.character.name %></div>
+                    <div class="text-sm text-indigo-700"><%= membership.character.element %> / <%= membership.character.weapon_type %></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">サブメンバー</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <% @party_post.sub_members.each do |membership| %>
+            <%= link_to character_path(membership.character), class: "block" do %>
+              <div class="bg-purple-50 border-2 border-purple-200 rounded-lg hover:border-purple-400 transition overflow-hidden">
+                <div class="flex items-center gap-3 p-2">
+                  <% image_url = membership.character.display_image_for(current_user) %>
+                  <% if image_url.present? %>
+                    <img src="<%= image_url %>" alt="<%= membership.character.name %>" class="w-16 h-16 object-cover rounded">
+                  <% else %>
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded flex items-center justify-center">
+                      <span class="text-2xl text-white">?</span>
+                    </div>
+                  <% end %>
+                  <div class="flex-1">
+                    <div class="font-semibold text-purple-900"><%= membership.character.name %></div>
+                    <div class="text-sm text-purple-700"><%= membership.character.element %> / <%= membership.character.weapon_type %></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <% @party_post.characters.each do |character| %>
+          <%= link_to character_path(character), class: "block" do %>
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg hover:border-blue-400 transition overflow-hidden">
+              <div class="flex items-center gap-3 p-2">
+                <% image_url = character.display_image_for(current_user) %>
+                <% if image_url.present? %>
+                  <img src="<%= image_url %>" alt="<%= character.name %>" class="w-16 h-16 object-cover rounded">
+                <% else %>
+                  <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded flex items-center justify-center">
+                    <span class="text-2xl text-white">?</span>
+                  </div>
+                <% end %>
+                <div class="flex-1">
+                  <div class="font-semibold text-blue-900"><%= character.name %></div>
+                  <div class="text-sm text-blue-700"><%= character.element %> / <%= character.weapon_type %></div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">説明</h2>
+    <div class="text-gray-700 whitespace-pre-wrap"><%= @party_post.description %></div>
+  </div>
+
+  <% if @party_post.strategy.present? %>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-900">戦略</h2>
+      <div class="text-gray-700 whitespace-pre-wrap"><%= @party_post.strategy %></div>
+    </div>
+  <% end %>
+
+  <% if @party_post.use_case_tags.any? %>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-900">用途</h2>
+      <div class="flex flex-wrap gap-2">
+        <% @party_post.use_case_tags.each do |tag| %>
+          <span class="inline-block bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full"><%= tag.name %></span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">この<%= @party_post.synergy? ? 'シナジー' : 'パーティ' %>の能力</h2>
+    <p class="text-sm text-gray-600 mb-4">緑色のタグはこの<%= @party_post.synergy? ? 'シナジー' : 'パーティ' %>が持っている能力です</p>
+
+    <% party_ability_tag_ids = @party_post.all_ability_tags.map(&:id) %>
+    <% @all_ability_tags_by_category.each do |category, tags| %>
+      <div class="mb-4 last:mb-0">
+        <h3 class="text-sm font-semibold text-gray-700 mb-2"><%= category %></h3>
+        <div class="flex flex-wrap gap-2">
+          <% tags.each do |tag| %>
+            <% if party_ability_tag_ids.include?(tag.id) %>
+              <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded text-sm"><%= tag.name %></span>
+            <% else %>
+              <span class="inline-block bg-gray-100 text-gray-400 px-3 py-1 rounded text-sm"><%= tag.name %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="text-sm text-gray-600">
+      投稿者: <span class="font-semibold"><%= @party_post.user.username %></span>
+    </div>
+  </div>
+
+  <% if @versions.any? %>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-900">編集履歴</h2>
+
+      <div class="space-y-3">
+        <% @versions.each do |version| %>
+          <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+            <div>
+              <span class="text-sm text-gray-600">
+                <%= l(version.created_at, format: :long) %>
+              </span>
+              <span class="ml-2 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                <%= version.event == 'create' ? '作成' : version.event == 'update' ? '更新' : '削除' %>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @party_post.versions.count > 10 %>
+        <div class="mt-4 text-center">
+          <p class="text-sm text-gray-600">さらに <%= @party_post.versions.count - 10 %> 件の履歴があります</p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render 'comments/list', commentable: @party_post %>
+</div>

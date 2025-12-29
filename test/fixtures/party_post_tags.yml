@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  party_post: one
+  use_case_tag: one
+
+two:
+  party_post: two
+  use_case_tag: two

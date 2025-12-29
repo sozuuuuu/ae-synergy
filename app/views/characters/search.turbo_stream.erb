@@ -1,0 +1,88 @@
+<%= turbo_stream.update "character_results" do %>
+
+  <% if @characters.empty? %>
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+      <p class="text-gray-500 text-lg">該当するキャラクターが見つかりませんでした</p>
+      <% if logged_in? && @show_only_owned %>
+        <p class="text-gray-400 mt-2 text-sm">「所持キャラのみ表示」のチェックを外すと全てのキャラクターが表示されます</p>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <% if logged_in? %>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">所持</th>
+            <% end %>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">画像</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">レア</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">属性</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">武器</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">天冥</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タグ</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @characters.each do |character| %>
+            <tr class="hover:bg-gray-50">
+            <% if logged_in? %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if @owned_character_ids.include?(character.id) %>
+                  <%= button_to "削除", batch_remove_ownership_characters_path(character_ids: [character.id]), method: :post, class: "bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-semibold" %>
+                <% else %>
+                  <%= button_to "追加", batch_add_ownership_characters_path(character_ids: [character.id]), method: :post, class: "bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-semibold" %>
+                <% end %>
+              </td>
+            <% end %>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% display_url = character.display_image_for(current_user) %>
+              <% if display_url.present? %>
+                <img src="<%= display_url %>" alt="<%= character.name %>" class="object-cover rounded" style="width: 32px; height: 32px; max-width: 32px; max-height: 32px;">
+              <% else %>
+                <div class="bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center" style="width: 32px; height: 32px;">
+                  <span class="text-white text-xs">?</span>
+                </div>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= link_to character.name, character_path(character), class: "text-indigo-600 hover:text-indigo-900 font-semibold", data: { turbo_frame: "_top" } %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                <%= character.rarity %>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-xl" title="<%= character.element %>">
+              <%= element_icon(character.element) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-xl" title="<%= character.weapon_type %>">
+              <%= weapon_icon(character.weapon_type) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-lg" title="<%= character.light_shadow_type %>">
+              <%= light_shadow_icon(character.light_shadow_type) %>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-wrap gap-1">
+                <% character.personality_tags.take(2).each do |tag| %>
+                  <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded"><%= tag.name %></span>
+                <% end %>
+                <% if character.personality_tags.count > 2 %>
+                  <span class="text-xs text-gray-500">+<%= character.personality_tags.count - 2 %></span>
+                <% end %>
+                <% character.ability_tags.take(2).each do |tag| %>
+                  <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded"><%= tag.name %></span>
+                <% end %>
+                <% if character.ability_tags.count > 2 %>
+                  <span class="text-xs text-gray-500">+<%= character.ability_tags.count - 2 %></span>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+<% end %>

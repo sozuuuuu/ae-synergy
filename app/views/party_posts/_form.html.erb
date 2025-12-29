@@ -1,0 +1,304 @@
+<%= form_with model: party_post, local: true, id: "party_post_form" do |f| %>
+  <% if party_post.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold"><%= pluralize(party_post.errors.count, "個のエラー") %>があります:</h2>
+      <ul class="list-disc list-inside">
+        <% party_post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :composition_type %>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4">基本情報</h2>
+
+    <div class="mb-4">
+      <%= f.label :title, "タイトル", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500", placeholder: "例: アルド×フィーネの火力コンボ" %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :description, "説明", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_area :description, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500", placeholder: "このシナジー・パーティーの特徴や強みを説明してください" %>
+    </div>
+
+    <% if party_post.full_party? %>
+      <div class="mb-4">
+        <%= f.label :strategy, "戦略・立ち回り", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :strategy, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500", placeholder: "戦闘の流れや立ち回りを説明してください" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4">キャラクター選択</h2>
+
+    <div id="selected_characters" class="mb-4">
+      <% if party_post.synergy? %>
+        <p class="text-sm text-gray-600 mb-2">シナジーに含めるキャラクターを選択してください（2人以上）</p>
+        <div id="synergy_characters" class="flex flex-wrap gap-2 mb-4">
+          <!-- 選択されたキャラクターがここに表示されます -->
+        </div>
+      <% else %>
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">メインメンバー（4人）</p>
+          <div id="main_characters" class="flex flex-wrap gap-2 mb-4 min-h-[40px] border-2 border-dashed border-gray-300 rounded p-2">
+            <!-- 選択されたメインメンバーがここに表示されます -->
+          </div>
+        </div>
+        <div class="mb-4">
+          <p class="text-sm text-gray-600 mb-2">サブメンバー（2人）</p>
+          <div id="sub_characters" class="flex flex-wrap gap-2 mb-4 min-h-[40px] border-2 border-dashed border-gray-300 rounded p-2">
+            <!-- 選択されたサブメンバーがここに表示されます -->
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- キャラクター検索UI（characters/index と同様） -->
+    <div class="border-t pt-4">
+      <h3 class="text-lg font-semibold mb-3">キャラクター検索</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">キャラクター名</label>
+          <input
+            type="text"
+            id="character_search"
+            placeholder="名前で検索..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">属性</label>
+          <select id="element_filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">すべての属性</option>
+            <% Character::ELEMENTS.each do |element| %>
+              <option value="<%= element %>"><%= element %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">武器種</label>
+          <select id="weapon_filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">すべての武器種</option>
+            <% Character::WEAPON_TYPES.each do |weapon| %>
+              <option value="<%= weapon %>"><%= weapon %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <div id="character_list" class="max-h-96 overflow-y-auto border rounded">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"></th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">画像</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">名前</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">レア</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">属性</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">武器</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200" id="filterable_characters">
+            <% @characters.each do |character| %>
+              <tr class="hover:bg-gray-50 character-row"
+                  data-name="<%= character.name.downcase %>"
+                  data-element="<%= character.element %>"
+                  data-weapon="<%= character.weapon_type %>"
+                  data-character-id="<%= character.id %>"
+                  data-character-name="<%= character.name %>">
+                <td class="px-4 py-2">
+                  <button type="button" class="add-character-btn bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm font-semibold">追加</button>
+                </td>
+                <td class="px-4 py-2">
+                  <% if character.image_url.present? %>
+                    <img src="<%= character.image_url %>" alt="<%= character.name %>" class="object-cover rounded" style="width: 32px; height: 32px; max-width: 32px; max-height: 32px;">
+                  <% else %>
+                    <div class="bg-gradient-to-br from-indigo-400 to-purple-500 rounded flex items-center justify-center" style="width: 32px; height: 32px;">
+                      <span class="text-white text-xs">?</span>
+                    </div>
+                  <% end %>
+                </td>
+                <td class="px-4 py-2"><%= character.name %></td>
+                <td class="px-4 py-2">
+                  <span class="inline-flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">
+                    <%= character.rarity %>
+                  </span>
+                </td>
+                <td class="px-4 py-2 text-xl"><%= element_icon(character.element) %></td>
+                <td class="px-4 py-2 text-xl"><%= weapon_icon(character.weapon_type) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-semibold mb-4">ユースケースタグ</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+      <% @use_case_tags.each do |tag| %>
+        <label class="flex items-center">
+          <%= f.check_box :use_case_tag_ids, { multiple: true, class: "rounded text-indigo-600 focus:ring-indigo-500 mr-2" }, tag.id, nil %>
+          <span class="text-sm text-gray-700"><%= tag.name %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex gap-2">
+    <%= f.submit "投稿する", class: "bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded font-semibold" %>
+    <%= link_to "キャンセル", :back, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded font-semibold" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const isSynergy = <%= party_post.synergy? %>;
+    const selectedCharacters = new Set();
+    let mainCount = 0;
+    let subCount = 0;
+
+    // フィルタリング機能
+    const searchInput = document.getElementById('character_search');
+    const elementFilter = document.getElementById('element_filter');
+    const weaponFilter = document.getElementById('weapon_filter');
+
+    function filterCharacters() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const element = elementFilter.value;
+      const weapon = weaponFilter.value;
+
+      document.querySelectorAll('.character-row').forEach(row => {
+        const name = row.dataset.name;
+        const rowElement = row.dataset.element;
+        const rowWeapon = row.dataset.weapon;
+
+        const matchesSearch = !searchTerm || name.includes(searchTerm);
+        const matchesElement = !element || rowElement === element;
+        const matchesWeapon = !weapon || rowWeapon === weapon;
+
+        row.style.display = matchesSearch && matchesElement && matchesWeapon ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterCharacters);
+    elementFilter.addEventListener('change', filterCharacters);
+    weaponFilter.addEventListener('change', filterCharacters);
+
+    // キャラクター選択機能
+    document.querySelectorAll('.add-character-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const row = this.closest('.character-row');
+        const characterId = row.dataset.characterId;
+        const characterName = row.dataset.characterName;
+
+        if (selectedCharacters.has(characterId)) {
+          alert(`${characterName}は既に追加されています`);
+          return;
+        }
+
+        if (isSynergy) {
+          addCharacterToSynergy(characterId, characterName);
+        } else {
+          // パーティーの場合、メイン/サブの選択ダイアログを表示
+          showSlotTypeDialog(characterId, characterName);
+        }
+      });
+    });
+
+    function addCharacterToSynergy(characterId, characterName) {
+      if (selectedCharacters.has(characterId)) return;
+
+      selectedCharacters.add(characterId);
+      const container = document.getElementById('synergy_characters');
+      const badge = createCharacterBadge(characterId, characterName, 'synergy', 0);
+      container.appendChild(badge);
+    }
+
+    function showSlotTypeDialog(characterId, characterName) {
+      const slotType = prompt(`「${characterName}」を追加する位置:\n1. メインメンバー (現在${mainCount}/4人)\n2. サブメンバー (現在${subCount}/2人)\n\n1 または 2 を入力してください:`);
+
+      if (slotType === '1') {
+        if (mainCount >= 4) {
+          alert('メインメンバーは4人までです');
+          return;
+        }
+        addCharacterToParty(characterId, characterName, 'main', mainCount);
+        mainCount++;
+        selectedCharacters.add(characterId);
+      } else if (slotType === '2') {
+        if (subCount >= 2) {
+          alert('サブメンバーは2人までです');
+          return;
+        }
+        addCharacterToParty(characterId, characterName, 'sub', subCount);
+        subCount++;
+        selectedCharacters.add(characterId);
+      } else {
+        return;
+      }
+    }
+
+    function addCharacterToParty(characterId, characterName, slotType, position) {
+      const containerId = slotType === 'main' ? 'main_characters' : 'sub_characters';
+      const container = document.getElementById(containerId);
+      const badge = createCharacterBadge(characterId, characterName, slotType, position);
+      container.appendChild(badge);
+    }
+
+    function createCharacterBadge(characterId, characterName, slotType, position) {
+      const badge = document.createElement('div');
+      badge.className = 'inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full';
+      badge.dataset.characterId = characterId;
+
+      const hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.name = 'party_post[party_memberships_attributes][][character_id]';
+      hiddenField.value = characterId;
+
+      const slotTypeField = document.createElement('input');
+      slotTypeField.type = 'hidden';
+      slotTypeField.name = 'party_post[party_memberships_attributes][][slot_type]';
+      slotTypeField.value = slotType;
+
+      const positionField = document.createElement('input');
+      positionField.type = 'hidden';
+      positionField.name = 'party_post[party_memberships_attributes][][position]';
+      positionField.value = position;
+
+      badge.innerHTML = `
+        <span>${characterName}</span>
+        <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-900" onclick="this.parentElement.remove(); removeCharacter(${characterId});">×</button>
+      `;
+
+      badge.appendChild(hiddenField);
+      badge.appendChild(slotTypeField);
+      badge.appendChild(positionField);
+
+      return badge;
+    }
+
+    window.removeCharacter = function(characterId) {
+      selectedCharacters.delete(characterId.toString());
+
+      // カウントを更新
+      const badge = document.querySelector(`[data-character-id="${characterId}"]`);
+      if (badge) {
+        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+        if (slotTypeField) {
+          if (slotTypeField.value === 'main') mainCount--;
+          if (slotTypeField.value === 'sub') subCount--;
+        }
+      }
+    };
+  });
+</script>

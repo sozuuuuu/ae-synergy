@@ -1,0 +1,7 @@
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-4xl font-bold text-gray-900 mb-6">
+    <%= @party_post.synergy? ? 'シナジー投稿' : 'パーティー編成投稿' %>
+  </h1>
+
+  <%= render 'form', party_post: @party_post %>
+</div>

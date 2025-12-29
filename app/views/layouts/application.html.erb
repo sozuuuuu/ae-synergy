@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Ae Synergy" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Ae Synergy">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-8">
+            <%= link_to "AE Synergy", root_path, class: "text-2xl font-bold text-indigo-600" %>
+            <%= link_to "キャラクター", characters_path, class: "text-gray-700 hover:text-indigo-600 font-medium" %>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <% if Rails.env.development? %>
+              <div class="flex items-center space-x-2">
+                <label class="text-sm text-gray-600">Dev Login:</label>
+                <%= form_with url: dev_login_path, method: :post, class: "inline-block" do |f| %>
+                  <select name="username" onchange="this.form.submit()" class="border border-gray-300 rounded px-2 py-1 text-sm">
+                    <option value="">ユーザー選択...</option>
+                    <option value="admin" <%= 'selected' if logged_in? && current_user.username == 'admin' %>>Login as admin</option>
+                    <option value="user1" <%= 'selected' if logged_in? && current_user.username == 'user1' %>>Login as user1</option>
+                    <option value="user2" <%= 'selected' if logged_in? && current_user.username == 'user2' %>>Login as user2</option>
+                  </select>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if logged_in? %>
+              <%= link_to "マイページ", dashboard_path, class: "text-gray-700 hover:text-indigo-600 font-medium" %>
+              <%= link_to "シナジー投稿", new_synergy_post_path, class: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold" %>
+              <%= link_to "パーティー投稿", new_party_post_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold" %>
+              <span class="text-gray-700">ようこそ、<%= current_user.username %>さん</span>
+              <%= button_to "ログアウト", logout_path, method: :delete, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded" %>
+            <% else %>
+              <%= link_to "ログイン", login_path, class: "text-gray-700 hover:text-indigo-600" %>
+              <%= link_to "新規登録", new_user_path, class: "bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <% if flash[:notice] %>
+      <div class="container mx-auto px-4 mt-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+          <%= flash[:notice] %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="container mx-auto px-4 mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <%= flash[:alert] %>
+        </div>
+      </div>
+    <% end %>
+
+    <main class="container mx-auto px-4 py-8">
+      <%= yield %>
+    </main>
+  </body>
+</html>

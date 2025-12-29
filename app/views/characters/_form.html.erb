@@ -1,0 +1,69 @@
+<%= form_with(model: character, class: "space-y-6") do |form| %>
+  <% if character.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h3 class="text-red-800 font-semibold mb-2">
+        <%= character.errors.count %>件のエラーがあります
+      </h3>
+      <ul class="list-disc list-inside text-red-700">
+        <% character.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">基本情報</h2>
+
+    <div class="space-y-4">
+      <div>
+        <%= form.label :name, "キャラクター名", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+        <%= form.text_field :name, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form.label :rarity, "レアリティ", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= form.select :rarity, Character::RARITIES, { include_blank: "選択してください" }, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+
+        <div>
+          <%= form.label :element, "属性", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= form.select :element, Character::ELEMENTS, { include_blank: "選択してください" }, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+
+        <div>
+          <%= form.label :weapon_type, "武器種", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= form.select :weapon_type, Character::WEAPON_TYPES, { include_blank: "選択してください" }, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+
+        <div>
+          <%= form.label :light_shadow_type, "天冥", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= form.select :light_shadow_type, Character::LIGHT_SHADOW_TYPES, { include_blank: "選択してください" }, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :personality_tag_ids, "パーソナリティ", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <%= form.collection_check_boxes :personality_tag_ids, PersonalityTag.order(:name), :id, :name do |b| %>
+            <div class="flex items-center">
+              <%= b.check_box class: "rounded text-indigo-600 focus:ring-indigo-500 mr-2" %>
+              <%= b.label class: "text-sm text-gray-700" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :notes, "備考", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+        <%= form.text_area :notes, rows: 4, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "キャンセル", character.persisted? ? character_path(character) : characters_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg" %>
+    <%= form.submit character.persisted? ? "更新する" : "作成する", class: "bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg" %>
+  </div>
+<% end %>

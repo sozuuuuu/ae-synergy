@@ -1,0 +1,27 @@
+<% votable_type = votable.class.name %>
+<% votable_id = votable.id %>
+<% user_vote = logged_in? ? votable.user_vote(current_user) : nil %>
+<% current_value = user_vote&.value || 0 %>
+
+<div id="votes_<%= votable_type.underscore %>_<%= votable_id %>" class="flex items-center space-x-3">
+  <% if logged_in? %>
+    <%= button_to votes_path(votable_type: votable_type, votable_id: votable_id, value: 'up'),
+                  method: :post,
+                  data: { turbo_frame: "_top" },
+                  class: "flex items-center space-x-1 px-3 py-2 rounded transition #{current_value == 1 ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+      <span class="text-lg">👍</span>
+    <% end %>
+
+    <%= button_to votes_path(votable_type: votable_type, votable_id: votable_id, value: 'down'),
+                  method: :post,
+                  data: { turbo_frame: "_top" },
+                  class: "flex items-center space-x-1 px-3 py-2 rounded transition #{current_value == -1 ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" do %>
+      <span class="text-lg">👎</span>
+    <% end %>
+  <% end %>
+
+  <div class="flex items-center space-x-2">
+    <span class="text-2xl font-bold text-gray-800"><%= votable.votes_count %></span>
+    <span class="text-sm text-gray-600">票</span>
+  </div>
+</div>

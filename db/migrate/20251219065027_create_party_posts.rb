@@ -1,0 +1,17 @@
+class CreatePartyPosts < ActiveRecord::Migration[8.1]
+  def change
+    create_table :party_posts do |t|
+      t.references :user, null: false, foreign_key: true
+      t.string :title, null: false
+      t.text :description
+      t.text :strategy
+      t.integer :votes_count, default: 0, null: false
+      t.integer :comments_count, default: 0, null: false
+
+      t.timestamps
+    end
+
+    add_index :party_posts, :created_at
+    add_index :party_posts, :votes_count
+  end
+end

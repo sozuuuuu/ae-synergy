@@ -1,0 +1,11 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-4xl font-bold text-gray-900">
+      <%= @draft.synergy? ? 'シナジー編集' : 'パーティー編成編集' %>
+      <span class="text-sm text-gray-500 font-normal ml-2">(下書き)</span>
+    </h1>
+    <%= button_to "公開する", publish_draft_party_post_path(@draft), method: :post, class: "bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded font-semibold" %>
+  </div>
+
+  <%= render 'draft_form', draft: @draft %>
+</div>

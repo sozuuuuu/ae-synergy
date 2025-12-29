@@ -1,0 +1,7 @@
+<div id="like_button">
+  <%= button_to like_character_character_image_path(character, character_image),
+      method: :post,
+      class: "text-sm px-3 py-1 rounded #{user_liked ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'} hover:opacity-80" do %>
+    <%= user_liked ? '❤️ いいね済み' : '🤍 いいね' %>
+  <% end %>
+</div>

@@ -1,0 +1,151 @@
+characters:
+  - name: アルド
+    rarity: ☆5
+    element: Fire
+    weapon_type: Sword
+    light_shadow_type: Light
+    notes: 主人公。火属性の剣使い
+    personality_tags:
+      - 人間
+    ability_tags:
+      - 物理バフ
+      - 剣バフ
+
+  - name: フィーネ
+    rarity: ☆5
+    element: Wind
+    weapon_type: Staff
+    light_shadow_type: Light
+    notes: ヒロイン。風属性の杖使い
+    personality_tags:
+      - 人間
+      - 時の民
+
+  - name: アルド（AS）
+    rarity: AS
+    element: Fire
+    weapon_type: Sword
+    light_shadow_type: Light
+    notes: 主人公のアナザースタイル
+    personality_tags:
+      - 人間
+
+  - name: ミュンファ
+    rarity: ☆5
+    element: Earth
+    weapon_type: Fists
+    light_shadow_type: Light
+    notes: 地属性の拳使い。サポート性能が高い
+    personality_tags:
+      - 獣王
+      - 猫好き
+    ability_tags:
+      - 地属性ゾーン
+      - 守護
+      - 拳バフ
+
+  - name: シグレ
+    rarity: ☆5
+    element: Water
+    weapon_type: Katana
+    light_shadow_type: Shadow
+    notes: 水属性の刀使い
+    personality_tags:
+      - 東方
+      - 人間
+
+  - name: マリエル
+    rarity: ☆5
+    element: Water
+    weapon_type: Staff
+    light_shadow_type: Light
+    notes: 水属性の杖使い。優秀なヒーラー
+    personality_tags:
+      - 人間
+      - 西方
+    ability_tags:
+      - 速度バフ
+      - 杖バフ
+
+  - name: アナベル
+    rarity: ☆5
+    element: Water
+    weapon_type: Lance
+    light_shadow_type: Light
+    notes: 水属性の槍使い。高防御のタンク
+    personality_tags:
+      - 人間
+      - 西方
+
+  - name: シェイネ
+    rarity: ☆5
+    element: Water
+    weapon_type: Katana
+    light_shadow_type: Shadow
+    notes: 水属性の刀使い。高火力アタッカー
+    personality_tags:
+      - 人間
+      - 東方
+
+  - name: イスカ
+    rarity: ☆5
+    element: Fire
+    weapon_type: Katana
+    light_shadow_type: Shadow
+    notes: 火属性の刀使い。高速アタッカー
+    personality_tags:
+      - 人間
+      - 東方
+
+  - name: ツバメ
+    rarity: ☆5
+    element: Wind
+    weapon_type: Katana
+    light_shadow_type: Light
+    notes: 風属性の刀使い。クリティカル特化
+    personality_tags:
+      - 人間
+      - 東方
+    ability_tags:
+      - クリティカルバフ
+      - 刀バフ
+      - 先制行動
+
+  - name: セティー
+    rarity: ☆5
+    element: Earth
+    weapon_type: Bow
+    light_shadow_type: Light
+    notes: 地属性の弓使い。デバフ特化
+    personality_tags:
+      - 人間
+      - 西方
+
+  - name: ユーイン
+    rarity: ☆5
+    element: Wind
+    weapon_type: Staff
+    light_shadow_type: Light
+    notes: 風属性の杖使い。サポート特化
+    personality_tags:
+      - 人間
+      - 海の一族
+
+  - name: トゥーヴァ
+    rarity: ☆5
+    element: Thunder
+    weapon_type: Bow
+    light_shadow_type: Shadow
+    notes: 雷属性の弓使い。遠距離アタッカー
+    personality_tags:
+      - 人間
+      - 外史
+
+  - name: ロキド
+    rarity: ☆5
+    element: Earth
+    weapon_type: Axe
+    light_shadow_type: Light
+    notes: 地属性の斧使い。パワーファイター
+    personality_tags:
+      - 獣王

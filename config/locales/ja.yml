@@ -1,0 +1,104 @@
+ja:
+  activerecord:
+    models:
+      user: ユーザー
+      character: キャラクター
+      synergy_post: シナジー投稿
+      party_post: パーティ投稿
+      comment: コメント
+      vote: 投票
+    attributes:
+      user:
+        username: ユーザー名
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード（確認）
+      character:
+        name: 名前
+        rarity: レアリティ
+        element: 属性
+        weapon_type: 武器種
+        light_shadow_type: 天冥
+        notes: 備考
+      skill:
+        name: スキル名
+        effects: 効果
+        mp_cost: 消費MP
+        position: 表示順
+
+  elements:
+    Fire: 火
+    Water: 水
+    Earth: 地
+    Wind: 風
+    Thunder: 雷
+    Shade: 闇
+    Crystal: 晶
+    None: 無
+
+  weapons:
+    Sword: 剣
+    Katana: 刀
+    Axe: 斧
+    Lance: 槍
+    Bow: 弓
+    Staff: 杖
+    Fists: 拳
+    Hammer: 槌
+
+  rarities:
+    "☆4": "☆4"
+    "☆5": "☆5"
+    AS: AS
+    ES: ES
+    Alter: アルター
+
+  light_shadow:
+    Light: 光
+    Shadow: 闇
+
+  date:
+    formats:
+      default: "%Y年%m月%d日"
+      long: "%Y年%m月%d日 %H:%M"
+      short: "%m/%d"
+
+  time:
+    formats:
+      default: "%Y年%m月%d日 %H:%M:%S"
+      long: "%Y年%m月%d日 %H:%M"
+      short: "%m/%d %H:%M"
+
+  datetime:
+    distance_in_words:
+      half_a_minute: 30秒
+      less_than_x_seconds:
+        one: 1秒以内
+        other: "%{count}秒以内"
+      x_seconds:
+        one: 1秒
+        other: "%{count}秒"
+      less_than_x_minutes:
+        one: 1分以内
+        other: "%{count}分以内"
+      x_minutes:
+        one: 1分
+        other: "%{count}分"
+      about_x_hours:
+        one: 約1時間
+        other: 約%{count}時間
+      x_days:
+        one: 1日
+        other: "%{count}日"
+      about_x_months:
+        one: 約1ヶ月
+        other: 約%{count}ヶ月"
+      x_months:
+        one: 1ヶ月
+        other: "%{count}ヶ月"
+      about_x_years:
+        one: 約1年
+        other: 約%{count}年
+      over_x_years:
+        one: 1年以上
+        other: "%{count}年以上"

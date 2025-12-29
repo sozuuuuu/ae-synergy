@@ -1,0 +1,16 @@
+<div id="<%= dom_id(comment) %>" class="border-b border-gray-200 pb-4 last:border-b-0">
+  <div class="flex justify-between items-start mb-2">
+    <div>
+      <span class="font-semibold text-gray-900"><%= comment.user.username %></span>
+      <span class="text-sm text-gray-500 ml-2"><%= time_ago_in_words(comment.created_at) %>前</span>
+    </div>
+    <% if logged_in? && comment.user == current_user %>
+      <%= button_to "削除",
+                    [comment.commentable, comment],
+                    method: :delete,
+                    data: { turbo_confirm: "本当に削除しますか？", turbo_frame: "_top" },
+                    class: "text-red-600 hover:text-red-800 text-sm" %>
+    <% end %>
+  </div>
+  <div class="text-gray-700 whitespace-pre-wrap"><%= comment.body %></div>
+</div>

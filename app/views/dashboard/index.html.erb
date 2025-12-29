@@ -1,0 +1,125 @@
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-4xl font-bold text-gray-900 mb-8">マイページ</h1>
+
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-900">シナジー（下書き）</h2>
+      <%= link_to "新規作成", new_synergy_post_path, class: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold" %>
+    </div>
+
+    <% if @draft_synergies.any? %>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タイトル</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">キャラクター数</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新日時</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @draft_synergies.each do |draft| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                  <%= link_to draft.title.presence || "無題", edit_draft_party_post_path(draft), class: "text-indigo-600 hover:text-indigo-900 font-semibold" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= draft.characters.count %>人
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= l(draft.updated_at, format: :short) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <%= link_to "編集", edit_draft_party_post_path(draft), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                  <%= button_to "削除", draft_party_post_path(draft, draft: true), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "text-red-600 hover:text-red-900" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <p class="text-gray-500">シナジーの下書きはありません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-900">パーティー編成（下書き）</h2>
+      <%= link_to "新規作成", new_party_post_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold" %>
+    </div>
+
+    <% if @draft_parties.any? %>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タイトル</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">キャラクター数</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新日時</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @draft_parties.each do |draft| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                  <%= link_to draft.title.presence || "無題", edit_draft_party_post_path(draft), class: "text-indigo-600 hover:text-indigo-900 font-semibold" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= draft.characters.count %>人
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= l(draft.updated_at, format: :short) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <%= link_to "編集", edit_draft_party_post_path(draft), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                  <%= button_to "削除", draft_party_post_path(draft, draft: true), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "text-red-600 hover:text-red-900" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <p class="text-gray-500">パーティー編成の下書きはありません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mb-8">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-4">投稿した画像</h2>
+
+    <% if @character_images.any? %>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <% @character_images.each do |char_image| %>
+            <div class="group">
+              <%= link_to character_path(char_image.character), class: "block" do %>
+                <div class="aspect-square bg-gray-200 rounded overflow-hidden mb-2">
+                  <img src="<%= char_image.display_url %>" alt="<%= char_image.character.name %>" class="w-full h-full object-cover">
+                </div>
+                <div class="text-center">
+                  <p class="text-sm font-medium text-gray-900"><%= char_image.character.name %></p>
+                  <p class="text-xs text-gray-500"><%= l(char_image.created_at, format: :short) %></p>
+                </div>
+              <% end %>
+              <%= button_to character_character_image_path(char_image.character, char_image), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "w-full mt-2 text-red-600 hover:text-red-800 text-xs" do %>
+                削除
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <p class="text-gray-500">まだ画像を投稿していません</p>
+        <p class="text-sm text-gray-400 mt-2">キャラクター詳細ページから画像を投稿できます</p>
+      </div>
+    <% end %>
+  </div>
+</div>
