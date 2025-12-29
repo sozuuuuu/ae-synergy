@@ -51,7 +51,7 @@ puts "Loading ability tags from YAML..."
 ability_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'ability_tags.yml'))
 ability_tags_data['ability_tags'].each do |tag_data|
   AbilityTag.find_or_create_by!(name: tag_data['name']) do |tag|
-    tag.category = tag_data['category']
+    tag.category = tag_data['category'] || "特殊能力"
   end
 end
 puts "Created #{AbilityTag.count} ability tags"
