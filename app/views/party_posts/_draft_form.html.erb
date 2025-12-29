@@ -202,7 +202,7 @@
 <% end %>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('turbo:load', function() {
     const isSynergy = <%= draft.synergy? %>;
     const draftId = <%= draft.id %>;
     const selectedCharacters = new Set();
