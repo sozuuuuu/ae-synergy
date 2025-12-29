@@ -22,7 +22,7 @@ characters:
   - 美食
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(極・風王陣)
 - name: シオン
   rarity: ☆5
   element: Fire
@@ -124,7 +124,7 @@ characters:
   - 槌
   - 王族
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: シェリーヌ
   rarity: ☆5
   element: Earth
@@ -148,7 +148,7 @@ characters:
   - 杖
   - 恋わずらい
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: シュゼット(AS)
   rarity: ☆5
   element: Wind
@@ -383,7 +383,7 @@ characters:
   - ロストラボ
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: ラディカ
   rarity: ☆5
   element: Fire
@@ -495,7 +495,7 @@ characters:
   - 杖
   - 地獄耳
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ナギ(AS)
   rarity: ☆5
   element: Earth
@@ -543,7 +543,7 @@ characters:
   - ニックネーマー
   - ドワーフ
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: ロキド(AS)
   rarity: ☆5
   element: Earth
@@ -635,7 +635,7 @@ characters:
   - 杖
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: ガリユ(AS)
   rarity: ☆5
   element: Fire
@@ -646,7 +646,7 @@ characters:
   - 杖
   - 竜
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: クロード(AS)
   rarity: ☆5
   element: Wind
@@ -660,7 +660,7 @@ characters:
   - 王族
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: キキョウ
   rarity: ☆5
   element: Wind
@@ -840,7 +840,7 @@ characters:
   - 剣
   - 盾
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: ブリアー
   rarity: ☆5
   element: Water
@@ -878,7 +878,7 @@ characters:
   - 盾
   - 騎乗
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: ゼヴィーロ
   rarity: ☆5
   element: Water
@@ -904,7 +904,7 @@ characters:
   - 生物
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: シンシア
   rarity: ☆5
   element: Wind
@@ -946,7 +946,7 @@ characters:
   - いぬ好き
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ソフィア
   rarity: ☆5
   element: Water
@@ -982,7 +982,7 @@ characters:
   - 槍
   - ねこ嫌い
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: チルリル
   rarity: ☆5
   element: Fire
@@ -1079,7 +1079,7 @@ characters:
   - 杖
   - 地獄耳
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: ベルトラン(AS)
   rarity: ☆5
   element: Earth
@@ -1104,7 +1104,7 @@ characters:
   - 辛党
   - ニックネーマー
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: ホオズキ(AS)
   rarity: ☆5
   element: Fire
@@ -1142,7 +1142,7 @@ characters:
   - フード
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: ユーイン(AS)
   rarity: ☆5
   element: Fire
@@ -1215,7 +1215,7 @@ characters:
   - 杖
   - 恋わずらい
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ミーユ(AS)
   rarity: ☆5
   element: Fire
@@ -1294,7 +1294,7 @@ characters:
   - テイルズオブ
   - コンチェルトアーツ
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: メリナ(ES)
   rarity: ☆5
   element: Water
@@ -1325,7 +1325,7 @@ characters:
   - 辛党
   - 普賢一刀流
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: ティラミス(AS)
   rarity: ☆5
   element: Earth
@@ -1337,7 +1337,7 @@ characters:
   - 槍
   - 竜
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: メリッサ
   rarity: ☆5
   element: Wind
@@ -1349,7 +1349,7 @@ characters:
   - 刀
   - KMS社
   ability_tags:
-  - ZONE
+  - ZONE(閃撃陣)
 - name: メロディ
   rarity: ☆5
   element: Wind
@@ -1438,7 +1438,7 @@ characters:
   - 王族
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: ガラムバレル
   rarity: ☆5
   element: Wind
@@ -1463,7 +1463,7 @@ characters:
   - 恋わずらい
   - 封印
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: メイ
   rarity: ☆5
   element: Earth
@@ -1499,7 +1499,7 @@ characters:
   - 竜宮
   - 杖
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: ハーディー(AS)
   rarity: ☆5
   element: Fire
@@ -1515,7 +1515,7 @@ characters:
   - いぬ好き
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(閃撃陣)
 - name: ピチカ
   rarity: ☆5
   element: Fire
@@ -1539,7 +1539,7 @@ characters:
   - 王族
   - 魚人
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: キキョウ(AS)
   rarity: ☆5
   element: Wind
@@ -1578,7 +1578,7 @@ characters:
   - 王族
   - 大食い
   ability_tags:
-  - ZONE
+  - ZONE(星海陣)
 - name: ゼヴィーロ(AS)
   rarity: ☆5
   element: Water
@@ -1591,7 +1591,7 @@ characters:
   - フード
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: ヒナギク
   rarity: ☆5
   element: Earth
@@ -1618,7 +1618,7 @@ characters:
   - ロストラボ
   - 万能の支配者
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: 黒衣の刀使い(異時層イスカ)
   rarity: ☆5
   element: Earth
@@ -1630,7 +1630,7 @@ characters:
   - ロストラボ
   - 万能の支配者
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: 赤套の炎使い(異時層デューイ)
   rarity: ☆5
   element: Fire
@@ -1644,7 +1644,7 @@ characters:
   - フード
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: 碧光の鎌使い(異時層シュゼット)
   rarity: ☆5
   element: Wind
@@ -1657,7 +1657,7 @@ characters:
   - 美食
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: ミストレア(AS)
   rarity: ☆5
   element: Wind
@@ -1694,7 +1694,7 @@ characters:
   - 新時空超限流派
   - 時の傷痕の輪舞
   ability_tags:
-  - ZONE
+  - ZONE(双撃陣・斬魔)
 - name: キッド
   rarity: ☆5
   element: Fire
@@ -1744,7 +1744,7 @@ characters:
   - ロストラボ
   - 記憶喪失
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: 銀織の雷使い(異時層プレメア)
   rarity: ☆5
   element: Water
@@ -1756,7 +1756,7 @@ characters:
   - マシナリー
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: マユ
   rarity: ☆5
   element: Water
@@ -1767,7 +1767,7 @@ characters:
   - IDAスクール
   - 杖
   ability_tags:
-  - ZONE
+  - ZONE(星海陣)
 - name: シュゼット(ES)
   rarity: ☆5
   element: Fire
@@ -1780,7 +1780,7 @@ characters:
   - 美食
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: エヴァ
   rarity: ☆5
   element: Water
@@ -1791,7 +1791,7 @@ characters:
   - 杖
   - 竜
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: セヴェン
   rarity: ☆5
   element: Wind
@@ -1805,7 +1805,7 @@ characters:
   - 精霊対話
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: オトハ(AS)
   rarity: ☆5
   element: Earth
@@ -1830,7 +1830,7 @@ characters:
   - 西方
   - 魚人
   ability_tags:
-  - ZONE
+  - ZONE(月海陣)
 - name: フィロ(AS)
   rarity: ☆5
   element: Water
@@ -1852,7 +1852,7 @@ characters:
   - 槍
   - 王族
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: ノクシス
   rarity: ☆5
   element: Wind
@@ -1873,7 +1873,7 @@ characters:
   - 斧
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: ラディアス(AS)
   rarity: ☆5
   element: Fire
@@ -1885,7 +1885,7 @@ characters:
   - 剣
   - 盾
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: 星の子
   rarity: ☆5
   element: Crystal
@@ -1909,7 +1909,7 @@ characters:
   - 読書家
   - 普賢一刀流
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: アザミ(AS)
   rarity: ☆5
   element: Wind
@@ -1935,7 +1935,7 @@ characters:
   - 辛党
   - ニックネーマー
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: アルマ
   rarity: ☆5
   element: Crystal
@@ -1949,7 +1949,7 @@ characters:
   - 銃
   - 錬金術師
   ability_tags:
-  - ZONE
+  - ZONE(輝晶陣)
 - name: レレ(AS)
   rarity: ☆5
   element: Water
@@ -1972,7 +1972,7 @@ characters:
   - 弓
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: ウクアージ
   rarity: ☆5
   element: Water
@@ -2004,7 +2004,7 @@ characters:
   - 杖
   - 呪い
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: クロード(ES)
   rarity: ☆5
   element: Earth
@@ -2018,7 +2018,7 @@ characters:
   - 王族
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: シンシア(AS)
   rarity: ☆5
   element: Wind
@@ -2033,7 +2033,7 @@ characters:
   - 読書家
   - 封印
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: ヴィアッカ(AS)
   rarity: ☆5
   element: Wind
@@ -2061,7 +2061,7 @@ characters:
   - 精霊対話
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: 花咲の姫君(異時層ツキハ)
   rarity: ☆5
   element: Fire
@@ -2075,7 +2075,7 @@ characters:
   - 読書家
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ノーナ
   rarity: ☆5
   element: Water
@@ -2101,7 +2101,7 @@ characters:
   - アウトロー
   - 時間帝国
   ability_tags:
-  - ZONE
+  - ZONE(極・煌斬陣)
 - name: アシュティア
   rarity: ☆5
   element: Fire
@@ -2115,7 +2115,7 @@ characters:
   - バルオキー
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(堅守陣)
 - name: フラムラピス(AS)
   rarity: ☆5
   element: Water
@@ -2166,17 +2166,18 @@ characters:
 - name: シオン
   rarity: ☆5
   element: Fire
-  weapon_type: Bow
+  weapon_type: Katana
   light_shadow_type: Shadow
-  notes: 配布(協奏)
+  notes: ZONE(極・煌斬陣)真・顕現
   personality_tags:
-  - 弓
-  - 呪い
-  - 大食い
-  - 銃
-  - テイルズオブ
-  - コンチェルトアーツ
-  ability_tags: []
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 普賢一刀流
+  ability_tags:
+  - ZONE(極・煌斬陣)
 - name: コレット
   rarity: ☆5
   element: None
@@ -2212,7 +2213,7 @@ characters:
   - テイルズオブ
   - コンチェルトアーツ
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: マリエル(ES)
   rarity: ☆5
   element: Crystal
@@ -2237,7 +2238,7 @@ characters:
   - 辛党
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: デューイ(AS)
   rarity: ☆5
   element: Water
@@ -2252,7 +2253,7 @@ characters:
   - ロストラボ
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: エニ
   rarity: ☆5
   element: Fire
@@ -2264,7 +2265,7 @@ characters:
   - 辛党
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(刻陰陣)
 - name: ヤクモ
   rarity: ☆5
   element: Shadow
@@ -2288,7 +2289,7 @@ characters:
   - 拳
   - アウトロー
   ability_tags:
-  - ZONE
+  - ZONE(閃撃陣)
 - name: 残影の佳人(異時層シャノン)
   rarity: ☆5
   element: Earth
@@ -2301,7 +2302,7 @@ characters:
   - いぬ好き
   - 記憶喪失
   ability_tags:
-  - ZONE
+  - ZONE(極・地裂陣)
 - name: ラブリ(AS)
   rarity: ☆5
   element: Fire
@@ -2314,7 +2315,7 @@ characters:
   - ニックネーマー
   - ドワーフ
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: ノーナ(AS)
   rarity: ☆5
   element: Water
@@ -2327,7 +2328,7 @@ characters:
   - フード
   - 記憶喪失
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: トゥーヴァ(ES)
   rarity: ☆5
   element: Water
@@ -2350,7 +2351,7 @@ characters:
   - 刀
   - 復讐者
   ability_tags:
-  - ZONE
+  - ZONE(極・風王陣)
 - name: ピチカ(AS)
   rarity: ☆5
   element: Fire
@@ -2373,7 +2374,7 @@ characters:
   - 斧
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: プレメア(AS)
   rarity: ☆5
   element: Earth
@@ -2409,7 +2410,7 @@ characters:
   - 武具
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: フェルミナ(ES)
   rarity: ☆5
   element: Water
@@ -2423,7 +2424,7 @@ characters:
   - フード
   - 忍び
   ability_tags:
-  - ZONE
+  - ZONE(極・水天陣)
 - name: メロディ(AS)
   rarity: ☆5
   element: Wind
@@ -2435,7 +2436,7 @@ characters:
   - 杖
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(極・風王陣)
 - name: ノクシス(AS)
   rarity: ☆5
   element: Wind
@@ -2459,7 +2460,7 @@ characters:
   - 辛党
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(極・水天陣)
 - name: パリサ(AS)
   rarity: ☆5
   element: Fire
@@ -2482,7 +2483,7 @@ characters:
   - 採掘
   - 時間帝国
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: カムラナージュ
   rarity: ☆5
   element: Thunder
@@ -2496,7 +2497,7 @@ characters:
   - 背理夢想団リーダー
   - 未来革命家
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: 白磁の魔人(異時層ミュンファ)
   rarity: ☆5
   element: Earth
@@ -2508,7 +2509,7 @@ characters:
   - 杖
   - 封印
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: オルレイア(AS)
   rarity: ☆5
   element: Fire
@@ -2519,7 +2520,7 @@ characters:
   - 斧
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: ポム(AS)
   rarity: ☆5
   element: Fire
@@ -2532,7 +2533,7 @@ characters:
   - 杖
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: セリエス
   rarity: ☆5
   element: Earth
@@ -2545,7 +2546,7 @@ characters:
   - 辛党
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(瞬突陣)
 - name: オボロ
   rarity: ☆5
   element: Thunder
@@ -2561,7 +2562,7 @@ characters:
   - 普賢一刀流
   - 恋わずらい
   ability_tags:
-  - ZONE
+  - ZONE(極・招雷陣)
 - name: ウェネーフィカ
   rarity: ☆5
   element: Water
@@ -2574,7 +2575,7 @@ characters:
   - バルオキー
   - 復讐者
   ability_tags:
-  - ZONE
+  - ZONE(極・刻陰陣)
 - name: ティティ
   rarity: ☆5
   element: Thunder
@@ -2597,16 +2598,16 @@ characters:
   ability_tags: []
 - name: サイラス
   rarity: ☆5
-  element: Fire
-  weapon_type: Staff
+  element: Water
+  weapon_type: Katana
   light_shadow_type: Shadow
-  notes: ZONE(烈火陣)ZONE(水天陣)ZONE(招雷陣)配布
+  notes: 配布
   personality_tags:
-  - 杖
-  - 読書家
-  - 導きのトラベラー
-  ability_tags:
-  - ZONE
+  - 東方
+  - 天の導き
+  - 刀
+  - 呪い
+  ability_tags: []
 - name: アルマ(AS)
   rarity: ☆5
   element: Crystal
@@ -2620,7 +2621,7 @@ characters:
   - 銃
   - 錬金術師
   ability_tags:
-  - ZONE
+  - ZONE(極・輝晶陣)
 - name: チルリル(ES)
   rarity: ☆5
   element: Crystal
@@ -2633,7 +2634,7 @@ characters:
   - 西方
   - 剣
   ability_tags:
-  - ZONE
+  - ZONE(輝晶陣)
 - name: 菊花の剣客(異時層アカネ)
   rarity: ☆5
   element: Earth
@@ -2645,7 +2646,7 @@ characters:
   - 刀
   - 普賢一刀流
   ability_tags:
-  - ZONE
+  - ZONE(極・地裂陣)
 - name: リュゼ
   rarity: ☆5
   element: Water
@@ -2658,7 +2659,7 @@ characters:
   - ドラゴンキラー
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: メルピピア
   rarity: ☆5
   element: Wind
@@ -2671,7 +2672,7 @@ characters:
   - ニックネーマー
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: サザンカ
   rarity: ☆5
   element: Fire
@@ -2687,7 +2688,7 @@ characters:
   - 大食い
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(極・烈火陣)
 - name: イウェラ(AS)
   rarity: ☆5
   element: Water
@@ -2710,7 +2711,7 @@ characters:
   - いぬ好き
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(極・轟打陣)
 - name: クチナワ
   rarity: ☆5
   element: Earth
@@ -2721,7 +2722,7 @@ characters:
   - 杖
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(極・地裂陣)
 - name: シェンファ
   rarity: ☆5
   element: None
@@ -2735,7 +2736,7 @@ characters:
   - KMS社
   - 合成人間
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: アナベル(ES)
   rarity: ☆5
   element: Fire
@@ -2749,7 +2750,7 @@ characters:
   - 盾
   - 騎乗
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ヘレナ
   rarity: ☆5
   element: Earth
@@ -2761,7 +2762,7 @@ characters:
   - 合成人間
   - 杖
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: ガリアード
   rarity: ☆5
   element: Earth
@@ -2787,7 +2788,7 @@ characters:
   - 槌
   - フード
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: ヤクモ(AS)
   rarity: ☆5
   element: Shadow
@@ -2800,7 +2801,7 @@ characters:
   - KMS社
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(極・幻魔陣)
 - name: マツリカ
   rarity: ☆5
   element: Water
@@ -2815,7 +2816,7 @@ characters:
   - お昼寝
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: フィーネ(AS)
   rarity: ☆5
   element: None
@@ -2830,7 +2831,7 @@ characters:
   - ジオ
   - 魔剣
   ability_tags:
-  - ZONE
+  - ZONE(星海陣)
 - name: ジルファニー
   rarity: ☆5
   element: Water
@@ -2843,7 +2844,7 @@ characters:
   - フード
   - 記憶喪失
   ability_tags:
-  - ZONE
+  - ZONE(極・水天陣)
 - name: ミナルカ(AS)
   rarity: ☆5
   element: Fire
@@ -2857,7 +2858,7 @@ characters:
   - アウトロー
   - 時間帝国
   ability_tags:
-  - ZONE
+  - ZONE(極・烈火陣)
 - name: 韜晦の討手(異時層レンリ)
   rarity: ☆5
   element: Fire
@@ -2871,7 +2872,7 @@ characters:
   - 読書家
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(烈火陣)
 - name: ウツハラ
   rarity: ☆5
   element: Thunder
@@ -2885,7 +2886,7 @@ characters:
   - 煉獄界
   - アルカディア
   ability_tags:
-  - ZONE
+  - ZONE(極・招雷陣)
 - name: ジルバー(AS)
   rarity: ☆5
   element: Earth
@@ -2911,7 +2912,7 @@ characters:
   - 呪い
   - フード
   ability_tags:
-  - ZONE
+  - ZONE(風王陣)
 - name: クーラ
   rarity: ☆5
   element: Water
@@ -2923,7 +2924,7 @@ characters:
   - 甘党
   - KOF
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: テリー
   rarity: ☆5
   element: Earth
@@ -2934,7 +2935,7 @@ characters:
   - 拳
   - KOF
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: 舞
   rarity: ☆5
   element: Fire
@@ -2947,7 +2948,7 @@ characters:
   - 忍び
   - KOF
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: 京
   rarity: ☆5
   element: Fire
@@ -2959,7 +2960,7 @@ characters:
   - 騎乗
   - KOF
   ability_tags:
-  - ZONE
+  - ZONE(轟打陣)
 - name: リンリー(AS)
   rarity: ☆5
   element: Fire
@@ -2986,7 +2987,7 @@ characters:
   - 辛党
   - 普賢一刀流
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: センヤ
   rarity: ☆5
   element: Fire
@@ -3024,7 +3025,7 @@ characters:
   - 大食い
   - 忍び
   ability_tags:
-  - ZONE
+  - ZONE(極・風王陣)
 - name: ルーフス(AS)
   rarity: ☆5
   element: Fire
@@ -3035,7 +3036,7 @@ characters:
   - 拳
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(極・烈火陣)
 - name: イヅナ
   rarity: ☆5
   element: Thunder
@@ -3049,7 +3050,7 @@ characters:
   - 人見知り
   - 記憶喪失
   ability_tags:
-  - ZONE
+  - ZONE(招雷陣)
 - name: イド
   rarity: ☆5
   element: Earth
@@ -3060,7 +3061,7 @@ characters:
   - 拳
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(極・轟打陣)
 - name: ライザ
   rarity: ☆5
   element: Fire
@@ -3096,7 +3097,7 @@ characters:
   - 読書家
   - アトリエ
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: エルシール(AS)
   rarity: ☆5
   element: Water
@@ -3108,7 +3109,7 @@ characters:
   - 武具
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(極・水天陣)
 - name: ねここ(ES)
   rarity: ☆5
   element: Wind
@@ -3123,7 +3124,7 @@ characters:
   - 精霊対話
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(極・風王陣)
 - name: 寂寞の舞台人(異時層ロキド)
   rarity: ☆5
   element: Earth
@@ -3135,7 +3136,7 @@ characters:
   - 剣
   - 読書家
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: カグラメ
   rarity: ☆5
   element: Shadow
@@ -3176,7 +3177,7 @@ characters:
   - 採集
   - KMS社
   ability_tags:
-  - ZONE
+  - ZONE(幻魔陣)
 - name: 氷塵の歌姫(異時層ユキノ)
   rarity: ☆5
   element: Water
@@ -3189,7 +3190,7 @@ characters:
   - 弓
   - 妖し
   ability_tags:
-  - ZONE
+  - ZONE(水天陣)
 - name: コマチ(AS)
   rarity: ☆5
   element: Earth
@@ -3200,7 +3201,7 @@ characters:
   - 東方
   - 槍
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: 墨染の軍師(AS)(異時層シオン(AS))
   rarity: ☆5
   element: Fire
@@ -3215,7 +3216,7 @@ characters:
   - 普賢一刀流
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(絶・烈火陣)
 - name: センヤ(AS)
   rarity: ☆5
   element: Fire
@@ -3230,7 +3231,7 @@ characters:
   - フード
   - 普賢一刀流
   ability_tags:
-  - ZONE
+  - ZONE(絶・烈火陣)
 - name: ニルヤ
   rarity: ☆5
   element: Crystal
@@ -3244,7 +3245,7 @@ characters:
   - いぬ好き
   - 格闘技
   ability_tags:
-  - ZONE
+  - ZONE(輝晶陣)
 - name: シオン(ES)
   rarity: ☆5
   element: Thunder
@@ -3260,7 +3261,7 @@ characters:
   - 普賢一刀流
   - 巳の国
   ability_tags:
-  - ZONE
+  - ZONE(極・煌斬陣)
 - name: アルド(AS)
   rarity: ☆5
   element: Fire
@@ -3291,7 +3292,7 @@ characters:
   - 採掘
   - 時間帝国
   ability_tags:
-  - ZONE
+  - ZONE(極・招雷陣)
 - name: 赤套の炎使い(AS)(異時層デューイ(AS))
   rarity: ☆5
   element: Fire
@@ -3305,7 +3306,7 @@ characters:
   - フード
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(絶・輝晶陣)
 - name: 義侠の猟人(異時層ラクレア)
   rarity: ☆5
   element: Earth
@@ -3317,7 +3318,7 @@ characters:
   - アウトロー
   - 銃
   ability_tags:
-  - ZONE
+  - ZONE(極・瞬突陣)
 - name: リナリア
   rarity: ☆5
   element: Fire
@@ -3329,7 +3330,7 @@ characters:
   - COA
   - IDAスクール
   ability_tags:
-  - ZONE
+  - ZONE(極・双撃陣・斬突)
 - name: 碧光の鎌使い(AS)(異時層シュゼット(AS))
   rarity: ☆5
   element: Wind
@@ -3342,7 +3343,7 @@ characters:
   - 美食
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(絶・風王陣)
 - name: 茜袖の旅商人(異時層シグレ)
   rarity: ☆5
   element: Earth
@@ -3357,7 +3358,7 @@ characters:
   - 普賢一刀流
   - 巳の国
   ability_tags:
-  - ZONE
+  - ZONE(煌斬陣)
 - name: アカネ
   rarity: ☆5
   element: Fire
@@ -3380,7 +3381,7 @@ characters:
   - 記憶喪失
   - フード
   ability_tags:
-  - ZONE
+  - ZONE(極・地裂陣)
 - name: 黒衣の刀使い(AS)(異時層イスカ(AS))
   rarity: ☆5
   element: Earth
@@ -3392,7 +3393,7 @@ characters:
   - ロストラボ
   - 万能の支配者
   ability_tags:
-  - ZONE
+  - ZONE(絶・刻陰陣)
 - name: ミュルス(ES)
   rarity: ☆5
   element: Water
@@ -3404,7 +3405,7 @@ characters:
   - 斧
   - 恋わずらい
   ability_tags:
-  - ZONE
+  - ZONE(星海陣)
 - name: 蒼色の忠臣(ヴァレス)
   rarity: ☆5
   element: Shadow
@@ -3429,7 +3430,7 @@ characters:
   - お昼寝
   - 人見知り
   ability_tags:
-  - ZONE
+  - ZONE(極・輝晶陣)
 - name: 夢吟の詩人(AS)(異時層デュナリス(AS))
   rarity: ☆5
   element: Water
@@ -3443,7 +3444,7 @@ characters:
   - 辛党
   - 煉獄界
   ability_tags:
-  - ZONE
+  - ZONE(絶・水天陣)
 - name: ミルディ
   rarity: ☆5
   element: Crystal
@@ -3455,7 +3456,7 @@ characters:
   - 杖
   - 未来革命家
   ability_tags:
-  - ZONE
+  - ZONE(極・月光陣)
 - name: クラグホーン
   rarity: ☆5
   element: Shadow
@@ -3467,7 +3468,7 @@ characters:
   - 読書家
   - 未来革命家
   ability_tags:
-  - ZONE
+  - ZONE(月光陣)
 - name: 銀織の雷使い(AS)(異時層プレメア(AS))
   rarity: ☆5
   element: Water
@@ -3481,7 +3482,7 @@ characters:
   - フード
   - ロストラボ
   ability_tags:
-  - ZONE
+  - ZONE(絶・招雷陣)
 - name: ヴェルダンタ
   rarity: ☆5
   element: Water
@@ -3547,7 +3548,7 @@ characters:
   - 恋わずらい
   - 封印
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: シグレ
   rarity: ☆5
   element: Water
@@ -3650,7 +3651,7 @@ characters:
   - 武具
   - 呪い
   ability_tags:
-  - ZONE
+  - ZONE(極・烈火陣)
 - name: トゥーヴァ
   rarity: ☆5
   element: Earth
@@ -3663,7 +3664,7 @@ characters:
   - ニックネーマー
   - フューネラル
   ability_tags:
-  - ZONE
+  - ZONE(地裂陣)
 - name: ロキド
   rarity: ☆5
   element: Earth

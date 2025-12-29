@@ -1,78 +1,38 @@
 ability_tags:
-  # ゾーン
-  - name: 火属性ゾーン
-    category: ゾーン
-  - name: 水属性ゾーン
-    category: ゾーン
-  - name: 地属性ゾーン
-    category: ゾーン
-  - name: 風属性ゾーン
-    category: ゾーン
-  - name: 雷属性ゾーン
-    category: ゾーン
-  - name: 闇属性ゾーン
-    category: ゾーン
-  - name: 晶属性ゾーン
-    category: ゾーン
-
-  # バフ・デバフ
-  - name: 物理バフ
-    category: バフ・デバフ
-  - name: 物理デバフ
-    category: バフ・デバフ
-  - name: 魔法バフ
-    category: バフ・デバフ
-  - name: 魔法デバフ
-    category: バフ・デバフ
-  - name: 速度バフ
-    category: バフ・デバフ
-  - name: 速度デバフ
-    category: バフ・デバフ
-  - name: クリティカルバフ
-    category: バフ・デバフ
-
-  # 状態異常
-  - name: 毒
-    category: 状態異常
-  - name: ペイン
-    category: 状態異常
-  - name: 睡眠
-    category: 状態異常
-  - name: 麻痺
-    category: 状態異常
-  - name: 封印
-    category: 状態異常
-
-  # 守護・庇い立て
-  - name: 庇い立て
-    category: 守護・庇い立て
-  - name: 守護
-    category: 守護・庇い立て
-
-  # 特殊能力
-  - name: 臨機応変
-    category: 特殊能力
-  - name: 先進統一
-    category: 特殊能力
-  - name: 心技一体
-    category: 特殊能力
-  - name: 先制行動
-    category: 特殊能力
-
-  # 武器種バフ
-  - name: 剣バフ
-    category: 武器種バフ
-  - name: 刀バフ
-    category: 武器種バフ
-  - name: 斧バフ
-    category: 武器種バフ
-  - name: 槍バフ
-    category: 武器種バフ
-  - name: 弓バフ
-    category: 武器種バフ
-  - name: 杖バフ
-    category: 武器種バフ
-  - name: 拳バフ
-    category: 武器種バフ
-  - name: 槌バフ
-    category: 武器種バフ
+- name: ZONE
+- name: ZONE(刻陰陣)
+- name: ZONE(双撃陣・斬魔)
+- name: ZONE(地裂陣)
+- name: ZONE(堅守陣)
+- name: ZONE(幻魔陣)
+- name: ZONE(招雷陣)
+- name: ZONE(星海陣)
+- name: ZONE(月光陣)
+- name: ZONE(月海陣)
+- name: ZONE(極・刻陰陣)
+- name: ZONE(極・双撃陣・斬突)
+- name: ZONE(極・地裂陣)
+- name: ZONE(極・幻魔陣)
+- name: ZONE(極・招雷陣)
+- name: ZONE(極・月光陣)
+- name: ZONE(極・水天陣)
+- name: ZONE(極・烈火陣)
+- name: ZONE(極・煌斬陣)
+- name: ZONE(極・瞬突陣)
+- name: ZONE(極・輝晶陣)
+- name: ZONE(極・轟打陣)
+- name: ZONE(極・風王陣)
+- name: ZONE(水天陣)
+- name: ZONE(烈火陣)
+- name: ZONE(煌斬陣)
+- name: ZONE(瞬突陣)
+- name: ZONE(絶・刻陰陣)
+- name: ZONE(絶・招雷陣)
+- name: ZONE(絶・水天陣)
+- name: ZONE(絶・烈火陣)
+- name: ZONE(絶・輝晶陣)
+- name: ZONE(絶・風王陣)
+- name: ZONE(輝晶陣)
+- name: ZONE(轟打陣)
+- name: ZONE(閃撃陣)
+- name: ZONE(風王陣)
