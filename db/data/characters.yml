@@ -1631,6 +1631,7 @@ characters:
   - 万能の支配者
   ability_tags:
   - ZONE(煌斬陣)
+  - 異時層キャラ
 - name: 赤套の炎使い(異時層デューイ)
   rarity: ☆5
   element: Fire
@@ -1645,6 +1646,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(烈火陣)
+  - 異時層キャラ
 - name: 碧光の鎌使い(異時層シュゼット)
   rarity: ☆5
   element: Wind
@@ -1658,6 +1660,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(風王陣)
+  - 異時層キャラ
 - name: ミストレア(AS)
   rarity: ☆5
   element: Wind
@@ -1745,6 +1748,7 @@ characters:
   - 記憶喪失
   ability_tags:
   - ZONE(地裂陣)
+  - 異時層キャラ
 - name: 銀織の雷使い(異時層プレメア)
   rarity: ☆5
   element: Water
@@ -1757,6 +1761,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(瞬突陣)
+  - 異時層キャラ
 - name: マユ
   rarity: ☆5
   element: Water
@@ -1910,6 +1915,7 @@ characters:
   - 普賢一刀流
   ability_tags:
   - ZONE(幻魔陣)
+  - 異時層キャラ
 - name: アザミ(AS)
   rarity: ☆5
   element: Wind
@@ -2076,6 +2082,7 @@ characters:
   - 妖し
   ability_tags:
   - ZONE(烈火陣)
+  - 異時層キャラ
 - name: ノーナ
   rarity: ☆5
   element: Water
@@ -2199,7 +2206,8 @@ characters:
   personality_tags:
   - IDAスクール
   - 剣
-  ability_tags: []
+  ability_tags:
+  - 異時層キャラ
 - name: アルフェン
   rarity: ☆5
   element: Fire
@@ -2239,6 +2247,7 @@ characters:
   - 妖し
   ability_tags:
   - ZONE(瞬突陣)
+  - 異時層キャラ
 - name: デューイ(AS)
   rarity: ☆5
   element: Water
@@ -2303,6 +2312,7 @@ characters:
   - 記憶喪失
   ability_tags:
   - ZONE(極・地裂陣)
+  - 異時層キャラ
 - name: ラブリ(AS)
   rarity: ☆5
   element: Fire
@@ -2375,6 +2385,7 @@ characters:
   - 煉獄界
   ability_tags:
   - ZONE(煌斬陣)
+  - 異時層キャラ
 - name: プレメア(AS)
   rarity: ☆5
   element: Earth
@@ -2461,6 +2472,7 @@ characters:
   - 煉獄界
   ability_tags:
   - ZONE(極・水天陣)
+  - 異時層キャラ
 - name: パリサ(AS)
   rarity: ☆5
   element: Fire
@@ -2510,6 +2522,7 @@ characters:
   - 封印
   ability_tags:
   - ZONE(地裂陣)
+  - 異時層キャラ
 - name: オルレイア(AS)
   rarity: ☆5
   element: Fire
@@ -2647,6 +2660,7 @@ characters:
   - 普賢一刀流
   ability_tags:
   - ZONE(極・地裂陣)
+  - 異時層キャラ
 - name: リュゼ
   rarity: ☆5
   element: Water
@@ -2789,6 +2803,7 @@ characters:
   - フード
   ability_tags:
   - ZONE(轟打陣)
+  - 異時層キャラ
 - name: ヤクモ(AS)
   rarity: ☆5
   element: Shadow
@@ -2873,6 +2888,7 @@ characters:
   - 銃
   ability_tags:
   - ZONE(烈火陣)
+  - 異時層キャラ
 - name: ウツハラ
   rarity: ☆5
   element: Thunder
@@ -2913,6 +2929,7 @@ characters:
   - フード
   ability_tags:
   - ZONE(風王陣)
+  - 異時層キャラ
 - name: クーラ
   rarity: ☆5
   element: Water
@@ -3026,6 +3043,7 @@ characters:
   - 忍び
   ability_tags:
   - ZONE(極・風王陣)
+  - 異時層キャラ
 - name: ルーフス(AS)
   rarity: ☆5
   element: Fire
@@ -3137,6 +3155,7 @@ characters:
   - 読書家
   ability_tags:
   - ZONE(地裂陣)
+  - 異時層キャラ
 - name: カグラメ
   rarity: ☆5
   element: Shadow
@@ -3191,6 +3210,7 @@ characters:
   - 妖し
   ability_tags:
   - ZONE(水天陣)
+  - 異時層キャラ
 - name: コマチ(AS)
   rarity: ☆5
   element: Earth
@@ -3217,6 +3237,7 @@ characters:
   - 銃
   ability_tags:
   - ZONE(絶・烈火陣)
+  - 異時層キャラ
 - name: センヤ(AS)
   rarity: ☆5
   element: Fire
@@ -3307,6 +3328,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(絶・輝晶陣)
+  - 異時層キャラ
 - name: 義侠の猟人(異時層ラクレア)
   rarity: ☆5
   element: Earth
@@ -3319,6 +3341,7 @@ characters:
   - 銃
   ability_tags:
   - ZONE(極・瞬突陣)
+  - 異時層キャラ
 - name: リナリア
   rarity: ☆5
   element: Fire
@@ -3344,6 +3367,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(絶・風王陣)
+  - 異時層キャラ
 - name: 茜袖の旅商人(異時層シグレ)
   rarity: ☆5
   element: Earth
@@ -3359,6 +3383,7 @@ characters:
   - 巳の国
   ability_tags:
   - ZONE(煌斬陣)
+  - 異時層キャラ
 - name: アカネ
   rarity: ☆5
   element: Fire
@@ -3394,6 +3419,7 @@ characters:
   - 万能の支配者
   ability_tags:
   - ZONE(絶・刻陰陣)
+  - 異時層キャラ
 - name: ミュルス(ES)
   rarity: ☆5
   element: Water
@@ -3445,6 +3471,7 @@ characters:
   - 煉獄界
   ability_tags:
   - ZONE(絶・水天陣)
+  - 異時層キャラ
 - name: ミルディ
   rarity: ☆5
   element: Crystal
@@ -3483,6 +3510,7 @@ characters:
   - ロストラボ
   ability_tags:
   - ZONE(絶・招雷陣)
+  - 異時層キャラ
 - name: ヴェルダンタ
   rarity: ☆5
   element: Water
