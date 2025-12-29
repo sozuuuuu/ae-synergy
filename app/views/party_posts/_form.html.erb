@@ -161,7 +161,7 @@
 <% end %>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('turbo:load', function() {
     const isSynergy = <%= party_post.synergy? %>;
     const selectedCharacters = new Set();
     let mainCount = 0;
