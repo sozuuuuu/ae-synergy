@@ -31,7 +31,8 @@ puts "Created user2: #{user2.username}"
 # パーソナリティタグの作成（YAMLから読み込み）
 puts "Loading personality tags from YAML..."
 personality_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'personality_tags.yml'))
-personality_tags_data['personality_tags'].each do |name|
+personality_tags_data['personality_tags'].each do |tag_data|
+  name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
   PersonalityTag.find_or_create_by!(name: name)
 end
 puts "Created #{PersonalityTag.count} personality tags"
@@ -39,7 +40,8 @@ puts "Created #{PersonalityTag.count} personality tags"
 # ユースケースタグの作成（YAMLから読み込み）
 puts "Loading use case tags from YAML..."
 use_case_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'use_case_tags.yml'))
-use_case_tags_data['use_case_tags'].each do |name|
+use_case_tags_data['use_case_tags'].each do |tag_data|
+  name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
   UseCaseTag.find_or_create_by!(name: name)
 end
 puts "Created #{UseCaseTag.count} use case tags"
@@ -49,7 +51,7 @@ puts "Loading ability tags from YAML..."
 ability_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'ability_tags.yml'))
 ability_tags_data['ability_tags'].each do |tag_data|
   AbilityTag.find_or_create_by!(name: tag_data['name']) do |tag|
-    tag.category = tag_data['category']
+    tag.category = tag_data['category'] || "特殊能力"
   end
 end
 puts "Created #{AbilityTag.count} ability tags"
@@ -74,7 +76,7 @@ characters_data['characters'].each do |char_data|
   if char_data['personality_tags']
     char_data['personality_tags'].each do |tag_name|
       tag = PersonalityTag.find_by(name: tag_name)
-      character.personality_tags << tag unless character.personality_tags.include?(tag)
+      character.personality_tags << tag if tag && !character.personality_tags.include?(tag)
     end
   end
 
@@ -116,7 +118,7 @@ PartyMembership.find_or_create_by!(party_post: synergy1, character: aldo_as) do 
   m.slot_type = "synergy"
   m.position = 1
 end
-synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")]
+synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")].compact
 
 synergy2 = PartyPost.find_or_create_by!(title: "地水デバフコンボ", composition_type: 'synergy') do |post|
   post.user = admin
@@ -131,7 +133,7 @@ PartyMembership.find_or_create_by!(party_post: synergy2, character: shigure) do 
   m.slot_type = "synergy"
   m.position = 1
 end
-synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")]
+synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")].compact
 
 synergy3 = PartyPost.find_or_create_by!(title: "ヒーラー＋火力アタッカー", composition_type: 'synergy') do |post|
   post.user = admin
@@ -146,7 +148,7 @@ PartyMembership.find_or_create_by!(party_post: synergy3, character: aldo) do |m|
   m.slot_type = "synergy"
   m.position = 1
 end
-synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")]
+synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")].compact
 
 puts "Created #{PartyPost.synergies.count} synergy posts"
 
@@ -183,7 +185,7 @@ PartyMembership.find_or_create_by!(party_post: party1, character: feinne) do |m|
   m.slot_type = "sub"
   m.position = 2
 end
-party1.use_case_tags = [UseCaseTag.find_by(name: "ストーリー"), UseCaseTag.find_by(name: "初心者向け")]
+party1.use_case_tags = [UseCaseTag.find_by(name: "ストーリー"), UseCaseTag.find_by(name: "初心者向け")].compact
 
 party2 = PartyPost.find_or_create_by!(title: "火属性特化周回パーティ", composition_type: 'full_party') do |post|
   post.user = admin
@@ -215,7 +217,7 @@ PartyMembership.find_or_create_by!(party_post: party2, character: feinne) do |m|
   m.slot_type = "sub"
   m.position = 2
 end
-party2.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "AF火力")]
+party2.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "AF火力")].compact
 
 puts "Created #{PartyPost.full_parties.count} party posts"
 
