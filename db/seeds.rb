@@ -31,7 +31,8 @@ puts "Created user2: #{user2.username}"
 # パーソナリティタグの作成（YAMLから読み込み）
 puts "Loading personality tags from YAML..."
 personality_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'personality_tags.yml'))
-personality_tags_data['personality_tags'].each do |name|
+personality_tags_data['personality_tags'].each do |tag_data|
+  name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
   PersonalityTag.find_or_create_by!(name: name)
 end
 puts "Created #{PersonalityTag.count} personality tags"
@@ -39,7 +40,8 @@ puts "Created #{PersonalityTag.count} personality tags"
 # ユースケースタグの作成（YAMLから読み込み）
 puts "Loading use case tags from YAML..."
 use_case_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'use_case_tags.yml'))
-use_case_tags_data['use_case_tags'].each do |name|
+use_case_tags_data['use_case_tags'].each do |tag_data|
+  name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
   UseCaseTag.find_or_create_by!(name: name)
 end
 puts "Created #{UseCaseTag.count} use case tags"
