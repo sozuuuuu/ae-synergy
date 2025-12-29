@@ -1,151 +1,3833 @@
 characters:
-  - name: アルド
-    rarity: ☆5
-    element: Fire
-    weapon_type: Sword
-    light_shadow_type: Light
-    notes: 主人公。火属性の剣使い
-    personality_tags:
-      - 人間
-    ability_tags:
-      - 物理バフ
-      - 剣バフ
-
-  - name: フィーネ
-    rarity: ☆5
-    element: Wind
-    weapon_type: Staff
-    light_shadow_type: Light
-    notes: ヒロイン。風属性の杖使い
-    personality_tags:
-      - 人間
-      - 時の民
-
-  - name: アルド（AS）
-    rarity: AS
-    element: Fire
-    weapon_type: Sword
-    light_shadow_type: Light
-    notes: 主人公のアナザースタイル
-    personality_tags:
-      - 人間
-
-  - name: ミュンファ
-    rarity: ☆5
-    element: Earth
-    weapon_type: Fists
-    light_shadow_type: Light
-    notes: 地属性の拳使い。サポート性能が高い
-    personality_tags:
-      - 獣王
-      - 猫好き
-    ability_tags:
-      - 地属性ゾーン
-      - 守護
-      - 拳バフ
-
-  - name: シグレ
-    rarity: ☆5
-    element: Water
-    weapon_type: Katana
-    light_shadow_type: Shadow
-    notes: 水属性の刀使い
-    personality_tags:
-      - 東方
-      - 人間
-
-  - name: マリエル
-    rarity: ☆5
-    element: Water
-    weapon_type: Staff
-    light_shadow_type: Light
-    notes: 水属性の杖使い。優秀なヒーラー
-    personality_tags:
-      - 人間
-      - 西方
-    ability_tags:
-      - 速度バフ
-      - 杖バフ
-
-  - name: アナベル
-    rarity: ☆5
-    element: Water
-    weapon_type: Lance
-    light_shadow_type: Light
-    notes: 水属性の槍使い。高防御のタンク
-    personality_tags:
-      - 人間
-      - 西方
-
-  - name: シェイネ
-    rarity: ☆5
-    element: Water
-    weapon_type: Katana
-    light_shadow_type: Shadow
-    notes: 水属性の刀使い。高火力アタッカー
-    personality_tags:
-      - 人間
-      - 東方
-
-  - name: イスカ
-    rarity: ☆5
-    element: Fire
-    weapon_type: Katana
-    light_shadow_type: Shadow
-    notes: 火属性の刀使い。高速アタッカー
-    personality_tags:
-      - 人間
-      - 東方
-
-  - name: ツバメ
-    rarity: ☆5
-    element: Wind
-    weapon_type: Katana
-    light_shadow_type: Light
-    notes: 風属性の刀使い。クリティカル特化
-    personality_tags:
-      - 人間
-      - 東方
-    ability_tags:
-      - クリティカルバフ
-      - 刀バフ
-      - 先制行動
-
-  - name: セティー
-    rarity: ☆5
-    element: Earth
-    weapon_type: Bow
-    light_shadow_type: Light
-    notes: 地属性の弓使い。デバフ特化
-    personality_tags:
-      - 人間
-      - 西方
-
-  - name: ユーイン
-    rarity: ☆5
-    element: Wind
-    weapon_type: Staff
-    light_shadow_type: Light
-    notes: 風属性の杖使い。サポート特化
-    personality_tags:
-      - 人間
-      - 海の一族
-
-  - name: トゥーヴァ
-    rarity: ☆5
-    element: Thunder
-    weapon_type: Bow
-    light_shadow_type: Shadow
-    notes: 雷属性の弓使い。遠距離アタッカー
-    personality_tags:
-      - 人間
-      - 外史
-
-  - name: ロキド
-    rarity: ☆5
-    element: Earth
-    weapon_type: Axe
-    light_shadow_type: Light
-    notes: 地属性の斧使い。パワーファイター
-    personality_tags:
-      - 獣王
+- name: ヴェルダンタ
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 剣
+  - 美食
+  - 復讐者
+  - 辛党
+  - アウトロー
+  ability_tags: []
+- name: 銀織の雷使い(AS)(異時層プレメア(AS))
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(絶・招雷陣)異時層キャラ
+  personality_tags:
+  - 弓
+  - 恋わずらい
+  - マシナリー
+  - フード
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(絶・招雷陣)
+  - 異時層キャラ
+- name: クラグホーン
+  rarity: ☆5
+  element: Shadow
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(月光陣)
+  personality_tags:
+  - 槍
+  - 読書家
+  - 未来革命家
+  ability_tags:
+  - ZONE
+  - ZONE(月光陣)
+- name: ミルディ
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・月光陣)
+  personality_tags:
+  - 吟遊詩人
+  - 杖
+  - 未来革命家
+  ability_tags:
+  - ZONE
+  - ZONE(極・月光陣)
+- name: 夢吟の詩人(AS)(異時層デュナリス(AS))
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(絶・水天陣)異時層キャラ
+  personality_tags:
+  - 魔獣
+  - 吟遊詩人
+  - 杖
+  - 辛党
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(絶・水天陣)
+  - 異時層キャラ
+- name: ニナ
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・輝晶陣)
+  personality_tags:
+  - ねこ好き
+  - 杖
+  - 美術
+  - お昼寝
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(極・輝晶陣)
+- name: 蒼色の忠臣(ヴァレス)
+  rarity: ☆5
+  element: Shadow
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 魔獣
+  - メガネ
+  - 斧
+  ability_tags: []
+- name: ミュルス(ES)
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(星海陣)
+  personality_tags:
+  - 魔獣
+  - 斧
+  - 恋わずらい
+  ability_tags:
+  - ZONE
+  - ZONE(星海陣)
+- name: 黒衣の刀使い(AS)(異時層イスカ(AS))
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(絶・刻陰陣)異時層キャラ
+  personality_tags:
+  - 刀
+  - ロストラボ
+  - 万能の支配者
+  ability_tags:
+  - ZONE
+  - ZONE(絶・刻陰陣)
+  - 異時層キャラ
+- name: レイヴン(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・地裂陣)
+  personality_tags:
+  - 仮面
+  - 杖
+  - 記憶喪失
+  - フード
+  ability_tags:
+  - ZONE
+  - ZONE(極・地裂陣)
+- name: アカネ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 刀
+  ability_tags: []
+- name: 茜袖の旅商人(異時層シグレ)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 剣
+  - 辛党
+  - うみねこ好き
+  - 普賢一刀流
+  - 巳の国
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+  - 異時層キャラ
+- name: 碧光の鎌使い(AS)(異時層シュゼット(AS))
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(絶・風王陣)異時層キャラ
+  personality_tags:
+  - 斧
+  - 甘党
+  - 美食
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(絶・風王陣)
+  - 異時層キャラ
+- name: リナリア
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・双撃陣・斬突)
+  personality_tags:
+  - 剣
+  - COA
+  - IDAスクール
+  ability_tags:
+  - ZONE
+  - ZONE(極・双撃陣・斬突)
+- name: 義侠の猟人(異時層ラクレア)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(極・瞬突陣)異時層キャラ
+  personality_tags:
+  - 弓
+  - アウトロー
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(極・瞬突陣)
+  - 異時層キャラ
+- name: 赤套の炎使い(AS)(異時層デューイ(AS))
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(絶・輝晶陣)ZONE(烈火陣)異時層キャラ
+  personality_tags:
+  - 拳
+  - IDAスクール
+  - 銃
+  - フード
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(絶・輝晶陣)
+  - 異時層キャラ
+- name: ヴェレット(AS)
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(極・招雷陣)
+  personality_tags:
+  - 槌
+  - メガネ
+  - 採掘
+  - 時間帝国
+  ability_tags:
+  - ZONE
+  - ZONE(極・招雷陣)
+- name: アルド(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 主人公
+  - 天の導き
+  - 採集
+  - 剣
+  - 竜
+  - バルオキー
+  - 新夢想過激団
+  - 新時空超限流派
+  - コンチェルトアーツ
+  - アルカディア
+  ability_tags: []
+- name: シオン(ES)
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(極・煌斬陣)
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 刀
+  - 竹馬の友
+  - 騎乗
+  - 普賢一刀流
+  - 巳の国
+  ability_tags:
+  - ZONE
+  - ZONE(極・煌斬陣)
+- name: ニルヤ
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(輝晶陣)
+  personality_tags:
+  - 拳
+  - 採集
+  - ニックネーマー
+  - いぬ好き
+  - 格闘技
+  ability_tags:
+  - ZONE
+  - ZONE(輝晶陣)
+- name: センヤ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布ZONE(絶・烈火陣)
+  personality_tags:
+  - 東方
+  - 刀
+  - 呪い
+  - 妖し
+  - フード
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(絶・烈火陣)
+- name: 墨染の軍師(AS)(異時層シオン(AS))
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(絶・烈火陣)異時層キャラ
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 杖
+  - 読書家
+  - 普賢一刀流
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(絶・烈火陣)
+  - 異時層キャラ
+- name: コマチ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)
+  personality_tags:
+  - 東方
+  - 槍
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: 氷塵の歌姫(異時層ユキノ)
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 吟遊詩人
+  - 弓
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+  - 異時層キャラ
+- name: クレルヴォ(AS)
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)
+  personality_tags:
+  - メガネ
+  - IDAスクール
+  - 科学者
+  - 杖
+  - 採集
+  - KMS社
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: ノノルド
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 科学者
+  - 杖
+  - IDAスクール
+  - 採集
+  - KMS社
+  ability_tags: []
+- name: カグラメ
+  rarity: ☆5
+  element: Shadow
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 槌
+  - フューネラル
+  - 地獄耳
+  - 妖し
+  ability_tags: []
+- name: 寂寞の舞台人(異時層ロキド)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)異時層キャラ
+  personality_tags:
+  - 魔獣
+  - 剣
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+  - 異時層キャラ
+- name: ねここ(ES)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(極・風王陣)
+  personality_tags:
+  - 東方
+  - 斧
+  - ねこ好き
+  - 動物対話
+  - 精霊対話
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(極・風王陣)
+- name: エルシール(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・水天陣)
+  personality_tags:
+  - 剣
+  - 武具
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(極・水天陣)
+- name: アンペル
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)配布
+  personality_tags:
+  - メガネ
+  - 杖
+  - 読書家
+  - アトリエ
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: クラウディア
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 料理
+  - 弓
+  - アトリエ
+  ability_tags: []
+- name: ライザ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 杖
+  - 採集
+  - 採掘
+  - アトリエ
+  ability_tags: []
+- name: イド
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(極・轟打陣)
+  personality_tags:
+  - 拳
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(極・轟打陣)
+- name: イヅナ
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)
+  personality_tags:
+  - 杖
+  - 東方
+  - 仮面
+  - 人見知り
+  - 記憶喪失
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: ルーフス(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(極・烈火陣)
+  personality_tags:
+  - 拳
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(極・烈火陣)
+- name: 烏夜の隠密(異時層ツバメ)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(極・風王陣)異時層キャラ
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 拳
+  - 大食い
+  - 忍び
+  ability_tags:
+  - ZONE
+  - ZONE(極・風王陣)
+  - 異時層キャラ
+- name: セスタ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 刀
+  - 復讐者
+  ability_tags: []
+- name: センヤ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 東方
+  - 刀
+  - 復讐者
+  - 呪い
+  - 妖し
+  - フード
+  ability_tags: []
+- name: シグレ(ES)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 辛党
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: リンリー(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 料理
+  - 東方
+  - 拳
+  ability_tags: []
+- name: 京
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(轟打陣)
+  personality_tags:
+  - 拳
+  - 騎乗
+  - KOF
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: 舞
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(轟打陣)
+  personality_tags:
+  - 拳
+  - 恋わずらい
+  - 忍び
+  - KOF
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: テリー
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(轟打陣)
+  personality_tags:
+  - 拳
+  - KOF
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: クーラ
+  rarity: ☆5
+  element: Water
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(水天陣)ZONE(轟打陣)
+  personality_tags:
+  - 拳
+  - 甘党
+  - KOF
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: 茨呪の艶女(異時層シェイネ)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)異時層キャラ
+  personality_tags:
+  - ねこ好き
+  - 槌
+  - 恋わずらい
+  - 呪い
+  - フード
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+  - 異時層キャラ
+- name: ジルバー(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 斧
+  - 採集
+  - 美術
+  - アウトロー
+  ability_tags: []
+- name: ウツハラ
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(極・招雷陣)
+  personality_tags:
+  - 斧
+  - 竜
+  - ドラゴンキラー
+  - 煉獄界
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(極・招雷陣)
+- name: 韜晦の討手(異時層レンリ)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)異時層キャラ
+  personality_tags:
+  - 拳
+  - 辛党
+  - アウトロー
+  - 読書家
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+  - 異時層キャラ
+- name: ミナルカ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・烈火陣)
+  personality_tags:
+  - 剣
+  - ミリタリー
+  - 大食い
+  - アウトロー
+  - 時間帝国
+  ability_tags:
+  - ZONE
+  - ZONE(極・烈火陣)
+- name: ジルファニー
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・水天陣)
+  personality_tags:
+  - ねこ好き
+  - 剣
+  - フード
+  - 記憶喪失
+  ability_tags:
+  - ZONE
+  - ZONE(極・水天陣)
+- name: フィーネ(AS)
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布ZONE(星海陣)
+  personality_tags:
+  - ねこ好き
+  - 料理
+  - 杖
+  - バルオキー
+  - ジオ
+  - 魔剣
+  ability_tags:
+  - ZONE
+  - ZONE(星海陣)
+- name: マツリカ
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - 甘党
+  - 魔獣
+  - 斧
+  - フード
+  - お昼寝
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: ヤクモ(AS)
+  rarity: ☆5
+  element: Shadow
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・幻魔陣)
+  personality_tags:
+  - 杖
+  - メガネ
+  - KMS社
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(極・幻魔陣)
+- name: 電影の明星(異時層シエル)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)異時層キャラ
+  personality_tags:
+  - 仮面
+  - 甘党
+  - 槌
+  - フード
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+  - 異時層キャラ
+- name: ガリアード
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 合成人間
+  - 槍
+  - 騎乗
+  - アウトロー
+  - 銃
+  ability_tags: []
+- name: ヘレナ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)配布
+  personality_tags:
+  - 仮面
+  - 合成人間
+  - 杖
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: アナベル(ES)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)ZONE(堅守陣)
+  personality_tags:
+  - ミグランス王宮
+  - 甘党
+  - 槍
+  - 盾
+  - 騎乗
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: シェンファ
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)
+  personality_tags:
+  - 東方
+  - 科学者
+  - 杖
+  - KMS社
+  - 合成人間
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: クチナワ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・地裂陣)
+  personality_tags:
+  - 杖
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(極・地裂陣)
+- name: ヒナギク(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(極・轟打陣)
+  personality_tags:
+  - 槌
+  - 辛党
+  - いぬ好き
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(極・轟打陣)
+- name: イウェラ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - エルフ
+  - 槍
+  ability_tags: []
+- name: サザンカ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(極・烈火陣)
+  personality_tags:
+  - 東方
+  - 斧
+  - 採集
+  - ドラゴンキラー
+  - 盾
+  - 大食い
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(極・烈火陣)
+- name: メルピピア
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)
+  personality_tags:
+  - エルフ
+  - 剣
+  - ニックネーマー
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+- name: リュゼ
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)配布
+  personality_tags:
+  - 槍
+  - 呪い
+  - ドラゴンキラー
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: 菊花の剣客(異時層アカネ)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(極・地裂陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 刀
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(極・地裂陣)
+  - 異時層キャラ
+- name: チルリル(ES)
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(輝晶陣)
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 西方
+  - 剣
+  ability_tags:
+  - ZONE
+  - ZONE(輝晶陣)
+- name: アルマ(AS)
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(極・輝晶陣)
+  personality_tags:
+  - ねこ好き
+  - メガネ
+  - 弓
+  - 銃
+  - 錬金術師
+  ability_tags:
+  - ZONE
+  - ZONE(極・輝晶陣)
+- name: サイラス
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)ZONE(水天陣)ZONE(招雷陣)配布
+  personality_tags:
+  - 杖
+  - 読書家
+  - 導きのトラベラー
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: パルテティオ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 弓
+  - 導きのトラベラー
+  ability_tags: []
+- name: ティティ
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 拳
+  - 導きのトラベラー
+  ability_tags: []
+- name: ウェネーフィカ
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(極・刻陰陣)
+  personality_tags:
+  - 弓
+  - 呪い
+  - バルオキー
+  - 復讐者
+  ability_tags:
+  - ZONE
+  - ZONE(極・刻陰陣)
+- name: オボロ
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(極・招雷陣)
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 仮面
+  - 刀
+  - KMS社
+  - 普賢一刀流
+  - 恋わずらい
+  ability_tags:
+  - ZONE
+  - ZONE(極・招雷陣)
+- name: セリエス
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)
+  personality_tags:
+  - 弓
+  - ドラゴンキラー
+  - 辛党
+  - アルカディア
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+- name: ポム(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)
+  personality_tags:
+  - 科学者
+  - 採集
+  - 杖
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: オルレイア(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)
+  personality_tags:
+  - 斧
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: 白磁の魔人(異時層ミュンファ)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)ZONE(幻魔陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 杖
+  - 封印
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+  - 異時層キャラ
+- name: カムラナージュ
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)ZONE(月光陣)配布
+  personality_tags:
+  - 杖
+  - 時間帝国
+  - 時の皇子
+  - 背理夢想団リーダー
+  - 未来革命家
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: ヴェレット
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)
+  personality_tags:
+  - 槌
+  - 採掘
+  - 時間帝国
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: パリサ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 弓
+  - 呪い
+  ability_tags: []
+- name: 夢吟の詩人(異時層デュナリス)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・水天陣)異時層キャラ
+  personality_tags:
+  - 魔獣
+  - 吟遊詩人
+  - 杖
+  - 辛党
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(極・水天陣)
+  - 異時層キャラ
+- name: ノクシス(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 配布(外伝)
+  personality_tags:
+  - 科学者
+  - 槌
+  ability_tags: []
+- name: メロディ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(極・風王陣)
+  personality_tags:
+  - IDAスクール
+  - 杖
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(極・風王陣)
+- name: フェルミナ(ES)
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(極・水天陣)
+  personality_tags:
+  - ミグランス王宮
+  - 斧
+  - アウトロー
+  - フード
+  - 忍び
+  ability_tags:
+  - ZONE
+  - ZONE(極・水天陣)
+- name: エルシール
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - 剣
+  - 武具
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: ベネディト
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 斧
+  - 採集
+  - アウトロー
+  - 木こり
+  ability_tags: []
+- name: プレメア(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 弓
+  - 料理
+  - マシナリー
+  - ロストラボ
+  ability_tags: []
+- name: 深緋の刈人(異時層イルルゥ)
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)異時層キャラ
+  personality_tags:
+  - 仮面
+  - 斧
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+  - 異時層キャラ
+- name: ピチカ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 北方
+  - 弓
+  ability_tags: []
+- name: セスタ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(極・風王陣)
+  personality_tags:
+  - 刀
+  - 復讐者
+  ability_tags:
+  - ZONE
+  - ZONE(極・風王陣)
+- name: トゥーヴァ(ES)
+  rarity: ☆5
+  element: Water
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 槌
+  - 霊媒体質
+  - ニックネーマー
+  - フューネラル
+  ability_tags: []
+- name: ノーナ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布(外伝)ZONE(煌斬陣)ZONE(瞬突陣)ZONE(轟打陣)ZONE(幻魔陣)
+  personality_tags:
+  - 弓
+  - 王族
+  - フード
+  - 記憶喪失
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: ラブリ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)
+  personality_tags:
+  - 料理
+  - 拳
+  - ニックネーマー
+  - ドワーフ
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: 残影の佳人(異時層シャノン)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・地裂陣)異時層キャラ
+  personality_tags:
+  - 剣
+  - KMS社
+  - いぬ好き
+  - 記憶喪失
+  ability_tags:
+  - ZONE
+  - ZONE(極・地裂陣)
+  - 異時層キャラ
+- name: シェリーヌ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(開眼)ZONE(閃撃陣)
+  personality_tags:
+  - メガネ
+  - IDAスクール
+  - 拳
+  - アウトロー
+  ability_tags:
+  - ZONE
+  - ZONE(閃撃陣)
+- name: ヤクモ
+  rarity: ☆5
+  element: Shadow
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 杖
+  - KMS社
+  - 人見知り
+  ability_tags: []
+- name: エニ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(刻陰陣)
+  personality_tags:
+  - 杖
+  - 辛党
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(刻陰陣)
+- name: デューイ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - メガネ
+  - 拳
+  - 恋わずらい
+  - 銃
+  - ロストラボ
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: 銀朱の九尾(異時層ホオズキ)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 料理
+  - 槍
+  - 辛党
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+  - 異時層キャラ
+- name: マリエル(ES)
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 聖職者
+  - 拳
+  ability_tags: []
+- name: アルフェン
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(烈火陣)
+  personality_tags:
+  - 仮面
+  - 剣
+  - 記憶喪失
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: 月華の令嬢(異時層ヒスメナ)
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 異時層キャラ
+  personality_tags:
+  - IDAスクール
+  - 剣
+  ability_tags:
+  - 異時層キャラ
+- name: コレット
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 杖
+  - いぬ好き
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: シオン
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 弓
+  - 呪い
+  - 大食い
+  - 銃
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: ロイド
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 刀
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: ヒイナ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 刀
+  - マシナリー
+  ability_tags: []
+- name: ガラムバレル(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 槍
+  - 呪い
+  - タイタン
+  ability_tags: []
+- name: フラムラピス(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 聖職者
+  - 杖
+  - 大食い
+  - タイタン
+  - 魔剣
+  ability_tags: []
+- name: アシュティア
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布ZONE(堅守陣)
+  personality_tags:
+  - メガネ
+  - 科学者
+  - 拳
+  - バルオキー
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(堅守陣)
+- name: ミナルカ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(極・煌斬陣)
+  personality_tags:
+  - 剣
+  - ミリタリー
+  - 大食い
+  - アウトロー
+  - 時間帝国
+  ability_tags:
+  - ZONE
+  - ZONE(極・煌斬陣)
+- name: ノーナ
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布(外史)
+  personality_tags:
+  - 弓
+  - 王族
+  - フード
+  - 記憶喪失
+  ability_tags: []
+- name: 花咲の姫君(異時層ツキハ)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)異時層キャラ
+  personality_tags:
+  - 東方
+  - 槍
+  - 王族
+  - 読書家
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+  - 異時層キャラ
+- name: ねここ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)
+  personality_tags:
+  - 東方
+  - 斧
+  - ねこ好き
+  - 動物対話
+  - 精霊対話
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: ヴィアッカ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 仮面
+  - 槌
+  - アウトロー
+  - ミリタリー
+  - 銃
+  ability_tags: []
+- name: シンシア(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - 剣
+  - 美術
+  - 美食
+  - 王族
+  - 読書家
+  - 封印
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: クロード(ES)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)ZONE(瞬突陣)ZONE(轟打陣)ZONE(幻魔陣)
+  personality_tags:
+  - IDAスクール
+  - 剣
+  - 竜
+  - 王族
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: アィシャ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布ZONE(烈火陣)ZONE(水天陣)
+  personality_tags:
+  - 吟遊詩人
+  - 杖
+  - 呪い
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: ソイラ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ミグランス王宮
+  - 槍
+  - お昼寝
+  ability_tags: []
+- name: ウクアージ
+  rarity: ☆5
+  element: Water
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 拳
+  ability_tags: []
+- name: ユキノ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)
+  personality_tags:
+  - 東方
+  - 弓
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+- name: レレ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 杖
+  - 動物対話
+  ability_tags: []
+- name: アルマ
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(輝晶陣)
+  personality_tags:
+  - ねこ好き
+  - メガネ
+  - 弓
+  - 銃
+  - 錬金術師
+  ability_tags:
+  - ZONE
+  - ZONE(輝晶陣)
+- name: イーファ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)ZONE(轟打陣)
+  personality_tags:
+  - 聖職者
+  - 槌
+  - 恋わずらい
+  - 辛党
+  - ニックネーマー
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+- name: アザミ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(開眼)
+  personality_tags:
+  - 東方
+  - 甘党
+  - 刀
+  - 恋わずらい
+  ability_tags: []
+- name: 墨染の軍師(異時層シオン)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)異時層キャラ
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 杖
+  - 読書家
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+  - 異時層キャラ
+- name: 星の子
+  rarity: ☆5
+  element: Crystal
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 杖
+  - 時の傷痕の輪舞
+  ability_tags: []
+- name: ラディアス(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - ミグランス王宮
+  - 剣
+  - 盾
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: オルレイア
+  rarity: ☆5
+  element: Fire
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)
+  personality_tags:
+  - 斧
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: ノクシス
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 配布(メビウスの迷宮)
+  personality_tags:
+  - 科学者
+  - 槌
+  ability_tags: []
+- name: ミーユ(ES)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(招雷陣)
+  personality_tags:
+  - ミグランス王宮
+  - 槍
+  - 王族
+  ability_tags:
+  - ZONE
+  - ZONE(招雷陣)
+- name: フィロ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 斧
+  - 木こり
+  ability_tags: []
+- name: ミルシャ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(月海陣)
+  personality_tags:
+  - 吟遊詩人
+  - 槍
+  - 西方
+  - 魚人
+  ability_tags:
+  - ZONE
+  - ZONE(月海陣)
+- name: オトハ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 刀
+  - 生物
+  ability_tags: []
+- name: セヴェン
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)
+  personality_tags:
+  - メガネ
+  - IDAスクール
+  - 杖
+  - 精霊対話
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+- name: エヴァ
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)
+  personality_tags:
+  - 杖
+  - 竜
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: シュゼット(ES)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)
+  personality_tags:
+  - 甘党
+  - 槌
+  - 美食
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: マユ
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(外典)ZONE(星海陣)
+  personality_tags:
+  - IDAスクール
+  - 杖
+  ability_tags:
+  - ZONE
+  - ZONE(星海陣)
+- name: 銀織の雷使い(異時層プレメア)
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)異時層キャラ
+  personality_tags:
+  - 弓
+  - マシナリー
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+  - 異時層キャラ
+- name: 紫装の槍使い(異時層トゥーヴァ)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)異時層キャラ
+  personality_tags:
+  - 槍
+  - ロストラボ
+  - 記憶喪失
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+  - 異時層キャラ
+- name: キュリオ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(外典)
+  personality_tags:
+  - 甘党
+  - IDAスクール
+  - 刀
+  - 読書家
+  - ロストラボ
+  - 万能の支配者
+  ability_tags: []
+- name: フラムラピス
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 聖職者
+  - 杖
+  - 大食い
+  - タイタン
+  - 魔剣
+  ability_tags: []
+- name: キッド
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 刀
+  - 新夢想過激団
+  - 時の傷痕の輪舞
+  ability_tags: []
+- name: セルジュ
+  rarity: ☆5
+  element: None
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(双撃陣・斬魔)
+  personality_tags:
+  - 剣
+  - 新夢想過激団
+  - 新時空超限流派
+  - 時の傷痕の輪舞
+  ability_tags:
+  - ZONE
+  - ZONE(双撃陣・斬魔)
+- name: ツクヨミ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 杖
+  - 新時空超限流派
+  - 時の傷痕の輪舞
+  ability_tags: []
+- name: ミストレア(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 西方
+  - 弓
+  - ニックネーマー
+  - 読書家
+  ability_tags: []
+- name: 碧光の鎌使い(異時層シュゼット)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)異時層キャラ
+  personality_tags:
+  - 斧
+  - 甘党
+  - 美食
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+  - 異時層キャラ
+- name: 赤套の炎使い(異時層デューイ)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)異時層キャラ
+  personality_tags:
+  - 拳
+  - IDAスクール
+  - 銃
+  - フード
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+  - 異時層キャラ
+- name: 黒衣の刀使い(異時層イスカ)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)異時層キャラ
+  personality_tags:
+  - 刀
+  - ロストラボ
+  - 万能の支配者
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+  - 異時層キャラ
+- name: イスカ(ES)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - IDAスクール
+  - 剣
+  - 読書家
+  - COA
+  - ロストラボ
+  - 万能の支配者
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: ヒナギク
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 槌
+  - 辛党
+  - いぬ好き
+  - 煉獄界
+  ability_tags: []
+- name: ゼヴィーロ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - 魔獣
+  - 斧
+  - フード
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: ナギ(ES)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(星海陣)
+  personality_tags:
+  - 竜宮
+  - 杖
+  - 王族
+  - 大食い
+  ability_tags:
+  - ZONE
+  - ZONE(星海陣)
+- name: リヴァイア(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(開眼)
+  personality_tags:
+  - 竜宮
+  - 杖
+  - 記憶喪失
+  - 魚人
+  - 封印
+  ability_tags: []
+- name: キキョウ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 斧
+  - 復讐者
+  - 騎乗
+  ability_tags: []
+- name: シーラ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 配布(外伝)ZONE(瞬突陣)
+  personality_tags:
+  - 竜宮
+  - 槍
+  - 王族
+  - 魚人
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+- name: ピチカ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 北方
+  - 弓
+  ability_tags: []
+- name: ハーディー(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(閃撃陣)
+  personality_tags:
+  - 拳
+  - 甘党
+  - 武具
+  - 生物
+  - アウトロー
+  - いぬ好き
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(閃撃陣)
+- name: チヨ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)ZONE(幻魔陣)
+  personality_tags:
+  - 竜宮
+  - 杖
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: ヴィクト(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 刀
+  - バルオキー
+  - 呪い
+  ability_tags: []
+- name: メイ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 鍛冶屋
+  - メガネ
+  - 採掘
+  - 槌
+  - バルオキー
+  - 恋わずらい
+  ability_tags: []
+- name: ミュンファ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)
+  personality_tags:
+  - 東方
+  - 槌
+  - 恋わずらい
+  - 封印
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: ガラムバレル
+  rarity: ☆5
+  element: Wind
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 槍
+  - 呪い
+  - タイタン
+  ability_tags: []
+- name: ツキハ(ES)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)
+  personality_tags:
+  - 東方
+  - 仮面
+  - 弓
+  - 復讐者
+  - 呪い
+  - 王族
+  - 妖し
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+- name: ねここ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 斧
+  - ねこ好き
+  - 動物対話
+  - 精霊対話
+  - 妖し
+  ability_tags: []
+- name: フィーネ
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - ねこ好き
+  - 料理
+  - 杖
+  - バルオキー
+  - ジオ
+  - 魔剣
+  ability_tags: []
+- name: ツバメ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 拳
+  - 忍び
+  - 大食い
+  ability_tags: []
+- name: プライ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 聖職者
+  - 採掘
+  - 西方
+  - 槌
+  ability_tags: []
+- name: クラルテ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(外典)
+  personality_tags:
+  - 西方
+  - 杖
+  - ジオ
+  - 記憶喪失
+  ability_tags: []
+- name: チルリル(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 西方
+  - 剣
+  ability_tags: []
+- name: メロディ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - IDAスクール
+  - 杖
+  - 人見知り
+  ability_tags: []
+- name: メリッサ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(閃撃陣)顕現
+  personality_tags:
+  - 合成人間
+  - 刀
+  - KMS社
+  ability_tags:
+  - ZONE
+  - ZONE(閃撃陣)
+- name: ティラミス(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)
+  personality_tags:
+  - 甘党
+  - 槍
+  - 竜
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: シグレ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 辛党
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: メリナ(ES)
+  rarity: ☆5
+  element: Water
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 吟遊詩人
+  - 採掘
+  - 西方
+  - 拳
+  - 王族
+  ability_tags: []
+- name: クレス
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)ZONE(煌斬陣)
+  personality_tags:
+  - 剣
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: ベルベット
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 剣
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: デュナリス(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 魔獣
+  - 杖
+  - 煉獄界
+  - フューネラル
+  - 動物対話
+  ability_tags: []
+- name: ミラ
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 剣
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: ユーリ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 刀
+  - テイルズオブ
+  - コンチェルトアーツ
+  ability_tags: []
+- name: イウェラ
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - エルフ
+  - 槍
+  ability_tags: []
+- name: ミーユ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ミグランス王宮
+  - 剣
+  - 王族
+  ability_tags: []
+- name: ラディカ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)
+  personality_tags:
+  - エルフ
+  - 杖
+  - 恋わずらい
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: ヴァイオレット
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 仮面
+  - 剣
+  - 心の怪盗団
+  - 大食い
+  - 銃
+  ability_tags: []
+- name: スカル
+  rarity: ☆5
+  element: Thunder
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 仮面
+  - 槌
+  - 心の怪盗団
+  - 銃
+  ability_tags: []
+- name: ヒスメナ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - IDAスクール
+  - 槍
+  ability_tags: []
+- name: ミルシャ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 槍
+  - 西方
+  - 魚人
+  ability_tags: []
+- name: ユーイン(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - メガネ
+  - 甘党
+  - 採掘
+  - 槌
+  - 武具
+  - 呪い
+  ability_tags: []
+- name: イルルゥ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - 仮面
+  - 斧
+  - フード
+  - 煉獄界
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: クラルテ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(外典)
+  personality_tags:
+  - 西方
+  - 杖
+  - ジオ
+  - 記憶喪失
+  ability_tags: []
+- name: ホオズキ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 料理
+  - 弓
+  - 辛党
+  - 妖し
+  ability_tags: []
+- name: イーファ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)
+  personality_tags:
+  - 聖職者
+  - 槌
+  - 恋わずらい
+  - 辛党
+  - ニックネーマー
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: ベルトラン(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ミグランス王宮
+  - 槍
+  - 盾
+  ability_tags: []
+- name: ロゼッタ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(幻魔陣)
+  personality_tags:
+  - ねこ好き
+  - 聖職者
+  - 西方
+  - 杖
+  - 地獄耳
+  ability_tags:
+  - ZONE
+  - ZONE(幻魔陣)
+- name: ヒイナ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 刀
+  - マシナリー
+  ability_tags: []
+- name: ユキノ
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 弓
+  - 妖し
+  ability_tags: []
+- name: ツキハ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 仮面
+  - 刀
+  - 復讐者
+  - 呪い
+  - 王族
+  - 妖し
+  ability_tags: []
+- name: ミストレア
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 西方
+  - 弓
+  - ニックネーマー
+  - 読書家
+  ability_tags: []
+- name: ヴィクト
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 刀
+  - バルオキー
+  - 呪い
+  ability_tags: []
+- name: ジェイド
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 配布(外伝)
+  personality_tags:
+  - IDAスクール
+  - 槍
+  ability_tags: []
+- name: チルリル
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 西方
+  - 剣
+  ability_tags: []
+- name: フォラン(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(瞬突陣)
+  personality_tags:
+  - IDAスクール
+  - 槍
+  - ねこ嫌い
+  ability_tags:
+  - ZONE
+  - ZONE(瞬突陣)
+- name: シエル(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 弓
+  ability_tags: []
+- name: ソフィア
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 配布(外伝)
+  personality_tags:
+  - 斧
+  - 武具
+  - 美術
+  - 生物
+  - 美食
+  - 封印
+  ability_tags: []
+- name: ハーディー
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(烈火陣)
+  personality_tags:
+  - 拳
+  - 甘党
+  - 武具
+  - 生物
+  - アウトロー
+  - いぬ好き
+  - 銃
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: シャノン(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 剣
+  - 美術
+  - KMS社
+  ability_tags: []
+- name: シンシア
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 剣
+  - 美術
+  - 美食
+  - 王族
+  - 読書家
+  - 封印
+  ability_tags: []
+- name: ヴェイナ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)
+  personality_tags:
+  - エルフ
+  - 採集
+  - 杖
+  - 生物
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+- name: ゼヴィーロ
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 魔獣
+  - 斧
+  - フード
+  - 煉獄界
+  ability_tags: []
+- name: アナベル(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - ミグランス王宮
+  - 甘党
+  - 剣
+  - 盾
+  - 騎乗
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: ディアドラ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(外伝)顕現
+  personality_tags:
+  - ミグランス王宮
+  - 剣
+  - アウトロー
+  - 記憶喪失
+  - 魔剣
+  ability_tags: []
+- name: ブリアー
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - エルフ
+  - フリアレス
+  - 槍
+  ability_tags: []
+- name: ラディアス
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ZONE(煌斬陣)
+  personality_tags:
+  - ミグランス王宮
+  - 剣
+  - 盾
+  ability_tags:
+  - ZONE
+  - ZONE(煌斬陣)
+- name: ジョーカー
+  rarity: ☆5
+  element: None
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 仮面
+  - メガネ
+  - 剣
+  - 心の怪盗団
+  - 銃
+  ability_tags: []
+- name: ミュルス(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 魔獣
+  - 杖
+  - 恋わずらい
+  ability_tags: []
+- name: モルガナ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布(協奏)
+  personality_tags:
+  - 剣
+  - 心の怪盗団
+  - 恋わずらい
+  - 記憶喪失
+  ability_tags: []
+- name: レンリ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - メガネ
+  - 甘党
+  - 斧
+  - COA
+  ability_tags: []
+- name: ティラミス
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 甘党
+  - 槍
+  - 竜
+  ability_tags: []
+- name: ビヴェット
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 杖
+  - 動物対話
+  - 精霊対話
+  ability_tags: []
+- name: エルガ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ねこ好き
+  - 刀
+  - フード
+  - 記憶喪失
+  ability_tags: []
+- name: フェルミナ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ミグランス王宮
+  - 拳
+  - アウトロー
+  - フード
+  - 忍び
+  ability_tags: []
+- name: ミュンファ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)
+  personality_tags:
+  - 東方
+  - 槌
+  - 恋わずらい
+  - 封印
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: セティー(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - メガネ
+  - 槍
+  - COA
+  - 騎乗
+  ability_tags: []
+- name: プレメア
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 弓
+  - 料理
+  - マシナリー
+  - ロストラボ
+  ability_tags: []
+- name: アルテナ
+  rarity: ☆5
+  element: None
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 魔獣
+  - 弓
+  - 精霊対話
+  - 王族
+  - 魔剣
+  ability_tags: []
+- name: ニケ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 東方
+  - 刀
+  - アウトロー
+  ability_tags: []
+- name: わら坊
+  rarity: ☆5
+  element: None
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 東方
+  - 巻きワラ
+  - 拳
+  ability_tags: []
+- name: キキョウ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 斧
+  - 復讐者
+  - 騎乗
+  ability_tags: []
+- name: クロード(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ZONE(風王陣)
+  personality_tags:
+  - IDAスクール
+  - 弓
+  - 竜
+  - 王族
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(風王陣)
+- name: ガリユ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(開眼)ZONE(烈火陣)
+  personality_tags:
+  - 杖
+  - 竜
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: ユナ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)
+  personality_tags:
+  - 東方
+  - 聖職者
+  - 杖
+  - 人見知り
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: シェイネ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 剣
+  - 恋わずらい
+  - 呪い
+  ability_tags: []
+- name: デュナリス
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 魔獣
+  - 杖
+  - 煉獄界
+  - フューネラル
+  - 動物対話
+  ability_tags: []
+- name: ルイナ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - メガネ
+  - IDAスクール
+  - エルフ
+  - 剣
+  - 読書家
+  ability_tags: []
+- name: ヒスメナ
+  rarity: ☆5
+  element: Water
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - IDAスクール
+  - 槍
+  ability_tags: []
+- name: マリエル(AS)
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 聖職者
+  - 杖
+  ability_tags: []
+- name: マナ
+  rarity: ☆5
+  element: None
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 配布(外伝)
+  personality_tags:
+  - IDAスクール
+  - 弓
+  ability_tags: []
+- name: ロキド(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 魔獣
+  - 拳
+  - 復讐者
+  ability_tags: []
+- name: ラブリ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(轟打陣)顕現
+  personality_tags:
+  - 料理
+  - 拳
+  - ニックネーマー
+  - ドワーフ
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: フィロ
+  rarity: ☆5
+  element: Water
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 斧
+  - 木こり
+  ability_tags: []
+- name: リィカ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - ねこ好き
+  - 採掘
+  - 槌
+  - KMS社
+  - マシナリー
+  ability_tags: []
+- name: ナギ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 竜宮
+  - 斧
+  - 王族
+  - 大食い
+  ability_tags: []
+- name: ロゼッタ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 結実顕現ZONE(烈火陣)ZONE(幻魔陣)
+  personality_tags:
+  - ねこ好き
+  - 聖職者
+  - 西方
+  - 杖
+  - 地獄耳
+  ability_tags:
+  - ZONE
+  - ZONE(烈火陣)
+- name: アカネ(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 東方
+  - 刀
+  ability_tags: []
+- name: シグレ
+  rarity: ☆5
+  element: Water
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 辛党
+  - 普賢一刀流
+  ability_tags: []
+- name: ツバメ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 東方
+  - 拳
+  - 忍び
+  - 大食い
+  ability_tags: []
+- name: メリナ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 吟遊詩人
+  - 採掘
+  - 西方
+  - 槌
+  - 王族
+  ability_tags: []
+- name: ヴィアッカ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 仮面
+  - 槌
+  - アウトロー
+  - ミリタリー
+  - 銃
+  ability_tags: []
+- name: ホオズキ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 東方
+  - 料理
+  - 弓
+  - 辛党
+  - 妖し
+  ability_tags: []
+- name: サイラス
+  rarity: ☆5
+  element: Water
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 東方
+  - 天の導き
+  - 刀
+  - 呪い
+  ability_tags: []
+- name: ラクレア(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 弓
+  - 復讐者
+  - ドラゴンキラー
+  - いぬ好き
+  ability_tags: []
+- name: イルルゥ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 仮面
+  - 斧
+  - フード
+  - 煉獄界
+  ability_tags: []
+- name: ラディカ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - エルフ
+  - 杖
+  - 恋わずらい
+  ability_tags: []
+- name: デューイ
+  rarity: ☆5
+  element: Water
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: ZONE(水天陣)顕現
+  personality_tags:
+  - メガネ
+  - 拳
+  - 恋わずらい
+  - 銃
+  - ロストラボ
+  - 読書家
+  ability_tags:
+  - ZONE
+  - ZONE(水天陣)
+- name: シオン(AS)
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 普賢一刀流
+  ability_tags: []
+- name: ギルドナ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 魔獣
+  - 冥の誘い
+  - 剣
+  - 王族
+  ability_tags: []
+- name: ヴェイナ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - エルフ
+  - 採集
+  - 杖
+  - 生物
+  - 読書家
+  ability_tags: []
+- name: エイミ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 鍛冶屋
+  - 料理
+  - 拳
+  - 霊媒体質
+  - 復讐者
+  ability_tags: []
+- name: エルガ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 刀
+  - フード
+  - 記憶喪失
+  ability_tags: []
+- name: トゥーヴァ(AS)
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 杖
+  - 霊媒体質
+  - ニックネーマー
+  - フューネラル
+  ability_tags: []
+- name: レンリ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - メガネ
+  - 甘党
+  - 斧
+  - COA
+  ability_tags: []
+- name: シエル
+  rarity: ☆5
+  element: Earth
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - 吟遊詩人
+  - 弓
+  ability_tags: []
+- name: シャノン
+  rarity: ☆5
+  element: Wind
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 剣
+  - 美術
+  - KMS社
+  ability_tags: []
+- name: イスカ(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - IDAスクール
+  - 刀
+  - 読書家
+  - COA
+  - ロストラボ
+  - 万能の支配者
+  ability_tags: []
+- name: サキ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(外伝)
+  personality_tags:
+  - IDAスクール
+  - 杖
+  ability_tags: []
+- name: ツキハ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - 東方
+  - 仮面
+  - 刀
+  - 復讐者
+  - 呪い
+  - 王族
+  - 妖し
+  ability_tags: []
+- name: クロード
+  rarity: ☆5
+  element: Wind
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - IDAスクール
+  - 弓
+  - 竜
+  - 王族
+  - 読書家
+  ability_tags: []
+- name: マイティ(AS)
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - IDAスクール
+  - 杖
+  - お昼寝
+  ability_tags: []
+- name: ミーユ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: ''
+  personality_tags:
+  - ミグランス王宮
+  - 剣
+  - 王族
+  ability_tags: []
+- name: フェルミナ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ミグランス王宮
+  - 拳
+  - アウトロー
+  - フード
+  - 忍び
+  ability_tags: []
+- name: ベルトラン
+  rarity: ☆5
+  element: Earth
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - ミグランス王宮
+  - 槍
+  - 盾
+  ability_tags: []
+- name: アルド
+  rarity: ☆5
+  element: Fire
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 配布
+  personality_tags:
+  - 主人公
+  - 天の導き
+  - 採集
+  - 剣
+  - 竜
+  - バルオキー
+  - 新夢想過激団
+  - 新時空超限流派
+  - コンチェルトアーツ
+  - アルカディア
+  ability_tags: []
+- name: シュゼット(AS)
+  rarity: ☆5
+  element: Wind
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - 甘党
+  - 槍
+  - 美食
+  - ロストラボ
+  ability_tags: []
+- name: ミュルス
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: ZONE(地裂陣)真・顕現
+  personality_tags:
+  - 魔獣
+  - 杖
+  - 恋わずらい
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: シェイネ
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - 剣
+  - 恋わずらい
+  - 呪い
+  ability_tags: []
+- name: セティー
+  rarity: ☆5
+  element: Fire
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - メガネ
+  - 槍
+  - COA
+  - 騎乗
+  ability_tags: []
+- name: シェリーヌ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 配布(邂逅)顕現
+  personality_tags:
+  - メガネ
+  - IDAスクール
+  - 拳
+  - アウトロー
+  ability_tags: []
+- name: メリナ
+  rarity: ☆5
+  element: Water
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 真・顕現ZONE(轟打陣)
+  personality_tags:
+  - 甘党
+  - 聖職者
+  - 吟遊詩人
+  - 採掘
+  - 西方
+  - 槌
+  - 王族
+  ability_tags:
+  - ZONE
+  - ZONE(轟打陣)
+- name: リヴァイア
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(釣り)
+  personality_tags:
+  - 竜宮
+  - 杖
+  - 記憶喪失
+  - 魚人
+  - 封印
+  ability_tags: []
+- name: ユーイン
+  rarity: ☆5
+  element: Fire
+  weapon_type: Hammer
+  light_shadow_type: Shadow
+  notes: 真・顕現ZONE(極・烈火陣)
+  personality_tags:
+  - メガネ
+  - 甘党
+  - 採掘
+  - 槌
+  - 武具
+  - 呪い
+  ability_tags:
+  - ZONE
+  - ZONE(極・烈火陣)
+- name: ナギ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Axe
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - 竜宮
+  - 斧
+  - 王族
+  - 大食い
+  ability_tags: []
+- name: ガリユ
+  rarity: ☆5
+  element: Fire
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 配布(邂逅)真・顕現
+  personality_tags:
+  - 杖
+  - 竜
+  ability_tags: []
+- name: ユナ
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - 東方
+  - 聖職者
+  - 杖
+  - 人見知り
+  ability_tags: []
+- name: イスカ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - IDAスクール
+  - 刀
+  - 読書家
+  - COA
+  - ロストラボ
+  - 万能の支配者
+  ability_tags: []
+- name: ラクレア
+  rarity: ☆5
+  element: Water
+  weapon_type: Bow
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - 弓
+  - 復讐者
+  - ドラゴンキラー
+  - いぬ好き
+  ability_tags: []
+- name: アザミ
+  rarity: ☆5
+  element: Wind
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: 配布(邂逅)真・顕現
+  personality_tags:
+  - 東方
+  - 甘党
+  - 刀
+  - 恋わずらい
+  ability_tags: []
+- name: アナベル
+  rarity: ☆5
+  element: Water
+  weapon_type: Sword
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ミグランス王宮
+  - 甘党
+  - 剣
+  - 盾
+  - 騎乗
+  ability_tags: []
+- name: シオン
+  rarity: ☆5
+  element: Fire
+  weapon_type: Katana
+  light_shadow_type: Shadow
+  notes: ZONE(極・煌斬陣)真・顕現
+  personality_tags:
+  - ねこ好き
+  - 東方
+  - 竹馬の友
+  - 刀
+  - 騎乗
+  - 普賢一刀流
+  ability_tags:
+  - ZONE
+  - ZONE(極・煌斬陣)
+- name: シュゼット
+  rarity: ☆5
+  element: Wind
+  weapon_type: Lance
+  light_shadow_type: Shadow
+  notes: ZONE(極・風王陣)真・顕現
+  personality_tags:
+  - 甘党
+  - 槍
+  - 美食
+  - ロストラボ
+  ability_tags:
+  - ZONE
+  - ZONE(極・風王陣)
+- name: トゥーヴァ
+  rarity: ☆5
+  element: Earth
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 真・顕現ZONE(地裂陣)
+  personality_tags:
+  - 杖
+  - 霊媒体質
+  - ニックネーマー
+  - フューネラル
+  ability_tags:
+  - ZONE
+  - ZONE(地裂陣)
+- name: マイティ
+  rarity: ☆5
+  element: Water
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 真・顕現
+  personality_tags:
+  - IDAスクール
+  - 杖
+  - お昼寝
+  ability_tags: []
+- name: マリエル
+  rarity: ☆5
+  element: None
+  weapon_type: Staff
+  light_shadow_type: Shadow
+  notes: 顕現
+  personality_tags:
+  - ねこ好き
+  - 聖職者
+  - 杖
+  ability_tags: []
+- name: ロキド
+  rarity: ☆5
+  element: Earth
+  weapon_type: Fists
+  light_shadow_type: Shadow
+  notes: 結実顕現
+  personality_tags:
+  - 魔獣
+  - 拳
+  - 復讐者
+  ability_tags: []

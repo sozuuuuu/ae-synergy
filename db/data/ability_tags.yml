@@ -1,78 +1,99 @@
 ability_tags:
-  # ゾーン
-  - name: 火属性ゾーン
-    category: ゾーン
-  - name: 水属性ゾーン
-    category: ゾーン
-  - name: 地属性ゾーン
-    category: ゾーン
-  - name: 風属性ゾーン
-    category: ゾーン
-  - name: 雷属性ゾーン
-    category: ゾーン
-  - name: 闇属性ゾーン
-    category: ゾーン
-  - name: 晶属性ゾーン
-    category: ゾーン
-
-  # バフ・デバフ
-  - name: 物理バフ
-    category: バフ・デバフ
-  - name: 物理デバフ
-    category: バフ・デバフ
-  - name: 魔法バフ
-    category: バフ・デバフ
-  - name: 魔法デバフ
-    category: バフ・デバフ
-  - name: 速度バフ
-    category: バフ・デバフ
-  - name: 速度デバフ
-    category: バフ・デバフ
-  - name: クリティカルバフ
-    category: バフ・デバフ
-
-  # 状態異常
-  - name: 毒
-    category: 状態異常
-  - name: ペイン
-    category: 状態異常
-  - name: 睡眠
-    category: 状態異常
-  - name: 麻痺
-    category: 状態異常
-  - name: 封印
-    category: 状態異常
-
-  # 守護・庇い立て
-  - name: 庇い立て
-    category: 守護・庇い立て
-  - name: 守護
-    category: 守護・庇い立て
-
-  # 特殊能力
-  - name: 臨機応変
-    category: 特殊能力
-  - name: 先進統一
-    category: 特殊能力
-  - name: 心技一体
-    category: 特殊能力
-  - name: 先制行動
-    category: 特殊能力
-
-  # 武器種バフ
-  - name: 剣バフ
-    category: 武器種バフ
-  - name: 刀バフ
-    category: 武器種バフ
-  - name: 斧バフ
-    category: 武器種バフ
-  - name: 槍バフ
-    category: 武器種バフ
-  - name: 弓バフ
-    category: 武器種バフ
-  - name: 杖バフ
-    category: 武器種バフ
-  - name: 拳バフ
-    category: 武器種バフ
-  - name: 槌バフ
-    category: 武器種バフ
+- name: HPバフ
+- name: MPバフ
+- name: ZONE
+- name: ZONE(刻陰陣)
+- name: ZONE(双撃陣・斬魔)
+- name: ZONE(地裂陣)
+- name: ZONE(堅守陣)
+- name: ZONE(幻魔陣)
+- name: ZONE(招雷陣)
+- name: ZONE(星海陣)
+- name: ZONE(月光陣)
+- name: ZONE(月海陣)
+- name: ZONE(極・刻陰陣)
+- name: ZONE(極・双撃陣・斬突)
+- name: ZONE(極・地裂陣)
+- name: ZONE(極・幻魔陣)
+- name: ZONE(極・招雷陣)
+- name: ZONE(極・月光陣)
+- name: ZONE(極・水天陣)
+- name: ZONE(極・烈火陣)
+- name: ZONE(極・煌斬陣)
+- name: ZONE(極・瞬突陣)
+- name: ZONE(極・輝晶陣)
+- name: ZONE(極・轟打陣)
+- name: ZONE(極・風王陣)
+- name: ZONE(水天陣)
+- name: ZONE(烈火陣)
+- name: ZONE(煌斬陣)
+- name: ZONE(瞬突陣)
+- name: ZONE(絶・刻陰陣)
+- name: ZONE(絶・招雷陣)
+- name: ZONE(絶・水天陣)
+- name: ZONE(絶・烈火陣)
+- name: ZONE(絶・輝晶陣)
+- name: ZONE(絶・風王陣)
+- name: ZONE(輝晶陣)
+- name: ZONE(轟打陣)
+- name: ZONE(閃撃陣)
+- name: ZONE(風王陣)
+- name: オーバークリティカル
+- name: ステルス
+- name: ダメージカットバリア
+- name: バリア貫通
+- name: ブレイク
+- name: ペイン
+- name: モードチェンジ
+- name: ルナティック
+- name: 下克上
+- name: 先制行動
+- name: 再行動
+- name: 凍結
+- name: 刀バフ
+- name: 剣バフ
+- name: 吹き飛ばしバリア
+- name: 守護
+- name: 封印
+- name: 属性耐性デバフ
+- name: 属性耐性バフ
+- name: 帯電
+- name: 庇立て
+- name: 弓バフ
+- name: 心技一体
+- name: 心眼
+- name: 怒り
+- name: 拳バフ
+- name: 挑発
+- name: 挺身
+- name: 捨身
+- name: 斧バフ
+- name: 星導覚醒
+- name: 暗闇
+- name: 杖バフ
+- name: 槌バフ
+- name: 槍バフ
+- name: 歌唱
+- name: 毒
+- name: 気絶
+- name: 混乱
+- name: 物理クリティカルバフ
+- name: 物理耐性デバフ
+- name: 物理耐性バフ
+- name: 状態異常バリア
+- name: 異時層キャラ
+- name: 睡眠
+- name: 知性デバフ
+- name: 知性バフ
+- name: 石化
+- name: 祈祷
+- name: 精神統一
+- name: 腕力デバフ
+- name: 腕力バフ
+- name: 複写
+- name: 迎撃
+- name: 追撃
+- name: 速度デバフ
+- name: 速度バフ
+- name: 連携
+- name: 魔法クリティカルバフ
