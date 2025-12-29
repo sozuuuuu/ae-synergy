@@ -2,11 +2,20 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
+def create_with_error_logging(model, attributes, &block)
+  model.find_or_create_by!(attributes, &block)
+rescue ActiveRecord::RecordInvalid => e
+  puts "Error creating #{model.name}: #{e.message}"
+  puts "Attributes: #{attributes}"
+  puts "Errors: #{e.record.errors.full_messages.join(', ')}"
+  raise e
+end
+
 puts "Seeding database..."
 
 # テストユーザーの作成
 puts "Creating test users..."
-admin = User.find_or_create_by!(email: "admin@example.com") do |user|
+admin = create_with_error_logging(User, { email: "admin@example.com" }) do |user|
   user.username = "admin"
   user.password = "password123"
   user.password_confirmation = "password123"
@@ -14,14 +23,14 @@ admin = User.find_or_create_by!(email: "admin@example.com") do |user|
 end
 puts "Created admin user: #{admin.username} (admin: #{admin.admin})"
 
-user1 = User.find_or_create_by!(email: "user1@example.com") do |user|
+user1 = create_with_error_logging(User, { email: "user1@example.com" }) do |user|
   user.username = "user1"
   user.password = "password123"
   user.password_confirmation = "password123"
 end
 puts "Created user1: #{user1.username}"
 
-user2 = User.find_or_create_by!(email: "user2@example.com") do |user|
+user2 = create_with_error_logging(User, { email: "user2@example.com" }) do |user|
   user.username = "user2"
   user.password = "password123"
   user.password_confirmation = "password123"
@@ -33,7 +42,7 @@ puts "Loading personality tags from YAML..."
 personality_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'personality_tags.yml'))
 personality_tags_data['personality_tags'].each do |tag_data|
   name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
-  PersonalityTag.find_or_create_by!(name: name)
+  create_with_error_logging(PersonalityTag, { name: name })
 end
 puts "Created #{PersonalityTag.count} personality tags"
 
@@ -42,7 +51,7 @@ puts "Loading use case tags from YAML..."
 use_case_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'use_case_tags.yml'))
 use_case_tags_data['use_case_tags'].each do |tag_data|
   name = tag_data.is_a?(Hash) ? tag_data['name'] : tag_data
-  UseCaseTag.find_or_create_by!(name: name)
+  create_with_error_logging(UseCaseTag, { name: name })
 end
 puts "Created #{UseCaseTag.count} use case tags"
 
@@ -50,7 +59,7 @@ puts "Created #{UseCaseTag.count} use case tags"
 puts "Loading ability tags from YAML..."
 ability_tags_data = YAML.load_file(Rails.root.join('db', 'data', 'ability_tags.yml'))
 ability_tags_data['ability_tags'].each do |tag_data|
-  AbilityTag.find_or_create_by!(name: tag_data['name']) do |tag|
+  create_with_error_logging(AbilityTag, { name: tag_data['name'] }) do |tag|
     tag.category = tag_data['category'] || "特殊能力"
   end
 end
@@ -63,7 +72,7 @@ characters_data = YAML.load_file(Rails.root.join('db', 'data', 'characters.yml')
 character_objects = {}
 
 characters_data['characters'].each do |char_data|
-  character = Character.find_or_create_by!(name: char_data['name']) do |char|
+  character = create_with_error_logging(Character, { name: char_data['name'] }) do |char|
     char.rarity = char_data['rarity']
     char.element = char_data['element']
     char.weapon_type = char_data['weapon_type']
@@ -94,130 +103,89 @@ end
 
 puts "Created #{Character.count} characters"
 
-# 変数を保持（シナジー/パーティ作成用）
-aldo = character_objects['アルド']
-feinne = character_objects['フィーネ']
-aldo_as = character_objects['アルド（AS）']
-myunfa = character_objects['ミュンファ']
-shigure = character_objects['シグレ']
+# シナジー作成用のキャラクター取得（存在しない場合はスキップするように堅牢化）
+def get_char(objects, name)
+  char = objects[name]
+  puts "Warning: Character '#{name}' not found for synergy seeding" unless char
+  char
+end
+
+aldo = get_char(character_objects, 'アルド')
+feinne = get_char(character_objects, 'フィーネ')
+aldo_as = get_char(character_objects, 'アルド(AS)') || get_char(character_objects, 'アルド（AS）')
+myunfa = get_char(character_objects, 'ミュンファ')
+shigure = get_char(character_objects, 'シグレ')
 
 # シナジー投稿の作成
 puts "Creating synergy posts..."
 
-synergy1 = PartyPost.find_or_create_by!(title: "火属性周回最強コンビ", composition_type: 'synergy') do |post|
-  post.user = admin
-  post.description = "アルドとアルド（AS）を組み合わせることで、火属性周回が非常に効率的になります。\n全体攻撃と単体攻撃を使い分けることで、あらゆる場面に対応可能。"
-  post.votes_count = 25
+if aldo && aldo_as
+  synergy1 = create_with_error_logging(PartyPost, { title: "火属性周回最強コンビ", composition_type: 'synergy' }) do |post|
+    post.user = admin
+    post.description = "アルドとアルド（AS）を組み合わせることで、火属性周回が非常に効率的になります。\n全体攻撃と単体攻撃を使い分けることで、あらゆる場面に対応可能。"
+    post.votes_count = 25
+  end
+  create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo, slot_type: "synergy", position: 0 })
+  create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo_as, slot_type: "synergy", position: 1 })
+  synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")].compact
 end
-# シナジーのメンバー追加
-PartyMembership.find_or_create_by!(party_post: synergy1, character: aldo) do |m|
-  m.slot_type = "synergy"
-  m.position = 0
-end
-PartyMembership.find_or_create_by!(party_post: synergy1, character: aldo_as) do |m|
-  m.slot_type = "synergy"
-  m.position = 1
-end
-synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")].compact
 
-synergy2 = PartyPost.find_or_create_by!(title: "地水デバフコンボ", composition_type: 'synergy') do |post|
-  post.user = admin
-  post.description = "ミュンファの耐性バフとシグレの高火力を組み合わせた安定シナジー。\nミュンファで耐性を上げつつ、シグレで一気に削る戦法が強力。"
-  post.votes_count = 18
+if myunfa && shigure
+  synergy2 = create_with_error_logging(PartyPost, { title: "地水デバフコンボ", composition_type: 'synergy' }) do |post|
+    post.user = admin
+    post.description = "ミュンファの耐性バフとシグレの高火力を組み合わせた安定シナジー。\nミュンファで耐性を上げつつ、シグレで一気に削る戦法が強力。"
+    post.votes_count = 18
+  end
+  create_with_error_logging(PartyMembership, { party_post: synergy2, character: myunfa, slot_type: "synergy", position: 0 })
+  create_with_error_logging(PartyMembership, { party_post: synergy2, character: shigure, slot_type: "synergy", position: 1 })
+  synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")].compact
 end
-PartyMembership.find_or_create_by!(party_post: synergy2, character: myunfa) do |m|
-  m.slot_type = "synergy"
-  m.position = 0
-end
-PartyMembership.find_or_create_by!(party_post: synergy2, character: shigure) do |m|
-  m.slot_type = "synergy"
-  m.position = 1
-end
-synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")].compact
 
-synergy3 = PartyPost.find_or_create_by!(title: "ヒーラー＋火力アタッカー", composition_type: 'synergy') do |post|
-  post.user = admin
-  post.description = "フィーネの回復でパーティを支えつつ、アルドで火力を出す基本的なシナジー。\n初心者におすすめの組み合わせです。"
-  post.votes_count = 32
+if feinne && aldo
+  synergy3 = create_with_error_logging(PartyPost, { title: "ヒーラー＋火力アタッカー", composition_type: 'synergy' }) do |post|
+    post.user = admin
+    post.description = "フィーネの回復でパーティを支えつつ、アルドで火力を出す基本的なシナジー。\n初心者におすすめの組み合わせです。"
+    post.votes_count = 32
+  end
+  create_with_error_logging(PartyMembership, { party_post: synergy3, character: feinne, slot_type: "synergy", position: 0 })
+  create_with_error_logging(PartyMembership, { party_post: synergy3, character: aldo, slot_type: "synergy", position: 1 })
+  synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")].compact
 end
-PartyMembership.find_or_create_by!(party_post: synergy3, character: feinne) do |m|
-  m.slot_type = "synergy"
-  m.position = 0
-end
-PartyMembership.find_or_create_by!(party_post: synergy3, character: aldo) do |m|
-  m.slot_type = "synergy"
-  m.position = 1
-end
-synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")].compact
 
 puts "Created #{PartyPost.synergies.count} synergy posts"
 
 # パーティ投稿の作成
 puts "Creating party posts..."
 
-party1 = PartyPost.find_or_create_by!(title: "バランス型汎用パーティ", composition_type: 'full_party') do |post|
-  post.user = admin
-  post.description = "どんな場面でも対応できる汎用性の高いパーティ構成です。"
-  post.strategy = "アルドで火力、フィーネで回復、ミュンファでサポート、シグレでサブアタッカー。\nサブにアルド（AS）を入れて属性の偏りに対応。"
-  post.votes_count = 45
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: aldo) do |m|
-  m.slot_type = "main"
-  m.position = 1
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: feinne) do |m|
-  m.slot_type = "main"
-  m.position = 2
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: myunfa) do |m|
-  m.slot_type = "main"
-  m.position = 3
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: shigure) do |m|
-  m.slot_type = "main"
-  m.position = 4
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: aldo_as) do |m|
-  m.slot_type = "sub"
-  m.position = 1
-end
-PartyMembership.find_or_create_by!(party_post: party1, character: feinne) do |m|
-  m.slot_type = "sub"
-  m.position = 2
-end
-party1.use_case_tags = [UseCaseTag.find_by(name: "ストーリー"), UseCaseTag.find_by(name: "初心者向け")].compact
+if aldo && feinne && myunfa && shigure && aldo_as
+  party1 = create_with_error_logging(PartyPost, { title: "バランス型汎用パーティ", composition_type: 'full_party' }) do |post|
+    post.user = admin
+    post.description = "どんな場面でも対応できる汎用性の高いパーティ構成です。"
+    post.strategy = "アルドで火力、フィーネで回復、ミュンファでサポート、シグレでサブアタッカー。\nサブにアルド（AS）を入れて属性の偏りに対応。"
+    post.votes_count = 45
+  end
+  create_with_error_logging(PartyMembership, { party_post: party1, character: aldo, slot_type: "main", position: 1 })
+  create_with_error_logging(PartyMembership, { party_post: party1, character: feinne, slot_type: "main", position: 2 })
+  create_with_error_logging(PartyMembership, { party_post: party1, character: myunfa, slot_type: "main", position: 3 })
+  create_with_error_logging(PartyMembership, { party_post: party1, character: shigure, slot_type: "main", position: 4 })
+  create_with_error_logging(PartyMembership, { party_post: party1, character: aldo_as, slot_type: "sub", position: 1 })
+  create_with_error_logging(PartyMembership, { party_post: party1, character: feinne, slot_type: "sub", position: 2 })
+  party1.use_case_tags = [UseCaseTag.find_by(name: "ストーリー"), UseCaseTag.find_by(name: "初心者向け")].compact
 
-party2 = PartyPost.find_or_create_by!(title: "火属性特化周回パーティ", composition_type: 'full_party') do |post|
-  post.user = admin
-  post.description = "火属性の敵に特化した高速周回用パーティです。"
-  post.strategy = "アルドとアルド（AS）をメインに配置し、全体攻撃と単体攻撃を使い分け。\nフィーネの回復で安定性を確保しつつ、ミュンファのバフで火力を底上げ。"
-  post.votes_count = 28
+  party2 = create_with_error_logging(PartyPost, { title: "火属性特化周回パーティ", composition_type: 'full_party' }) do |post|
+    post.user = admin
+    post.description = "火属性の敵に特化した高速周回用パーティです。"
+    post.strategy = "アルドとアルド（AS）をメインに配置し、全体攻撃と単体攻撃を使い分け。\nフィーネの回復で安定性を確保しつつ、ミュンファのバフで火力を底上げ。"
+    post.votes_count = 28
+  end
+  create_with_error_logging(PartyMembership, { party_post: party2, character: aldo, slot_type: "main", position: 1 })
+  create_with_error_logging(PartyMembership, { party_post: party2, character: aldo_as, slot_type: "main", position: 2 })
+  create_with_error_logging(PartyMembership, { party_post: party2, character: feinne, slot_type: "main", position: 3 })
+  create_with_error_logging(PartyMembership, { party_post: party2, character: myunfa, slot_type: "main", position: 4 })
+  create_with_error_logging(PartyMembership, { party_post: party2, character: shigure, slot_type: "sub", position: 1 })
+  create_with_error_logging(PartyMembership, { party_post: party2, character: feinne, slot_type: "sub", position: 2 })
+  party2.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "AF火力")].compact
 end
-PartyMembership.find_or_create_by!(party_post: party2, character: aldo) do |m|
-  m.slot_type = "main"
-  m.position = 1
-end
-PartyMembership.find_or_create_by!(party_post: party2, character: aldo_as) do |m|
-  m.slot_type = "main"
-  m.position = 2
-end
-PartyMembership.find_or_create_by!(party_post: party2, character: feinne) do |m|
-  m.slot_type = "main"
-  m.position = 3
-end
-PartyMembership.find_or_create_by!(party_post: party2, character: myunfa) do |m|
-  m.slot_type = "main"
-  m.position = 4
-end
-PartyMembership.find_or_create_by!(party_post: party2, character: shigure) do |m|
-  m.slot_type = "sub"
-  m.position = 1
-end
-PartyMembership.find_or_create_by!(party_post: party2, character: feinne) do |m|
-  m.slot_type = "sub"
-  m.position = 2
-end
-party2.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "AF火力")].compact
 
 puts "Created #{PartyPost.full_parties.count} party posts"
 
