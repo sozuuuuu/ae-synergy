@@ -350,11 +350,20 @@
       badge.className = 'inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full';
       badge.dataset.characterId = characterId;
 
-      // 表示要素を先に設定
-      badge.innerHTML = `
-        <span>${characterName}</span>
-        <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-900" onclick="this.parentElement.remove(); removeCharacter(${characterId});">×</button>
-      `;
+      // 表示要素を作成
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = characterName;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'ml-2 text-indigo-600 hover:text-indigo-900';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = function() {
+        removeCharacter(characterId, badge);
+      };
+
+      badge.appendChild(nameSpan);
+      badge.appendChild(removeBtn);
 
       // 既存のメンバーシップの場合はIDを含める
       if (membershipId) {
@@ -387,17 +396,17 @@
       return badge;
     }
 
-    window.removeCharacter = function(characterId) {
+    window.removeCharacter = function(characterId, badgeElement) {
       selectedCharacters.delete(characterId.toString());
 
       // カウントを更新
-      const badge = document.querySelector(`[data-character-id="${characterId}"]`);
-      if (badge) {
-        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+      if (badgeElement) {
+        const slotTypeField = badgeElement.querySelector('input[name*="slot_type"]');
         if (slotTypeField) {
           if (slotTypeField.value === 'main') mainCount--;
           if (slotTypeField.value === 'sub') subCount--;
         }
+        badgeElement.remove();
       }
     };
   });
