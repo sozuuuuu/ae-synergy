@@ -289,6 +289,62 @@
       checkbox.addEventListener('change', filterCharacters);
     });
 
+    // ドラッグ&ドロップ機能（パーティーの場合のみ）
+    if (!isSynergy) {
+      const mainContainer = document.getElementById('main_characters');
+      const subContainer = document.getElementById('sub_characters');
+
+      if (mainContainer) {
+        new Sortable(mainContainer, {
+          group: 'party-members',
+          animation: 150,
+          onEnd: function(evt) {
+            updatePositions();
+          }
+        });
+      }
+
+      if (subContainer) {
+        new Sortable(subContainer, {
+          group: 'party-members',
+          animation: 150,
+          onEnd: function(evt) {
+            updatePositions();
+          }
+        });
+      }
+    }
+
+    // 位置情報を更新する関数
+    function updatePositions() {
+      const mainContainer = document.getElementById('main_characters');
+      const subContainer = document.getElementById('sub_characters');
+
+      // メインメンバーの位置とカウントを更新
+      mainCount = 0;
+      Array.from(mainContainer.children).forEach((badge, index) => {
+        const positionField = badge.querySelector('input[name*="position"]');
+        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+        if (positionField && slotTypeField) {
+          positionField.value = index;
+          slotTypeField.value = 'main';
+          mainCount++;
+        }
+      });
+
+      // サブメンバーの位置とカウントを更新
+      subCount = 0;
+      Array.from(subContainer.children).forEach((badge, index) => {
+        const positionField = badge.querySelector('input[name*="position"]');
+        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+        if (positionField && slotTypeField) {
+          positionField.value = index;
+          slotTypeField.value = 'sub';
+          subCount++;
+        }
+      });
+    }
+
     // キャラクター選択機能（イベントデリゲーションで重複を防ぐ）
     const characterList = document.getElementById('filterable_characters');
     if (characterList && !characterList.dataset.listenerAdded) {
@@ -326,26 +382,17 @@
     }
 
     function showSlotTypeDialog(characterId, characterName) {
-      const slotType = prompt(`「${characterName}」を追加する位置:\n1. メインメンバー (現在${mainCount}/4人)\n2. サブメンバー (現在${subCount}/2人)\n\n1 または 2 を入力してください:`);
-
-      if (slotType === '1') {
-        if (mainCount >= 4) {
-          alert('メインメンバーは4人までです');
-          return;
-        }
+      // メインメンバーに空きがあれば追加、なければサブに追加
+      if (mainCount < 4) {
         addCharacterToParty(characterId, characterName, 'main', mainCount);
         mainCount++;
         selectedCharacters.add(characterId);
-      } else if (slotType === '2') {
-        if (subCount >= 2) {
-          alert('サブメンバーは2人までです');
-          return;
-        }
+      } else if (subCount < 2) {
         addCharacterToParty(characterId, characterName, 'sub', subCount);
         subCount++;
         selectedCharacters.add(characterId);
       } else {
-        return;
+        alert('パーティーは満員です（メイン4人、サブ2人）');
       }
     }
 
