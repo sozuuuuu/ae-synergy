@@ -213,6 +213,17 @@
     let subCount = 0;
     let synergyCount = 0;
 
+    // 既存のバッジをクリアして重複を防ぐ
+    if (isSynergy) {
+      const synergyContainer = document.getElementById('synergy_characters');
+      if (synergyContainer) synergyContainer.innerHTML = '';
+    } else {
+      const mainContainer = document.getElementById('main_characters');
+      const subContainer = document.getElementById('sub_characters');
+      if (mainContainer) mainContainer.innerHTML = '';
+      if (subContainer) subContainer.innerHTML = '';
+    }
+
     // 既存のドラフトメンバーシップを読み込み
     <% if draft.draft_party_memberships.any? %>
       <% draft.draft_party_memberships.each do |membership| %>
@@ -468,5 +479,22 @@
         badgeElement.remove();
       }
     };
+  });
+
+  // Turboキャッシュ前にクリーンアップ
+  document.addEventListener('turbo:before-cache', function() {
+    // イベントリスナーフラグをリセット
+    const characterList = document.getElementById('filterable_characters');
+    if (characterList) {
+      delete characterList.dataset.listenerAdded;
+    }
+
+    // バッジコンテナをクリア
+    const synergyContainer = document.getElementById('synergy_characters');
+    const mainContainer = document.getElementById('main_characters');
+    const subContainer = document.getElementById('sub_characters');
+    if (synergyContainer) synergyContainer.innerHTML = '';
+    if (mainContainer) mainContainer.innerHTML = '';
+    if (subContainer) subContainer.innerHTML = '';
   });
 </script>
