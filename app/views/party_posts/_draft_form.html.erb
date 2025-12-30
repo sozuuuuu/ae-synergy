@@ -1,4 +1,4 @@
-<%= form_with model: draft, url: draft_party_post_path(draft), method: :patch, local: true, id: "draft_form" do |f| %>
+<%= form_with model: draft, url: draft_party_post_path(draft), method: :patch, id: "draft_form", data: { turbo: false } do |f| %>
   <% if draft.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
       <h2 class="font-bold"><%= pluralize(draft.errors.count, "個のエラー") %>があります:</h2>
@@ -135,14 +135,14 @@
 
       <div id="character_list" class="max-h-96 overflow-y-auto border rounded">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 sticky top-0">
+          <thead class="bg-white sticky top-0 border-b-2 border-gray-300">
             <tr>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"></th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">画像</th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">名前</th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">レア</th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">属性</th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">武器</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase"></th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">画像</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">名前</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">レア</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">属性</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">武器</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" id="filterable_characters">
@@ -195,11 +195,14 @@
     </div>
   </div>
 
-  <div class="flex gap-2">
+  <div>
     <%= f.submit "保存する", class: "bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded font-semibold" %>
-    <%= button_to "削除", draft_party_post_path(draft, draft: true), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded font-semibold" %>
   </div>
 <% end %>
+
+<div class="mt-4">
+  <%= button_to "削除", draft_party_post_path(draft, draft: true), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded font-semibold" %>
+</div>
 
 <script>
   document.addEventListener('turbo:load', function() {
@@ -208,6 +211,7 @@
     const selectedCharacters = new Set();
     let mainCount = 0;
     let subCount = 0;
+    let synergyCount = 0;
 
     // 既存のドラフトメンバーシップを読み込み
     <% if draft.draft_party_memberships.any? %>
@@ -224,6 +228,7 @@
           const container = document.getElementById('synergy_characters');
           const badge = createCharacterBadge(characterId_<%= membership.id %>, characterName_<%= membership.id %>, slotType_<%= membership.id %>, position_<%= membership.id %>, membershipId_<%= membership.id %>);
           container.appendChild(badge);
+          synergyCount++;
         } else {
           if (slotType_<%= membership.id %> === 'main') {
             mainCount++;
@@ -284,10 +289,71 @@
       checkbox.addEventListener('change', filterCharacters);
     });
 
-    // キャラクター選択機能
-    document.querySelectorAll('.add-character-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const row = this.closest('.character-row');
+    // ドラッグ&ドロップ機能（パーティーの場合のみ）
+    if (!isSynergy) {
+      const mainContainer = document.getElementById('main_characters');
+      const subContainer = document.getElementById('sub_characters');
+
+      if (mainContainer) {
+        new Sortable(mainContainer, {
+          group: 'party-members',
+          animation: 150,
+          onEnd: function(evt) {
+            updatePositions();
+          }
+        });
+      }
+
+      if (subContainer) {
+        new Sortable(subContainer, {
+          group: 'party-members',
+          animation: 150,
+          onEnd: function(evt) {
+            updatePositions();
+          }
+        });
+      }
+    }
+
+    // 位置情報を更新する関数
+    function updatePositions() {
+      const mainContainer = document.getElementById('main_characters');
+      const subContainer = document.getElementById('sub_characters');
+
+      // メインメンバーの位置とカウントを更新
+      mainCount = 0;
+      Array.from(mainContainer.children).forEach((badge, index) => {
+        const positionField = badge.querySelector('input[name*="position"]');
+        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+        if (positionField && slotTypeField) {
+          positionField.value = index;
+          slotTypeField.value = 'main';
+          mainCount++;
+        }
+      });
+
+      // サブメンバーの位置とカウントを更新
+      subCount = 0;
+      Array.from(subContainer.children).forEach((badge, index) => {
+        const positionField = badge.querySelector('input[name*="position"]');
+        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+        if (positionField && slotTypeField) {
+          positionField.value = index;
+          slotTypeField.value = 'sub';
+          subCount++;
+        }
+      });
+    }
+
+    // キャラクター選択機能（イベントデリゲーションで重複を防ぐ）
+    const characterList = document.getElementById('filterable_characters');
+    if (characterList && !characterList.dataset.listenerAdded) {
+      characterList.dataset.listenerAdded = 'true';
+      characterList.addEventListener('click', function(e) {
+        const button = e.target.closest('.add-character-btn');
+        if (!button) return;
+
+        const row = button.closest('.character-row');
         const characterId = row.dataset.characterId;
         const characterName = row.dataset.characterName;
 
@@ -303,38 +369,30 @@
           showSlotTypeDialog(characterId, characterName);
         }
       });
-    });
+    }
 
     function addCharacterToSynergy(characterId, characterName) {
       if (selectedCharacters.has(characterId)) return;
 
       selectedCharacters.add(characterId);
       const container = document.getElementById('synergy_characters');
-      const badge = createCharacterBadge(characterId, characterName, 'synergy', 0);
+      const badge = createCharacterBadge(characterId, characterName, 'synergy', synergyCount);
       container.appendChild(badge);
+      synergyCount++;
     }
 
     function showSlotTypeDialog(characterId, characterName) {
-      const slotType = prompt(`「${characterName}」を追加する位置:\n1. メインメンバー (現在${mainCount}/4人)\n2. サブメンバー (現在${subCount}/2人)\n\n1 または 2 を入力してください:`);
-
-      if (slotType === '1') {
-        if (mainCount >= 4) {
-          alert('メインメンバーは4人までです');
-          return;
-        }
+      // メインメンバーに空きがあれば追加、なければサブに追加
+      if (mainCount < 4) {
         addCharacterToParty(characterId, characterName, 'main', mainCount);
         mainCount++;
         selectedCharacters.add(characterId);
-      } else if (slotType === '2') {
-        if (subCount >= 2) {
-          alert('サブメンバーは2人までです');
-          return;
-        }
+      } else if (subCount < 2) {
         addCharacterToParty(characterId, characterName, 'sub', subCount);
         subCount++;
         selectedCharacters.add(characterId);
       } else {
-        return;
+        alert('パーティーは満員です（メイン4人、サブ2人）');
       }
     }
 
@@ -350,11 +408,20 @@
       badge.className = 'inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full';
       badge.dataset.characterId = characterId;
 
-      // 表示要素を先に設定
-      badge.innerHTML = `
-        <span>${characterName}</span>
-        <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-900" onclick="this.parentElement.remove(); removeCharacter(${characterId});">×</button>
-      `;
+      // 表示要素を作成
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = characterName;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'ml-2 text-indigo-600 hover:text-indigo-900';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = function() {
+        removeCharacter(characterId, badge);
+      };
+
+      badge.appendChild(nameSpan);
+      badge.appendChild(removeBtn);
 
       // 既存のメンバーシップの場合はIDを含める
       if (membershipId) {
@@ -387,17 +454,18 @@
       return badge;
     }
 
-    window.removeCharacter = function(characterId) {
+    window.removeCharacter = function(characterId, badgeElement) {
       selectedCharacters.delete(characterId.toString());
 
       // カウントを更新
-      const badge = document.querySelector(`[data-character-id="${characterId}"]`);
-      if (badge) {
-        const slotTypeField = badge.querySelector('input[name*="slot_type"]');
+      if (badgeElement) {
+        const slotTypeField = badgeElement.querySelector('input[name*="slot_type"]');
         if (slotTypeField) {
           if (slotTypeField.value === 'main') mainCount--;
           if (slotTypeField.value === 'sub') subCount--;
+          if (slotTypeField.value === 'synergy') synergyCount--;
         }
+        badgeElement.remove();
       }
     };
   });

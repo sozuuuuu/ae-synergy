@@ -4,11 +4,8 @@ class VotesController < ApplicationController
   def create
     votable = find_votable
 
-    case params[:value]
-    when 'up'
+    if params[:value] == 'up'
       votable.upvote_by(current_user)
-    when 'down'
-      votable.downvote_by(current_user)
     end
 
     respond_to do |format|

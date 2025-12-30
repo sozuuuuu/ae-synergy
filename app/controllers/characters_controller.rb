@@ -6,9 +6,9 @@ class CharactersController < ApplicationController
   def index
     @characters = Character.includes(:personality_tags, :ability_tags)
 
-    # デフォルトでログイン中は所持キャラのみ表示
+    # 所持キャラフィルター
     if logged_in?
-      show_only_owned = params[:show_only_owned].nil? ? true : params[:show_only_owned] == '1'
+      show_only_owned = params[:show_only_owned] == '1'
       @characters = @characters.where(id: current_user.owned_characters.ids) if show_only_owned
       @show_only_owned = show_only_owned
       @owned_character_ids = current_user.owned_characters.ids
