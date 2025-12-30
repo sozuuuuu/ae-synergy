@@ -208,6 +208,7 @@
     const selectedCharacters = new Set();
     let mainCount = 0;
     let subCount = 0;
+    let synergyCount = 0;
 
     // 既存のドラフトメンバーシップを読み込み
     <% if draft.draft_party_memberships.any? %>
@@ -224,6 +225,7 @@
           const container = document.getElementById('synergy_characters');
           const badge = createCharacterBadge(characterId_<%= membership.id %>, characterName_<%= membership.id %>, slotType_<%= membership.id %>, position_<%= membership.id %>, membershipId_<%= membership.id %>);
           container.appendChild(badge);
+          synergyCount++;
         } else {
           if (slotType_<%= membership.id %> === 'main') {
             mainCount++;
@@ -310,8 +312,9 @@
 
       selectedCharacters.add(characterId);
       const container = document.getElementById('synergy_characters');
-      const badge = createCharacterBadge(characterId, characterName, 'synergy', 0);
+      const badge = createCharacterBadge(characterId, characterName, 'synergy', synergyCount);
       container.appendChild(badge);
+      synergyCount++;
     }
 
     function showSlotTypeDialog(characterId, characterName) {
@@ -405,6 +408,7 @@
         if (slotTypeField) {
           if (slotTypeField.value === 'main') mainCount--;
           if (slotTypeField.value === 'sub') subCount--;
+          if (slotTypeField.value === 'synergy') synergyCount--;
         }
         badgeElement.remove();
       }

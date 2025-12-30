@@ -166,6 +166,7 @@
     const selectedCharacters = new Set();
     let mainCount = 0;
     let subCount = 0;
+    let synergyCount = 0;
 
     // フィルタリング機能
     const searchInput = document.getElementById('character_search');
@@ -220,8 +221,9 @@
 
       selectedCharacters.add(characterId);
       const container = document.getElementById('synergy_characters');
-      const badge = createCharacterBadge(characterId, characterName, 'synergy', 0);
+      const badge = createCharacterBadge(characterId, characterName, 'synergy', synergyCount);
       container.appendChild(badge);
+      synergyCount++;
     }
 
     function showSlotTypeDialog(characterId, characterName) {
@@ -304,6 +306,7 @@
         if (slotTypeField) {
           if (slotTypeField.value === 'main') mainCount--;
           if (slotTypeField.value === 'sub') subCount--;
+          if (slotTypeField.value === 'synergy') synergyCount--;
         }
         badgeElement.remove();
       }
