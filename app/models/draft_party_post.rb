@@ -33,7 +33,7 @@ class DraftPartyPost < ApplicationRecord
   # ドラフトから公開投稿に変換
   def publish!
     ActiveRecord::Base.transaction do
-      party_post = PartyPost.create!(
+      party_post = PartyPost.new(
         user: user,
         title: title.presence || "無題の#{synergy? ? 'シナジー' : 'パーティー'}",
         description: description,
@@ -43,7 +43,7 @@ class DraftPartyPost < ApplicationRecord
 
       # メンバーをコピー
       draft_party_memberships.each do |draft_membership|
-        party_post.party_memberships.create!(
+        party_post.party_memberships.build(
           character: draft_membership.character,
           slot_type: draft_membership.slot_type,
           position: draft_membership.position
@@ -52,6 +52,9 @@ class DraftPartyPost < ApplicationRecord
 
       # タグをコピー
       party_post.use_case_tag_ids = use_case_tag_ids
+
+      # 保存（バリデーション実行）
+      party_post.save!
 
       # ドラフトを削除
       destroy!

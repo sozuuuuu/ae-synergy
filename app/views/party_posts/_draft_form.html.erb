@@ -286,10 +286,15 @@
       checkbox.addEventListener('change', filterCharacters);
     });
 
-    // キャラクター選択機能
-    document.querySelectorAll('.add-character-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const row = this.closest('.character-row');
+    // キャラクター選択機能（イベントデリゲーションで重複を防ぐ）
+    const characterList = document.getElementById('filterable_characters');
+    if (characterList && !characterList.dataset.listenerAdded) {
+      characterList.dataset.listenerAdded = 'true';
+      characterList.addEventListener('click', function(e) {
+        const button = e.target.closest('.add-character-btn');
+        if (!button) return;
+
+        const row = button.closest('.character-row');
         const characterId = row.dataset.characterId;
         const characterName = row.dataset.characterName;
 
@@ -305,7 +310,7 @@
           showSlotTypeDialog(characterId, characterName);
         }
       });
-    });
+    }
 
     function addCharacterToSynergy(characterId, characterName) {
       if (selectedCharacters.has(characterId)) return;

@@ -48,13 +48,15 @@ class PartyPost < ApplicationRecord
   private
 
   def correct_party_composition
-    return unless persisted?
-    return unless full_party?
+    if full_party?
+      main_count = party_memberships.select { |m| m.slot_type == 'main' && !m.marked_for_destruction? }.size
+      sub_count = party_memberships.select { |m| m.slot_type == 'sub' && !m.marked_for_destruction? }.size
 
-    main_count = party_memberships.select { |m| m.slot_type == 'main' }.size
-    sub_count = party_memberships.select { |m| m.slot_type == 'sub' }.size
-
-    errors.add(:base, "メインメンバーは4人必要です") unless main_count == 4
-    errors.add(:base, "サブメンバーは2人必要です") unless sub_count == 2
+      errors.add(:base, "メインメンバーは4人必要です") unless main_count == 4
+      errors.add(:base, "サブメンバーは2人必要です") unless sub_count == 2
+    elsif synergy?
+      synergy_count = party_memberships.select { |m| !m.marked_for_destruction? }.size
+      errors.add(:base, "シナジーには最低2人のキャラクターが必要です") if synergy_count < 2
+    end
   end
 end
