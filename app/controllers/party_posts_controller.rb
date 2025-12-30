@@ -87,7 +87,12 @@ class PartyPostsController < ApplicationController
       @party_post.destroy
     end
 
-    redirect_path = composition_type == 'synergy' ? synergy_posts_path : party_posts_path
+    # マイページから来た場合はマイページに戻る、そうでなければ一覧へ
+    redirect_path = if request.referer&.include?('dashboard')
+                      dashboard_path
+                    else
+                      composition_type == 'synergy' ? synergy_posts_path : party_posts_path
+                    end
     redirect_to redirect_path, notice: "#{composition_type == 'synergy' ? 'シナジー' : 'パーティー編成'}を削除しました"
   end
 
