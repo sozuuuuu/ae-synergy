@@ -372,12 +372,18 @@ class PartyPostsTest < ApplicationSystemTestCase
     # 公開ボタンをクリック
     click_on "公開する"
 
-    # エラーメッセージを確認
+    # エラーメッセージを確認（リダイレクト後）
     assert_text "公開に失敗しました"
     assert_text "シナジーには最低2人のキャラクターが必要です"
 
+    # 編集ページに戻っていることを確認
+    assert_current_path edit_draft_party_post_path(draft)
+
     # 草案が削除されていないことを確認
     assert_not_nil DraftPartyPost.find_by(id: draft.id)
+
+    # 選択されたキャラクターが保持されていることを確認
+    assert_text @character1.name
   end
 
   test "メインメンバーが不足しているパーティは公開できない" do
@@ -407,9 +413,12 @@ class PartyPostsTest < ApplicationSystemTestCase
     # 公開ボタンをクリック
     click_on "公開する"
 
-    # エラーメッセージを確認
+    # エラーメッセージを確認（リダイレクト後）
     assert_text "公開に失敗しました"
     assert_text "メインメンバーは4人必要です"
+
+    # 編集ページに戻っていることを確認
+    assert_current_path edit_draft_party_post_path(draft)
 
     # 草案が削除されていないことを確認
     assert_not_nil DraftPartyPost.find_by(id: draft.id)

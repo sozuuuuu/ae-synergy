@@ -20,11 +20,27 @@ ja:
         weapon_type: 武器種
         light_shadow_type: 天冥
         notes: 備考
+      party_post:
+        title: タイトル
+        description: 説明
+        strategy: 戦略
+        composition_type: 編成タイプ
+        base: パーティ編成
       skill:
         name: スキル名
         effects: 効果
         mp_cost: 消費MP
         position: 表示順
+    errors:
+      messages:
+        record_invalid: "バリデーションに失敗しました: %{errors}"
+      models:
+        party_post:
+          attributes:
+            base:
+              main_members_count: "メインメンバーは4人必要です"
+              sub_members_count: "サブメンバーは2人必要です"
+              synergy_members_count: "シナジーには最低2人のキャラクターが必要です"
 
   elements:
     Fire: 火

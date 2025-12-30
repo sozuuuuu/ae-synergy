@@ -85,13 +85,8 @@ class PartyPostsController < ApplicationController
       redirect_path = party_post.synergy? ? synergy_post_path(party_post) : party_post_path(party_post)
       redirect_to redirect_path, notice: "#{party_post.synergy? ? 'シナジー' : 'パーティー編成'}を公開しました"
     rescue ActiveRecord::RecordInvalid => e
-      @characters = Character.includes(:ability_tags, :personality_tags).order(:name)
-      @use_case_tags = UseCaseTag.all.order(:name)
-      @ability_tags_by_category = AbilityTag.all.group_by(&:category)
-      @all_ability_tags_by_category = AbilityTag.all.group_by(&:category)
-      @personality_tags = PersonalityTag.all.order(:name)
-      flash.now[:alert] = "公開に失敗しました: #{e.message}"
-      render :edit, status: :unprocessable_entity
+      error_messages = e.record.errors.full_messages.join(', ')
+      redirect_to edit_draft_party_post_path(@draft), alert: "公開に失敗しました: #{error_messages}"
     end
   end
 
