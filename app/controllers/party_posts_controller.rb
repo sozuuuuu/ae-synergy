@@ -59,13 +59,12 @@ class PartyPostsController < ApplicationController
   def publish
     # ドラフトを公開投稿に変換
     @draft = current_user.draft_party_posts.find(params[:id])
-    composition_type = @draft.composition_type
 
     begin
       party_post = @draft.publish!
-      # 公開後、同じタイプの新しいドラフトを作成して編集画面へ
-      new_draft = current_user.draft_party_posts.create!(composition_type: composition_type)
-      redirect_to edit_draft_party_post_path(new_draft), notice: "#{party_post.synergy? ? 'シナジー' : 'パーティー編成'}を公開しました。続けて新しい投稿を作成できます。"
+      # 公開後、作成した投稿の詳細ページへ
+      redirect_path = party_post.synergy? ? synergy_post_path(party_post) : party_post_path(party_post)
+      redirect_to redirect_path, notice: "#{party_post.synergy? ? 'シナジー' : 'パーティー編成'}を公開しました"
     rescue ActiveRecord::RecordInvalid => e
       @characters = Character.includes(:ability_tags, :personality_tags).order(:name)
       @use_case_tags = UseCaseTag.all.order(:name)
