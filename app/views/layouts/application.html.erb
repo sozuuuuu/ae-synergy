@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Ae Synergy" %></title>
+    <%= display_meta_tags site: "AE Synergy",
+                          reverse: true,
+                          separator: "|",
+                          description: "アナザーエデンのキャラクター編成とシナジーを共有するコミュニティサイト",
+                          og: {
+                            site_name: "AE Synergy",
+                            type: "website",
+                            locale: "ja_JP"
+                          },
+                          twitter: {
+                            card: "summary_large_image"
+                          } %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Ae Synergy">

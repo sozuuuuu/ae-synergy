@@ -21,6 +21,24 @@ class CharactersController < ApplicationController
   def show
     @popular_synergies = @character.party_posts.synergies.order(votes_count: :desc).limit(5)
     @popular_parties = @character.party_posts.full_parties.order(votes_count: :desc).limit(5)
+
+    # OGP meta tags
+    description = "#{@character.name}（#{@character.element}・#{@character.weapon_type}）の詳細情報とシナジー・パーティー編成"
+    set_meta_tags(
+      title: @character.name,
+      description: description,
+      og: {
+        title: @character.name,
+        description: description,
+        url: character_url(@character),
+        image: @character.display_image_for&.present? ? @character.display_image_for : nil
+      },
+      twitter: {
+        title: @character.name,
+        description: description,
+        image: @character.display_image_for&.present? ? @character.display_image_for : nil
+      }
+    )
   end
 
   def search
