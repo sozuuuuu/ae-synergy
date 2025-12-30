@@ -46,6 +46,9 @@ gem "paper_trail"
 # Pagination
 gem "kaminari"
 
+# SEO and OGP meta tags
+gem "meta-tags"
+
 # Tailwind CSS for styling
 gem "tailwindcss-rails"
 

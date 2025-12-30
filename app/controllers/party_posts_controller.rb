@@ -24,6 +24,23 @@ class PartyPostsController < ApplicationController
   def show
     @all_ability_tags_by_category = AbilityTag.all.group_by(&:category)
     @versions = @party_post.versions.order(created_at: :desc).limit(10)
+
+    # OGP meta tags
+    set_meta_tags(
+      title: @party_post.title,
+      description: @party_post.description.present? ? @party_post.description.truncate(200) : "アナザーエデンの#{@party_post.synergy? ? 'シナジー' : 'パーティー編成'}",
+      og: {
+        title: @party_post.title,
+        description: @party_post.description.present? ? @party_post.description.truncate(200) : "アナザーエデンの#{@party_post.synergy? ? 'シナジー' : 'パーティー編成'}",
+        url: @party_post.synergy? ? synergy_post_url(@party_post) : party_post_url(@party_post),
+        image: @party_post.characters.first&.display_image_for&.present? ? @party_post.characters.first.display_image_for : nil
+      },
+      twitter: {
+        title: @party_post.title,
+        description: @party_post.description.present? ? @party_post.description.truncate(200) : "アナザーエデンの#{@party_post.synergy? ? 'シナジー' : 'パーティー編成'}",
+        image: @party_post.characters.first&.display_image_for&.present? ? @party_post.characters.first.display_image_for : nil
+      }
+    )
   end
 
   def new
