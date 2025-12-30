@@ -30,6 +30,14 @@ class DraftPartyPost < ApplicationRecord
     draft_party_memberships.where(slot_type: 'sub').order(:position)
   end
 
+  def all_ability_tags
+    characters.flat_map(&:ability_tags).uniq.sort_by { |tag| [tag.category, tag.name] }
+  end
+
+  def ability_tags_by_category
+    all_ability_tags.group_by(&:category)
+  end
+
   # ドラフトから公開投稿に変換
   def publish!
     ActiveRecord::Base.transaction do
