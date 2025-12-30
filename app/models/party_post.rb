@@ -20,6 +20,11 @@ class PartyPost < ApplicationRecord
 
   scope :full_parties, -> { where(composition_type: 'full_party') }
   scope :synergies, -> { where(composition_type: 'synergy') }
+  scope :search, ->(query) {
+    query.present? ? where("title ILIKE ? OR description ILIKE ?",
+                          "%#{sanitize_sql_like(query)}%",
+                          "%#{sanitize_sql_like(query)}%") : all
+  }
 
   def full_party?
     composition_type == 'full_party'

@@ -23,6 +23,9 @@ Rails.application.routes.draw do
   # Dashboard (マイページ)
   get 'dashboard', to: 'dashboard#index', as: :dashboard
 
+  # Command Palette
+  get 'command_palette/search', to: 'command_palette#search', as: :command_palette_search
+
   # Characters (Wiki - Read-only, managed via YAML)
   resources :characters, only: [:index, :show] do
     collection do
