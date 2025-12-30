@@ -110,52 +110,112 @@ def get_char(objects, name)
   char
 end
 
+# ===== YAMLからシナジー・パーティデータを読み込み =====
+puts "Loading synergy parties from YAML..."
+synergy_parties_file = Rails.root.join('db', 'data', 'synergy_parties.yml')
+
+if File.exist?(synergy_parties_file)
+  synergy_parties_data = YAML.load_file(synergy_parties_file)
+  
+  synergy_parties_data['synergy_parties'].each do |party_data|
+    # キャラクターの存在確認
+    characters = party_data['characters'].map { |name| character_objects[name] }.compact
+    
+    if characters.length < 2
+      puts "Skipping '#{party_data['title']}': Not enough characters found (need at least 2)"
+      next
+    end
+    
+    # ランダムな投票数を生成（10〜50の範囲）
+    votes = rand(10..50)
+    
+    begin
+      synergy = create_with_error_logging(PartyPost, { title: party_data['title'], composition_type: party_data['composition_type'] }) do |post|
+        post.user = admin
+        post.description = party_data['description']
+        post.votes_count = votes
+      end
+      
+      # キャラクターをシナジーに追加
+      characters.each_with_index do |char, index|
+        create_with_error_logging(PartyMembership, { 
+          party_post: synergy, 
+          character: char, 
+          slot_type: "synergy", 
+          position: index 
+        })
+      end
+      
+      # ユースケースタグの追加
+      if party_data['use_case_tags']
+        tags = party_data['use_case_tags'].map { |name| UseCaseTag.find_by(name: name) }.compact
+        synergy.use_case_tags = tags
+      end
+      
+      puts "Created synergy: #{party_data['title']} (#{characters.length} characters)"
+    rescue => e
+      puts "Error creating synergy '#{party_data['title']}': #{e.message}"
+    end
+  end
+  
+  puts "Created #{PartyPost.synergies.count} synergy posts from YAML"
+else
+  puts "synergy_parties.yml not found, skipping..."
+  
+  # 既存のハードコードされたシナジーデータ（フォールバック）
+  aldo = get_char(character_objects, 'アルド')
+  feinne = get_char(character_objects, 'フィーネ')
+  aldo_as = get_char(character_objects, 'アルド(AS)') || get_char(character_objects, 'アルド（AS）')
+  myunfa = get_char(character_objects, 'ミュンファ')
+  shigure = get_char(character_objects, 'シグレ')
+
+  # シナジー投稿の作成
+  puts "Creating synergy posts (fallback)..."
+
+  if aldo && aldo_as
+    synergy1 = create_with_error_logging(PartyPost, { title: "火属性周回最強コンビ", composition_type: 'synergy' }) do |post|
+      post.user = admin
+      post.description = "アルドとアルド（AS）を組み合わせることで、火属性周回が非常に効率的になります。\n全体攻撃と単体攻撃を使い分けることで、あらゆる場面に対応可能。"
+      post.votes_count = 25
+    end
+    create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo, slot_type: "synergy", position: 0 })
+    create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo_as, slot_type: "synergy", position: 1 })
+    synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")].compact
+  end
+
+  if myunfa && shigure
+    synergy2 = create_with_error_logging(PartyPost, { title: "地水デバフコンボ", composition_type: 'synergy' }) do |post|
+      post.user = admin
+      post.description = "ミュンファの耐性バフとシグレの高火力を組み合わせた安定シナジー。\nミュンファで耐性を上げつつ、シグレで一気に削る戦法が強力。"
+      post.votes_count = 18
+    end
+    create_with_error_logging(PartyMembership, { party_post: synergy2, character: myunfa, slot_type: "synergy", position: 0 })
+    create_with_error_logging(PartyMembership, { party_post: synergy2, character: shigure, slot_type: "synergy", position: 1 })
+    synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")].compact
+  end
+
+  if feinne && aldo
+    synergy3 = create_with_error_logging(PartyPost, { title: "ヒーラー＋火力アタッカー", composition_type: 'synergy' }) do |post|
+      post.user = admin
+      post.description = "フィーネの回復でパーティを支えつつ、アルドで火力を出す基本的なシナジー。\n初心者におすすめの組み合わせです。"
+      post.votes_count = 32
+    end
+    create_with_error_logging(PartyMembership, { party_post: synergy3, character: feinne, slot_type: "synergy", position: 0 })
+    create_with_error_logging(PartyMembership, { party_post: synergy3, character: aldo, slot_type: "synergy", position: 1 })
+    synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")].compact
+  end
+
+  puts "Created #{PartyPost.synergies.count} synergy posts"
+end
+
+# パーティ投稿の作成
+puts "Creating party posts..."
+
 aldo = get_char(character_objects, 'アルド')
 feinne = get_char(character_objects, 'フィーネ')
 aldo_as = get_char(character_objects, 'アルド(AS)') || get_char(character_objects, 'アルド（AS）')
 myunfa = get_char(character_objects, 'ミュンファ')
 shigure = get_char(character_objects, 'シグレ')
-
-# シナジー投稿の作成
-puts "Creating synergy posts..."
-
-if aldo && aldo_as
-  synergy1 = create_with_error_logging(PartyPost, { title: "火属性周回最強コンビ", composition_type: 'synergy' }) do |post|
-    post.user = admin
-    post.description = "アルドとアルド（AS）を組み合わせることで、火属性周回が非常に効率的になります。\n全体攻撃と単体攻撃を使い分けることで、あらゆる場面に対応可能。"
-    post.votes_count = 25
-  end
-  create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo, slot_type: "synergy", position: 0 })
-  create_with_error_logging(PartyMembership, { party_post: synergy1, character: aldo_as, slot_type: "synergy", position: 1 })
-  synergy1.use_case_tags = [UseCaseTag.find_by(name: "周回"), UseCaseTag.find_by(name: "初心者向け")].compact
-end
-
-if myunfa && shigure
-  synergy2 = create_with_error_logging(PartyPost, { title: "地水デバフコンボ", composition_type: 'synergy' }) do |post|
-    post.user = admin
-    post.description = "ミュンファの耐性バフとシグレの高火力を組み合わせた安定シナジー。\nミュンファで耐性を上げつつ、シグレで一気に削る戦法が強力。"
-    post.votes_count = 18
-  end
-  create_with_error_logging(PartyMembership, { party_post: synergy2, character: myunfa, slot_type: "synergy", position: 0 })
-  create_with_error_logging(PartyMembership, { party_post: synergy2, character: shigure, slot_type: "synergy", position: 1 })
-  synergy2.use_case_tags = [UseCaseTag.find_by(name: "ボス戦"), UseCaseTag.find_by(name: "サポート")].compact
-end
-
-if feinne && aldo
-  synergy3 = create_with_error_logging(PartyPost, { title: "ヒーラー＋火力アタッカー", composition_type: 'synergy' }) do |post|
-    post.user = admin
-    post.description = "フィーネの回復でパーティを支えつつ、アルドで火力を出す基本的なシナジー。\n初心者におすすめの組み合わせです。"
-    post.votes_count = 32
-  end
-  create_with_error_logging(PartyMembership, { party_post: synergy3, character: feinne, slot_type: "synergy", position: 0 })
-  create_with_error_logging(PartyMembership, { party_post: synergy3, character: aldo, slot_type: "synergy", position: 1 })
-  synergy3.use_case_tags = [UseCaseTag.find_by(name: "初心者向け"), UseCaseTag.find_by(name: "ストーリー")].compact
-end
-
-puts "Created #{PartyPost.synergies.count} synergy posts"
-
-# パーティ投稿の作成
-puts "Creating party posts..."
 
 if aldo && feinne && myunfa && shigure && aldo_as
   party1 = create_with_error_logging(PartyPost, { title: "バランス型汎用パーティ", composition_type: 'full_party' }) do |post|
