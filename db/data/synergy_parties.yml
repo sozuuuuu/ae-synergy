@@ -1,0 +1,638 @@
+# シナジー・パーティのシードデータ
+# 環境キャラ・装備まとめページを参考に作成
+# 投稿者: admin
+
+synergy_parties:
+  # ===== 環境最上位キャラを軸としたシナジー =====
+
+  # 1. セスタ(AS)軸 - 風属性弱点看破
+  - title: "風属性弱点看破コンビ"
+    composition_type: synergy
+    description: "セスタ(AS)の「二刀神狼・改」で敵全体に弱点看破(風)を付与し、ねここ(ES)のサポートで風パーティの火力を爆発的に伸ばす最強コンビ。"
+    characters:
+      - セスタ(AS)
+      - ねここ(ES)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 2. チルリル(ES)軸 - 晶属性サポート
+  - title: "晶属性最強バフコンビ"
+    composition_type: synergy
+    description: "チルリル(ES)の「プロミストランド」による腕知速100%バフと精神統一付与、アルマ(AS)の極・輝晶陣展開で冥キャラの火力が爆発的に上昇する。"
+    characters:
+      - チルリル(ES)
+      - アルマ(AS)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+      - 高難易度
+
+  # 3. アルマ(AS)軸 - 守護+迎撃
+  - title: "守護迎撃タンクシナジー"
+    composition_type: synergy
+    description: "アルマ(AS)の守護+迎撃とカグラメの守勢+迎撃を組み合わせ、敵の攻撃を受けながら反撃でダメージを稼ぐ鉄壁の布陣。"
+    characters:
+      - アルマ(AS)
+      - カグラメ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 4. シェンファ軸 - 無属性魔法
+  - title: "無属性魔法最強コンビ"
+    composition_type: synergy
+    description: "シェンファの幻魔陣展開と圧倒的高火力、ユナの強力なデバフサポートで敵の耐性バフを無視して安定した高火力を叩き出す。"
+    characters:
+      - シェンファ
+      - ユナ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+      - サポート
+
+  # 5. ユナ軸 - デバフサポート
+  - title: "最強デバフサポートコンビ"
+    composition_type: synergy
+    description: "ユナの腕知60%DOWN+物理・全属性耐性100%DOWNとエニの各種サポートを組み合わせ、どんな敵も無力化する。"
+    characters:
+      - ユナ
+      - エニ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+      - サポート
+
+  # 6. エニ軸 - 陰属性ZONE
+  - title: "陰属性最強サポートコンビ"
+    composition_type: synergy
+    description: "エニの刻陰陣展開とルナティック捨身付与、ウェネーフィカの極・刻陰陣とイユンクスで陰属性パーティの火力を最大化。"
+    characters:
+      - エニ
+      - ウェネーフィカ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+      - 高難易度
+
+  # 7. ねここ(ES)軸 - 変幻自在
+  - title: "変幻自在サポートコンビ"
+    composition_type: synergy
+    description: "ねここ(ES)の変幻自在付与とメルピピアの各種サポートで、様々な属性のキャラを風属性として運用可能にする。"
+    characters:
+      - ねここ(ES)
+      - メルピピア
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # ===== 環境上位キャラを軸としたシナジー =====
+
+  # 8. 韜晦の討手軸 - 火属性サポート
+  - title: "火属性開幕バフコンビ"
+    composition_type: synergy
+    description: "韜晦の討手の戦闘開始時バフ（腕力・知性・火属性攻撃100%UP）と赤套の炎使い(AS)の高火力で開幕から敵を粉砕。"
+    characters:
+      - 韜晦の討手(異時層レンリ)
+      - 赤套の炎使い(AS)(異時層デューイ(AS))
+    use_case_tags:
+      - 周回
+      - AF火力
+
+  # 9. マツリカ軸 - 単体特化サポート
+  - title: "単体ボス特化サポートコンビ"
+    composition_type: synergy
+    description: "マツリカの単体特化バフ・デバフとセリエスの高火力で、単体ボスを効率的に撃破。"
+    characters:
+      - マツリカ
+      - セリエス
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 10. ユーイン軸 - 火属性高火力
+  - title: "火属性再行動アタッカーコンビ"
+    composition_type: synergy
+    description: "ユーインの再行動による最大11340%攻撃とアナベル(ES)のサポートで火属性パーティの火力を最大化。"
+    characters:
+      - ユーイン
+      - アナベル(ES)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 11. アナベル(ES)軸 - 天冥切り替え
+  - title: "天冥切り替えタンクコンビ"
+    composition_type: synergy
+    description: "アナベル(ES)の天冥切り替えによるアタッカー/タンク運用とミナルカ(AS)の守護+迎撃で攻守両面をカバー。"
+    characters:
+      - アナベル(ES)
+      - ミナルカ(AS)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 12. セリエス軸 - 地属性突
+  - title: "地属性突パーティコンビ"
+    composition_type: synergy
+    description: "セリエスの自己バフ完備と義侠の猟人の突サポートで地属性突パーティを構築。"
+    characters:
+      - セリエス
+      - 義侠の猟人(異時層ラクレア)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 13. コマチ(AS)軸 - 地属性戦姫
+  - title: "地属性戦姫コンビ"
+    composition_type: synergy
+    description: "コマチ(AS)の戦姫状態と寂寞の舞台人のVC高火力で地属性パーティの瞬間火力を最大化。"
+    characters:
+      - コマチ(AS)
+      - 寂寞の舞台人(異時層ロキド)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 14. 烏夜の隠密軸 - 風属性魔法
+  - title: "風属性魔法アタッカーコンビ"
+    composition_type: synergy
+    description: "烏夜の隠密の30連撃と茨呪の艶女のクリティカル率上昇で風属性魔法パーティの火力を最大化。"
+    characters:
+      - 烏夜の隠密(異時層ツバメ)
+      - 茨呪の艶女(異時層シェイネ)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 15. イヅナ軸 - 雷属性
+  - title: "雷属性AFコンビ"
+    composition_type: synergy
+    description: "イヅナのAF暴力運用とオボロの弱点看破(雷)で雷属性パーティのAF火力を最大化。"
+    characters:
+      - イヅナ
+      - オボロ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 16. ヴェレット(AS)軸 - 雷属性サポート
+  - title: "雷属性最強サポートコンビ"
+    composition_type: synergy
+    description: "ヴェレット(AS)の弱点看破(雷)+属性耐性100%DOWNとウツハラの迎撃で雷パーティの攻守を両立。"
+    characters:
+      - ヴェレット(AS)
+      - ウツハラ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 17. ニルヤ軸 - 晶属性臨機応変
+  - title: "晶属性臨機応変コンビ"
+    composition_type: synergy
+    description: "ニルヤの攻撃種変化とマリエル(ES)のルナティック心眼付与で弱点を突きながら高火力を発揮。"
+    characters:
+      - ニルヤ
+      - マリエル(ES)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 攻撃種特化シナジー =====
+
+  # 18. リナリア軸 - 斬突ZONE
+  - title: "斬突ZONE最強コンビ"
+    composition_type: synergy
+    description: "リナリアの双撃陣・斬突展開とオーバークリティカル付与、シオン(ES)の斬サポートで斬突パーティを構築。"
+    characters:
+      - リナリア
+      - シオン(ES)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 19. シオン(ES)軸 - 煌斬陣
+  - title: "煌斬陣サポートコンビ"
+    composition_type: synergy
+    description: "シオン(ES)の煌斬陣展開と心技一体付与、シグレ(ES)の攻守両立で斬パーティを強化。"
+    characters:
+      - シオン(ES)
+      - シグレ(ES)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 20. シグレ(ES)軸 - 刀パーティ
+  - title: "刀パーティ連携コンビ"
+    composition_type: synergy
+    description: "シグレ(ES)の刀キャラ連携付与とイスカの耐性デバフで刀パーティの火力を底上げ。"
+    characters:
+      - シグレ(ES)
+      - イスカ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 21. イスカ軸 - 耐性デバフ
+  - title: "耐性デバフ最強コンビ"
+    composition_type: synergy
+    description: "イスカの物理耐性100%DOWN+全属性耐性100%DOWNとクロード(ES)のバフ展開で火力を最大化。"
+    characters:
+      - イスカ
+      - クロード(ES)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 22. 義侠の猟人軸 - 突パーティ
+  - title: "突パーティサポートコンビ"
+    composition_type: synergy
+    description: "義侠の猟人の突サポートと心技一体付与、ヒスメナの高火力で突パーティを構築。"
+    characters:
+      - 義侠の猟人(異時層ラクレア)
+      - ヒスメナ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 23. イド軸 - 打パーティ
+  - title: "打パーティチェインコンビ"
+    composition_type: synergy
+    description: "イドのチェインアビリティとラブリ(AS)の打ZONEで打パーティの手数と火力を両立。"
+    characters:
+      - イド
+      - ラブリ(AS)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 24. ヤクモ(AS)軸 - 幻魔陣
+  - title: "幻魔陣サポートコンビ"
+    composition_type: synergy
+    description: "ヤクモ(AS)の極・幻魔陣展開と精神統一付与、墨染の軍師の弱点・耐性入れ替えで魔法パーティを強化。"
+    characters:
+      - ヤクモ(AS)
+      - 墨染の軍師(異時層シオン)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # ===== 環境キャラを軸としたシナジー =====
+
+  # 25. ねここ(AS)軸 - 属性書き換え
+  - title: "属性書き換えサポートコンビ"
+    composition_type: synergy
+    description: "ねここ(AS)の属性書き換え効果と白磁の魔人の祈祷バフで様々なパーティに出張可能。"
+    characters:
+      - ねここ(AS)
+      - 白磁の魔人(異時層ミュンファ)
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # 26. 月華の令嬢軸 - 水属性
+  - title: "水属性ダブルアタッカーコンビ"
+    composition_type: synergy
+    description: "月華の令嬢の攻撃種変化とエルシールの弱点看破(水)で水属性パーティのダブルアタッカー編成を実現。"
+    characters:
+      - 月華の令嬢(異時層ヒスメナ)
+      - エルシール
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 27. クロード(ES)軸 - エンパシー
+  - title: "エンパシーサポートコンビ"
+    composition_type: synergy
+    description: "クロード(ES)のエンパシー付与と深緋の刈人の斬サポートで様々な攻撃種パーティに出張。"
+    characters:
+      - クロード(ES)
+      - 深緋の刈人(異時層イルルゥ)
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # 28. 白磁の魔人軸 - 祈祷バフ
+  - title: "祈祷バフサポートコンビ"
+    composition_type: synergy
+    description: "白磁の魔人の祈祷バフとミュルスの地属性サポートでバフリセット対策を完備。"
+    characters:
+      - 白磁の魔人(異時層ミュンファ)
+      - ミュルス
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 29. アルド軸 - 主人公コンビ
+  - title: "主人公開幕AFコンビ"
+    composition_type: synergy
+    description: "アルドのSAによる開幕AF発動とノーナ(AS)の迎撃回復で安定した攻略を実現。"
+    characters:
+      - アルド
+      - ノーナ(AS)
+    use_case_tags:
+      - ストーリー
+      - 初心者向け
+
+  # 30. ノーナ(AS)軸 - 迎撃回復
+  - title: "迎撃回復サポートコンビ"
+    composition_type: synergy
+    description: "ノーナ(AS)の迎撃回復とメリナの歌唱効果で鉄壁の回復体制を構築。"
+    characters:
+      - ノーナ(AS)
+      - メリナ
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # 31. 氷塵の歌姫軸 - 先制行動
+  - title: "先制行動サポートコンビ"
+    composition_type: synergy
+    description: "氷塵の歌姫の先制行動付与とフェルミナ(ES)の先制全体攻撃で周回効率を最大化。"
+    characters:
+      - 氷塵の歌姫(異時層ユキノ)
+      - フェルミナ(ES)
+    use_case_tags:
+      - 周回
+      - AF火力
+
+  # ===== タンク系シナジー =====
+
+  # 32. カグラメ軸 - 迎撃タンク
+  - title: "迎撃タンクコンビ"
+    composition_type: synergy
+    description: "カグラメの守勢+迎撃と茨呪の艶女のクリティカルガード+庇立てで敵の攻撃を完全に受け止める。"
+    characters:
+      - カグラメ
+      - 茨呪の艶女(異時層シェイネ)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 33. 茨呪の艶女軸 - 風属性タンク
+  - title: "風属性タンクサポートコンビ"
+    composition_type: synergy
+    description: "茨呪の艶女のタンク性能とシュゼットの高火力で風属性パーティの攻守を両立。"
+    characters:
+      - 茨呪の艶女(異時層シェイネ)
+      - シュゼット
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 34. ラブリ(AS)軸 - 打タンク
+  - title: "打タンクサポートコンビ"
+    composition_type: synergy
+    description: "ラブリ(AS)の守護+全属性耐性デバフと電影の明星のウェポンブレイク(打)で打パーティを強化。"
+    characters:
+      - ラブリ(AS)
+      - 電影の明星(異時層シエル)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 属性特化シナジー（火属性） =====
+
+  # 35. シオン軸 - 火属性斬
+  - title: "火属性斬アタッカーコンビ"
+    composition_type: synergy
+    description: "シオンの火属性耐性→弱点変換とミナルカの高火力で火属性耐性持ちの敵を撃破。"
+    characters:
+      - シオン
+      - ミナルカ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 36. 墨染の軍師(AS)軸 - 火属性魔法
+  - title: "火属性魔法アタッカーコンビ"
+    composition_type: synergy
+    description: "墨染の軍師(AS)の高火力単体攻撃と墨染の軍師の弱点・耐性入れ替えで火属性魔法パーティを構築。"
+    characters:
+      - 墨染の軍師(AS)(異時層シオン(AS))
+      - 墨染の軍師(異時層シオン)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 37. ツキハ軸 - 火属性刀
+  - title: "火属性刀アタッカーコンビ"
+    composition_type: synergy
+    description: "ツキハの捨身ルナティックと高火力、セティーの解除不能腕知100%デバフで火属性刀パーティを構築。"
+    characters:
+      - ツキハ
+      - セティー(AS)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 属性特化シナジー（水属性） =====
+
+  # 38. エルシール軸 - 水属性弱点看破
+  - title: "水属性弱点看破コンビ"
+    composition_type: synergy
+    description: "エルシールの弱点看破(水/永続)とエルシール(AS)のバリア貫通付与で水属性パーティの火力を最大化。"
+    characters:
+      - エルシール
+      - エルシール(AS)
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 39. ジルファニー軸 - 水属性耐性
+  - title: "水属性耐性サポートコンビ"
+    composition_type: synergy
+    description: "ジルファニーの物理耐性60%+全属性耐性60%とマイティの魔法耐性デバフで水属性パーティの攻守を両立。"
+    characters:
+      - ジルファニー
+      - マイティ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 40. ヒスメナ軸 - 水属性周回
+  - title: "水属性周回コンビ"
+    composition_type: synergy
+    description: "ヒスメナの開幕0ターン目攻撃とフラムラピスの高火力全体攻撃で水属性周回を効率化。"
+    characters:
+      - ヒスメナ
+      - フラムラピス
+    use_case_tags:
+      - 周回
+      - 初心者向け
+
+  # 41. フェルミナ(ES)軸 - 水属性ZONE
+  - title: "水属性ZONE高火力コンビ"
+    composition_type: synergy
+    description: "フェルミナ(ES)の水滴神穿状態と再行動、レレ(AS)のストリームグレアーで水属性パーティの火力を最大化。"
+    characters:
+      - フェルミナ(ES)
+      - レレ(AS)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 属性特化シナジー（地属性） =====
+
+  # 42. 菊花の剣客軸 - 地属性刀
+  - title: "地属性刀サポートコンビ"
+    composition_type: synergy
+    description: "菊花の剣客の地属性耐性100%デバフとクチナワのエレメンタルブレイク(地)で地属性パーティの火力を倍増。"
+    characters:
+      - 菊花の剣客(異時層アカネ)
+      - クチナワ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 43. 寂寞の舞台人軸 - 地属性VC
+  - title: "地属性VC高火力コンビ"
+    composition_type: synergy
+    description: "寂寞の舞台人のVC高火力とコマチ(AS)の戦姫状態で地属性パーティの瞬間火力を最大化。"
+    characters:
+      - 寂寞の舞台人(異時層ロキド)
+      - コマチ(AS)
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 44. ミュルス軸 - 地属性サポート
+  - title: "地属性サポートコンビ"
+    composition_type: synergy
+    description: "ミュルスの地属性特化サポートとねここ(AS)の属性書き換えで地属性パーティを強化。"
+    characters:
+      - ミュルス
+      - ねここ(AS)
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # ===== 属性特化シナジー（風属性） =====
+
+  # 45. シュゼット軸 - 風属性周回
+  - title: "風属性周回コンビ"
+    composition_type: synergy
+    description: "シュゼットの先制攻撃+風ZONE展開とセスタの二刀神狼で風属性周回を効率化。"
+    characters:
+      - シュゼット
+      - セスタ
+    use_case_tags:
+      - 周回
+      - AF火力
+
+  # 46. メロディ(AS)軸 - 風属性魔法
+  - title: "風属性魔法サポートコンビ"
+    composition_type: synergy
+    description: "メロディ(AS)の腕知速50%デバフ+全武器種100%バフとメルピピアの各種サポートで風属性魔法パーティを構築。"
+    characters:
+      - メロディ(AS)
+      - メルピピア
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # ===== 属性特化シナジー（雷属性） =====
+
+  # 47. ヴェレット軸 - 雷属性サポート
+  - title: "雷属性万能サポートコンビ"
+    composition_type: synergy
+    description: "ヴェレットの雷ZONE展開+各種バフとオルレイア(AS)のタンク+サポートで雷属性パーティの攻守を両立。"
+    characters:
+      - ヴェレット
+      - オルレイア(AS)
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # 48. オボロ軸 - 雷属性弱点看破
+  - title: "雷属性弱点看破コンビ"
+    composition_type: synergy
+    description: "オボロの弱点看破(雷)とイヅナのAF暴力で雷属性パーティのAF火力を最大化。"
+    characters:
+      - オボロ
+      - イヅナ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 属性特化シナジー（晶属性） =====
+
+  # 49. ミストレア(AS)軸 - 晶属性歌唱
+  - title: "晶属性歌唱サポートコンビ"
+    composition_type: synergy
+    description: "ミストレア(AS)の歌唱効果とアルマの晶ZONE展開で晶属性パーティの火力を底上げ。"
+    characters:
+      - ミストレア(AS)
+      - アルマ
+    use_case_tags:
+      - ボス戦
+      - サポート
+
+  # 50. アルマ軸 - 晶属性弱点
+  - title: "晶属性弱点特化コンビ"
+    composition_type: synergy
+    description: "アルマの属性変化とエヴァのフィニス・ドラコで弱点を突いて暴力的な火力を発揮。"
+    characters:
+      - アルマ
+      - エヴァ
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # ===== 無属性・攻撃種特化シナジー =====
+
+  # 51. ジルバー(AS)軸 - 無属性デバフ
+  - title: "無属性デバフコンビ"
+    composition_type: synergy
+    description: "ジルバー(AS)の死出の途による腕知100%デバフとベネディトの斬耐性70%デバフで敵を完全に無力化。"
+    characters:
+      - ジルバー(AS)
+      - ベネディト
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 52. アルド(AS)軸 - 速度特化
+  - title: "速度特化AFコンビ"
+    composition_type: synergy
+    description: "アルド(AS)の速度999上昇とアルドの開幕AFで圧倒的な手数を叩き込む。"
+    characters:
+      - アルド(AS)
+      - アルド
+    use_case_tags:
+      - 周回
+      - AF火力
+      - 初心者向け
+
+  # 53. 深緋の刈人軸 - 斬ZONE
+  - title: "斬ZONE追撃コンビ"
+    composition_type: synergy
+    description: "深緋の刈人の先制斬覚醒ZONE展開と追撃、エルシールの連携効果で斬パーティの火力を最大化。"
+    characters:
+      - 深緋の刈人(異時層イルルゥ)
+      - エルシール
+    use_case_tags:
+      - ボス戦
+      - AF火力
+
+  # 54. セティー軸 - 解除不能デバフ
+  - title: "解除不能デバフコンビ"
+    composition_type: synergy
+    description: "セティーの解除不能腕知100%デバフとユナの各種デバフで敵の攻撃を完全に無力化。"
+    characters:
+      - セティー(AS)
+      - ユナ
+    use_case_tags:
+      - ボス戦
+      - 高難易度
+
+  # 55. 電影の明星軸 - 打ZONE
+  - title: "打ZONE周回コンビ"
+    composition_type: synergy
+    description: "電影の明星のウェポンブレイク(打)+バリア貫通とメリナの打ZONE展開で打パーティの周回を効率化。"
+    characters:
+      - 電影の明星(異時層シエル)
+      - メリナ
+    use_case_tags:
+      - 周回
+      - AF火力
