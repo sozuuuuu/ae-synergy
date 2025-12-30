@@ -250,4 +250,194 @@ class PartyPostsTest < ApplicationSystemTestCase
     # 緑色でハイライトされたタグがある
     assert_selector ".bg-green-100.text-green-800"
   end
+
+  test "マイページから草案パーティに遷移してキャラクター選択が重複しない" do
+    login
+
+    # 草案パーティを作成
+    draft = @user.draft_party_posts.create!(composition_type: 'synergy')
+
+    # マイページから草案パーティ編集ページに遷移
+    visit dashboard_path
+    click_on "編集", match: :first
+
+    # キャラクター追加ボタンが1回だけ表示されることを確認
+    character = Character.first
+    character_rows = all(".character-row[data-character-id='#{character.id}']")
+    assert_equal 1, character_rows.count, "キャラクター行が重複しています"
+
+    # キャラクターを追加
+    within(".character-row[data-character-id='#{character.id}']") do
+      click_on "追加"
+    end
+
+    # 選択されたキャラクターが1回だけ表示されることを確認
+    selected_badges = all(".inline-flex.items-center.bg-indigo-100[data-character-id='#{character.id}']")
+    assert_equal 1, selected_badges.count, "選択されたキャラクターバッジが重複しています"
+
+    # もう一度同じキャラクターを追加しようとするとアラートが表示される
+    accept_alert "#{character.name}は既に追加されています" do
+      within(".character-row[data-character-id='#{character.id}']") do
+        click_on "追加"
+      end
+    end
+  end
+
+  test "シナジー草案を公開できる" do
+    login
+
+    # シナジー草案を作成
+    draft = @user.draft_party_posts.create!(
+      composition_type: 'synergy',
+      title: "テスト公開シナジー",
+      description: "公開テスト用の説明"
+    )
+    draft.draft_party_memberships.create!(character: @character1, slot_type: 'synergy', position: 0)
+    draft.draft_party_memberships.create!(character: @character2, slot_type: 'synergy', position: 1)
+
+    # 編集ページに移動
+    visit edit_draft_party_post_path(draft)
+
+    # 公開ボタンをクリック
+    click_on "公開する"
+
+    # 公開成功メッセージを確認
+    assert_text "シナジーを公開しました"
+    assert_text "テスト公開シナジー"
+
+    # 草案が削除されたことを確認
+    assert_nil DraftPartyPost.find_by(id: draft.id)
+
+    # 公開投稿が作成されたことを確認
+    party_post = PartyPost.find_by(title: "テスト公開シナジー")
+    assert_not_nil party_post
+    assert_equal 2, party_post.characters.count
+  end
+
+  test "パーティ草案を公開できる" do
+    login
+
+    # パーティ草案を作成
+    draft = @user.draft_party_posts.create!(
+      composition_type: 'full_party',
+      title: "テスト公開パーティ",
+      description: "公開テスト用の説明",
+      strategy: "戦略の説明"
+    )
+
+    # メインメンバー4人
+    4.times do |i|
+      char = Character.offset(i).first
+      draft.draft_party_memberships.create!(character: char, slot_type: 'main', position: i)
+    end
+
+    # サブメンバー2人
+    2.times do |i|
+      char = Character.offset(i + 4).first
+      draft.draft_party_memberships.create!(character: char, slot_type: 'sub', position: i)
+    end
+
+    # 編集ページに移動
+    visit edit_draft_party_post_path(draft)
+
+    # 公開ボタンをクリック
+    click_on "公開する"
+
+    # 公開成功メッセージを確認
+    assert_text "パーティー編成を公開しました"
+    assert_text "テスト公開パーティ"
+
+    # 草案が削除されたことを確認
+    assert_nil DraftPartyPost.find_by(id: draft.id)
+
+    # 公開投稿が作成されたことを確認
+    party_post = PartyPost.find_by(title: "テスト公開パーティ")
+    assert_not_nil party_post
+    assert_equal 6, party_post.characters.count
+  end
+
+  test "キャラクターが不足しているシナジーは公開できない" do
+    login
+
+    # シナジー草案を作成（キャラクター1人のみ）
+    draft = @user.draft_party_posts.create!(
+      composition_type: 'synergy',
+      title: "不完全なシナジー"
+    )
+    draft.draft_party_memberships.create!(character: @character1, slot_type: 'synergy', position: 0)
+
+    # 編集ページに移動
+    visit edit_draft_party_post_path(draft)
+
+    # 公開ボタンをクリック
+    click_on "公開する"
+
+    # エラーメッセージを確認
+    assert_text "公開に失敗しました"
+    assert_text "シナジーには最低2人のキャラクターが必要です"
+
+    # 草案が削除されていないことを確認
+    assert_not_nil DraftPartyPost.find_by(id: draft.id)
+  end
+
+  test "メインメンバーが不足しているパーティは公開できない" do
+    login
+
+    # パーティ草案を作成（メイン3人、サブ2人）
+    draft = @user.draft_party_posts.create!(
+      composition_type: 'full_party',
+      title: "不完全なパーティ"
+    )
+
+    # メインメンバー3人（4人必要）
+    3.times do |i|
+      char = Character.offset(i).first
+      draft.draft_party_memberships.create!(character: char, slot_type: 'main', position: i)
+    end
+
+    # サブメンバー2人
+    2.times do |i|
+      char = Character.offset(i + 3).first
+      draft.draft_party_memberships.create!(character: char, slot_type: 'sub', position: i)
+    end
+
+    # 編集ページに移動
+    visit edit_draft_party_post_path(draft)
+
+    # 公開ボタンをクリック
+    click_on "公開する"
+
+    # エラーメッセージを確認
+    assert_text "公開に失敗しました"
+    assert_text "メインメンバーは4人必要です"
+
+    # 草案が削除されていないことを確認
+    assert_not_nil DraftPartyPost.find_by(id: draft.id)
+  end
+
+  test "タイトルがない草案も公開できる（自動で無題になる）" do
+    login
+
+    # タイトルなしのシナジー草案を作成
+    draft = @user.draft_party_posts.create!(
+      composition_type: 'synergy',
+      description: "タイトルなしのテスト"
+    )
+    draft.draft_party_memberships.create!(character: @character1, slot_type: 'synergy', position: 0)
+    draft.draft_party_memberships.create!(character: @character2, slot_type: 'synergy', position: 1)
+
+    # 編集ページに移動
+    visit edit_draft_party_post_path(draft)
+
+    # 公開ボタンをクリック
+    click_on "公開する"
+
+    # 公開成功メッセージを確認
+    assert_text "シナジーを公開しました"
+    assert_text "無題のシナジー"
+
+    # 公開投稿が作成されたことを確認
+    party_post = PartyPost.find_by(title: "無題のシナジー")
+    assert_not_nil party_post
+  end
 end
