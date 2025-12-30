@@ -69,6 +69,7 @@ class PartyPostsController < ApplicationController
       @characters = Character.includes(:ability_tags, :personality_tags).order(:name)
       @use_case_tags = UseCaseTag.all.order(:name)
       @ability_tags_by_category = AbilityTag.all.group_by(&:category)
+      @all_ability_tags_by_category = AbilityTag.all.group_by(&:category)
       @personality_tags = PersonalityTag.all.order(:name)
       render :edit, status: :unprocessable_entity
     end
@@ -87,6 +88,7 @@ class PartyPostsController < ApplicationController
       @characters = Character.includes(:ability_tags, :personality_tags).order(:name)
       @use_case_tags = UseCaseTag.all.order(:name)
       @ability_tags_by_category = AbilityTag.all.group_by(&:category)
+      @all_ability_tags_by_category = AbilityTag.all.group_by(&:category)
       @personality_tags = PersonalityTag.all.order(:name)
       flash.now[:alert] = "公開に失敗しました: #{e.message}"
       render :edit, status: :unprocessable_entity
