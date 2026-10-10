@@ -9,7 +9,7 @@ export const ROWS = [
     personalities: ["刀", "火", "東方"], stats: { lvMax: { hp: 3000, pwr: 300 } },
     skills: [
       { no: 1, name: "火炎斬", mpCost: 50, effects: [{ description: "敵単体に火属性の斬攻撃(大)", element: "火", types: "斬攻撃", targets: "敵単体", value: 1.3 }] },
-      { no: 2, name: "集中", mpCost: 30, effects: [{ description: "自身に精神統一(3ターン)", types: "精神統一", targets: "自身", turn: 3 }] },
+      { no: 2, name: "集中", mpCost: 30, effects: [{ description: "自身に心技一体(3ターン)", types: "心技一体", targets: "自身", turn: 3 }] },
     ],
     abilities: [{ description: "火属性耐性+30%", types: "火属性耐性UP", value: 30 }],
   },

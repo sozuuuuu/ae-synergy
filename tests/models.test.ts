@@ -78,7 +78,7 @@ describe("枠の判定", () => {
 
   test("アタッカー本人の自己バフはアタッカーの枠を埋める", () => {
     const { db, partyId } = setup();
-    expect(coverageOf(db, partyId).special!.status).toBe("ok");
+    expect(coverageOf(db, partyId).unity!.status).toBe("ok");
   });
 
   test("支援役の効果は対象・条件に応じて ok / partial になる", () => {
@@ -102,6 +102,28 @@ describe("枠の判定", () => {
     const ctx = partyContext(db, party);
     const zone = requirementsFor(ctx).find((r) => r.key === "zone")!;
     expect(candidatesFor(db, ctx, zone, [idOf(db, "テストアタッカー")]).map((p) => p.characterId)).toEqual([idOf(db, "テスト陣")]);
+  });
+
+  test("オーバークリティカル・挺身・踏ん張るの枠があり、魔法アタッカーなら魔法オーバークリティカルになる", () => {
+    const { db, partyId } = setup();
+    const party = getParty(db, partyId)!;
+    const ctx = partyContext(db, party);
+    expect(requirementsFor(ctx).map((r) => r.key)).toEqual(expect.arrayContaining(["over_crit", "devotion", "endure"]));
+    const magic = requirementsFor({ ...ctx, attackKind: "魔法" });
+    expect(magic.find((r) => r.key === "over_crit")!.label).toBe("魔法オーバークリティカル");
+    expect(magic.find((r) => r.key === "devotion")!.hint).toBe("精神を魔力に加算");
+  });
+
+  test("敵へのステータスデバフは、固定値版や全ステータスDOWNも含めて攻撃種・想定ボスに合うものだけ一致する", () => {
+    const { db, partyId } = setup();
+    const ctx = partyContext(db, getParty(db, partyId)!);
+    const req = (c: typeof ctx, key: string) => requirementsFor(c).find((r) => r.key === key)!;
+    expect(req(ctx, "def_down").match("耐久DOWN(固定値)")).toBe(true);
+    expect(req(ctx, "def_down").match("精神DOWN")).toBe(false);
+    expect(req({ ...ctx, attackKind: "魔法" }, "def_down").match("精神DOWN")).toBe(true);
+    expect(req(ctx, "enemy_atk_down").match("知性DOWN")).toBe(true);
+    expect(req({ ...ctx, bossAttack: "physical" }, "enemy_atk_down").match("知性DOWN")).toBe(false);
+    expect(req({ ...ctx, bossAttack: "physical" }, "enemy_atk_down").match("全ステータスDOWN")).toBe(true);
   });
 
   test("想定ボスの設定で耐久・ボス対策の枠が増える", () => {

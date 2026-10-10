@@ -1,5 +1,5 @@
 // パーティに必要な「枠」と、キャラの効果がその枠を埋めるかの判定ルール。
-// 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。
+// 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。仕様の根拠は doc/battle-mechanics.md。
 import type { Db } from "../db.ts";
 import { WEAPONS } from "./characters.ts";
 
@@ -30,6 +30,8 @@ const ZONES: Record<string, string> = {
 };
 
 const oneOf = (...types: string[]) => (t: string) => types.includes(t);
+/** 敵へのステータスデバフ（固定値版と全ステータスDOWNも含む） */
+const statDown = (...stats: string[]) => (t: string) => t === "全ステータスDOWN" || stats.some((s) => t.startsWith(`${s}DOWN`));
 
 /** 陣の種別がこの属性・攻撃種のダメージを上げるか（双撃陣・斬魔なども含む） */
 export function zoneFits(type: string, element: string, kind: string): boolean {
@@ -45,6 +47,7 @@ export const BOSS_NEEDS: Requirement[] = [
   { key: "status_resist", group: "boss", label: "状態異常耐性UP", hint: "", to: "party", match: oneOf("状態異常耐性UP") },
   { key: "knockback", group: "boss", label: "吹き飛ばし無効", hint: "前衛を入れ替えてくるボス向け", to: "party", match: oneOf("吹き飛ばし無効") },
   { key: "dispel", group: "boss", label: "敵のバフ解除", hint: "", to: "enemy", match: oneOf("バフ解除", "バフ/デバフ解除") },
+  { key: "buff_reversal", group: "boss", label: "バフリバーサル", hint: "敵のステータス・耐性・攻撃バフをデバフに反転", to: "enemy", match: oneOf("バフリバーサル") },
   { key: "cleanse", group: "boss", label: "味方のデバフ解除", hint: "", to: "party", match: oneOf("デバフ解除", "バフ/デバフ解除") },
   { key: "break", group: "boss", label: "ブレイク", hint: "ブレイク・ウェポン／エレメンタルブレイク", to: "any", match: (t) => /ブレイク/.test(t) && t !== "ブレイク無効" },
   { key: "revive", group: "boss", label: "戦闘不能回復", hint: "", to: "any", match: oneOf("戦闘不能回復") },
@@ -81,11 +84,30 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
     reqs.push(
       { key: "weapon_up", group: "damage", label: `${weapon}装備者ダメージUP`, hint: "武器種バフ", to: "attacker", match: oneOf(`${weapon}装備者ダメージUP`, "全武器種装備者ダメージUP") },
       { key: "stat_up", group: "damage", label: magic ? "知性UP" : "腕力UP", hint: "ステータスバフ", to: "attacker", match: (t) => t.startsWith(magic ? "知性UP" : "腕力UP") },
-      { key: "special", group: "damage", label: "特殊バフ", hint: "精神統一・心技一体・下克上・虎視眈眈", to: "attacker", match: oneOf("精神統一", "心技一体", "下克上", "虎視眈眈") },
+      { key: "def_down", group: "damage", label: magic ? "精神DOWN" : "耐久DOWN", hint: magic ? "敵の魔防を下げる" : "敵の防御を下げる", to: "enemy",
+        match: statDown(magic ? "精神" : "耐久") },
+      // 特殊バフは乗算では同じ枠だが重ねがけでき、精神統一・心技一体が高いほど他も伸びるので分けて埋める
+      magic
+        ? { key: "concentration", group: "damage", label: "精神統一", hint: "最大MPに応じて魔法ダメージUP", to: "attacker", match: oneOf("精神統一") }
+        : { key: "unity", group: "damage", label: "心技一体", hint: "最大MPに応じて物理ダメージUP", to: "attacker", match: oneOf("心技一体") },
+      { key: "underdog", group: "damage", label: "下克上", hint: "敵のLvが高いほどダメージUP", to: "attacker", match: oneOf("下克上") },
+      { key: "ambush", group: "damage", label: "虎視眈眈", hint: "敵の行動後に動くとダメージUP", to: "attacker", match: oneOf("虎視眈眈") },
       { key: "zone", group: "damage", label: "ZONE", hint: [E, K].map((x) => ZONES[x]).filter(Boolean).map((z) => `${z}陣`).join("・"), to: "any",
         match: (t) => /陣.*展開$/.test(t) && !/^(.*)陣展開時/.test(t),
         caveat: (t) => (zoneFits(t, E, K) ? null : "属性・攻撃種と一致しない陣") },
       { key: "dot", group: "damage", label: "毒・ペイン", hint: "", to: "enemy", match: oneOf("毒", "猛毒", "ペイン") },
+      { key: "over_crit", group: "damage", label: magic ? "魔法オーバークリティカル" : "オーバークリティカル", hint: "クリ率100%超の分だけ別枠でダメージ2倍", to: "attacker",
+        match: oneOf(magic ? "魔法オーバークリティカル" : "オーバークリティカル") },
+      { key: "crit_rate", group: "damage", label: magic ? "魔法クリティカル率UP" : "物理クリティカル率UP", hint: "クリダメ・オーバークリティカルの前提", to: "attacker",
+        match: oneOf(magic ? "魔法クリティカル率UP" : "物理クリティカル率UP") },
+      { key: "crit_dmg", group: "damage", label: magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP", hint: "単純加算・上限なし", to: "attacker",
+        match: oneOf(magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP") },
+      { key: "devotion", group: "damage", label: "ルナティック(挺身)", hint: magic ? "精神を魔力に加算" : "耐久を攻撃に加算", to: "attacker",
+        match: oneOf("ルナティック(挺身)") },
+      // 心眼・捨身はルナティックの乗算枠で、互いにも乗算になる
+      { key: "insight", group: "damage", label: "ルナティック(心眼)", hint: "ダメージ1.5倍＋弱点倍率+1", to: "attacker", match: oneOf("ルナティック(心眼)") },
+      { key: "abandon", group: "damage", label: "ルナティック(捨身)", hint: "ダメージ1.7倍＋クリ率100%UP（毎行動HP20%自傷）", to: "attacker",
+        match: oneOf("ルナティック(捨身)") },
       { key: "weak", group: "damage", label: "弱点時ダメージUP", hint: "弱点を突けるとき", to: "attacker", match: oneOf("弱点時ダメージUP") },
     );
   }
@@ -98,12 +120,17 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
       match: (t) => /^(バリア|シールド)/.test(t) && !["バリア貫通", "バリア効果量増加"].includes(t) },
     { key: "res_up", group: "durability", label: physical ? "物理耐性UP" : magical ? "魔法耐性UP" : "物理・魔法耐性UP", hint: "", to: "party",
       match: physical ? oneOf("物理耐性UP") : magical ? oneOf("魔法耐性UP") : oneOf("物理耐性UP", "魔法耐性UP") },
+    // 敵の腕力・知性は攻撃値A・Bの両方に入るので、味方への耐性バフよりよく効く
+    { key: "enemy_atk_down", group: "durability", label: physical ? "腕力DOWN" : magical ? "知性DOWN" : "腕力・知性DOWN", hint: "敵の攻撃力を下げる", to: "enemy",
+      match: statDown(...(physical ? ["腕力"] : magical ? ["知性"] : ["腕力", "知性"])) },
+    { key: "enemy_spd_down", group: "durability", label: "速度DOWN", hint: "敵より先に動ける（虎視眈眈とは逆）", to: "enemy", match: statDown("速度") },
   );
   if (ctx.bossElement && ctx.bossElement !== "無") {
     reqs.push({ key: "elem_res_up", group: "durability", label: `${ctx.bossElement}属性耐性UP`, hint: "ボスの攻撃属性への耐性", to: "party",
       match: oneOf(`${ctx.bossElement}属性耐性UP`, "全属性耐性UP") });
   }
   reqs.push(
+    { key: "endure", group: "durability", label: "踏ん張る", hint: "致死ダメージをHP1で耐える", to: "party", match: oneOf("踏ん張る") },
     { key: "tank", group: "durability", label: "挑発・庇い", hint: "挑発・庇立て・守護", to: "any", match: oneOf("挑発", "庇立て", "守護") },
     { key: "cure", group: "durability", label: "状態異常回復", hint: "", to: "party", match: oneOf("状態異常回復") },
     { key: "mp", group: "durability", label: "MP回復", hint: "", to: "party", match: (t) => /^MP(回復|治癒)/.test(t) },
