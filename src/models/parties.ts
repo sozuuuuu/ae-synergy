@@ -1,6 +1,7 @@
 import type { Db } from "../db.ts";
 import type { CharacterSummary } from "./characters.ts";
 import { loadCondMembers } from "./conditions.ts";
+import { type Enemy, parseEnemy } from "./estimate.ts";
 import { ATTACK_ELEMENTS, ATTACK_KINDS, attackKindsOf, BOSS_NEEDS, defaultAttack, type PartyContext } from "./requirements.ts";
 
 export const SLOT_NAMES = { main: "前衛", sub: "後衛" } as const;
@@ -19,11 +20,12 @@ export type PartyRow = {
   boss_element: string;
   boss_attack: string;
   boss_needs: string;
+  enemy: string;
   created_at: string;
   updated_at: string;
 };
 export type Member = CharacterSummary & { slot: Slot; position: number };
-export type Party = Omit<PartyRow, "boss_needs"> & { boss_needs: string[]; members: Member[] };
+export type Party = Omit<PartyRow, "boss_needs" | "enemy"> & { boss_needs: string[]; enemy: Enemy; members: Member[] };
 
 export const displayTitle = (party: Pick<Party, "title" | "members" | "attacker_id">) => {
   if (party.title) return party.title;
@@ -56,7 +58,8 @@ function loadMembers(db: Db, partyIds: number[]): Map<number, Member[]> {
   return map;
 }
 
-const hydrate = (row: PartyRow, members: Member[]): Party => ({ ...row, boss_needs: safeJsonArray(row.boss_needs), members });
+const hydrate = (row: PartyRow, members: Member[]): Party =>
+  ({ ...row, boss_needs: safeJsonArray(row.boss_needs), enemy: parseEnemy(row.enemy), members });
 const safeJsonArray = (json: string): string[] => {
   try {
     const value = JSON.parse(json);
@@ -164,6 +167,8 @@ export type SettingsInput = {
   bossElement: string;
   bossAttack: string;
   bossNeeds: string[];
+  /** 省略したら今の値のまま */
+  enemy?: Enemy;
 };
 
 export function updateSettings(db: Db, party: Party, input: SettingsInput): { errors: string[] } {
@@ -176,7 +181,7 @@ export function updateSettings(db: Db, party: Party, input: SettingsInput): { er
   const pick = (value: string, allowed: readonly string[]) => (allowed.includes(value) ? value : "");
   db.query(
     `UPDATE parties SET title = $title, memo = $memo, attack_element = $attackElement, attack_kind = $attackKind,
-       boss_element = $bossElement, boss_attack = $bossAttack, boss_needs = $bossNeeds,
+       boss_element = $bossElement, boss_attack = $bossAttack, boss_needs = $bossNeeds, enemy = $enemy,
        updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = $id`,
   ).run({
     id: party.id,
@@ -187,6 +192,7 @@ export function updateSettings(db: Db, party: Party, input: SettingsInput): { er
     bossElement: pick(input.bossElement, ATTACK_ELEMENTS),
     bossAttack: pick(input.bossAttack, ["physical", "magic"]),
     bossNeeds: JSON.stringify(input.bossNeeds.filter((key) => BOSS_NEEDS.some((n) => n.key === key))),
+    enemy: JSON.stringify(input.enemy ?? party.enemy),
   });
   return { errors: [] };
 }
@@ -197,8 +203,8 @@ export function duplicateParty(db: Db, id: number): number | null {
   return db.transaction(() => {
     const copyId = db
       .query<{ id: number }, any>(
-        `INSERT INTO parties (title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs)
-         SELECT $title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs FROM parties WHERE id = $id RETURNING id`,
+        `INSERT INTO parties (title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy)
+         SELECT $title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy FROM parties WHERE id = $id RETURNING id`,
       )
       .get({ id, title: `${displayTitle(party)}のコピー`.slice(0, LIMITS.title) })!.id;
     db.query("INSERT INTO party_members (party_id, character_id, slot, position) SELECT $copyId, character_id, slot, position FROM party_members WHERE party_id = $id")

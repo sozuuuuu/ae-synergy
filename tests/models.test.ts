@@ -4,6 +4,7 @@ import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, setAttacker, updateSettings } from "../src/models/parties.ts";
 import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
 import { extractEffects } from "../src/models/effect-extract.ts";
+import { enemyFromForm, estimateDealt, estimateTaken, parseEnemy } from "../src/models/estimate.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
 
@@ -274,5 +275,77 @@ describe("パーティ編成", () => {
 
     removeMember(db, moved, attacker);
     expect(getParty(db, partyId)!.attacker_id).toBeNull();
+  });
+});
+
+describe("火力・被ダメの目安", () => {
+  const setup = (labels: string[] = ["テスト支援"]) => {
+    const db = testDb();
+    const partyId = createParty(db, idOf(db, "テストアタッカー"))!;
+    for (const label of labels) addMember(db, getParty(db, partyId)!, idOf(db, label));
+    const load = () => {
+      const party = getParty(db, partyId)!;
+      const ctx = partyContext(db, party);
+      return { party, ctx, coverage: evaluateCoverage(db, ctx, party.members.map((m) => m.id)) };
+    };
+    return { db, partyId, load };
+  };
+  const settings = { title: "", memo: "", attackElement: "火", attackKind: "斬", bossElement: "", bossAttack: "", bossNeeds: [] };
+
+  test("✓ で埋まった枠を計算エンジンに渡し、枠ごとの伸びと支援なしからの倍率を出す", () => {
+    const { db, load } = setup();
+    const { party, ctx, coverage } = load();
+    const dealt = estimateDealt(db, ctx, coverage, party.enemy)!;
+    expect(dealt.skill).toMatchObject({ source: "火炎斬", rate: 130, target: "single" });
+    // 斬耐性DOWN 30% と火属性耐性DOWN 50% は加算なので、火属性を外すと 1.8 → 1.3
+    expect(dealt.gains.get("elem_res_down")).toBeCloseTo(1.8 / 1.3 - 1, 2);
+    expect(dealt.gains.get("stat_up")).toBeGreaterThan(0);
+    // 烈火陣展開時の火属性攻撃UP は条件未達なので数えない
+    expect(dealt.gains.has("elem_atk_up")).toBe(false);
+    expect(dealt.multiplier).toBeGreaterThan(1.8);
+    expect(dealt.weaponAssumed).toBe(true);
+  });
+
+  test("候補を入れたときの伸びは、その枠の効果だけを足して計算する", () => {
+    const { db, load } = setup();
+    const { party, ctx, coverage } = load();
+    const dealt = estimateDealt(db, ctx, coverage, party.enemy)!;
+    const zone = requirementsFor(ctx).find((r) => r.key === "zone")!;
+    const [candidate] = candidatesFor(db, ctx, zone, party.members.map((m) => m.id));
+    expect(candidate!.characterId).toBe(idOf(db, "テスト陣"));
+    expect(dealt.gainWith("zone", candidate!)).toBeCloseTo(0.5, 2); // 烈火陣は火属性 1.5 倍
+  });
+
+  test("★や攻撃種がないと与ダメは出さない", () => {
+    const { db, partyId, load } = setup();
+    updateSettings(db, getParty(db, partyId)!, { ...settings, attackKind: "" });
+    const { party, ctx, coverage } = load();
+    expect(estimateDealt(db, ctx, coverage, party.enemy)).toBeNull();
+  });
+
+  test("被ダメは想定ボスの物理/魔法と攻撃が入っているときだけ出し、本人のみの属性耐性はその本人にだけ効く", () => {
+    const { db, partyId, load } = setup([]);
+    const enemy = { atk: 500, power: 200 };
+    {
+      const { party, coverage } = load();
+      expect(estimateTaken(db, party, coverage, party.enemy)).toBeNull();
+    }
+    updateSettings(db, getParty(db, partyId)!, { ...settings, bossAttack: "physical", enemy });
+    const neutral = (() => { const { party, coverage } = load(); return estimateTaken(db, party, coverage, party.enemy)!; })();
+    expect(neutral).toHaveLength(1);
+    expect(neutral[0]!).toMatchObject({ hp: 3000 });
+    expect(neutral[0]!.damage).toBeGreaterThan(0);
+    // テストアタッカーは火属性耐性+30%（アビリティ・本人のみ）
+    updateSettings(db, getParty(db, partyId)!, { ...settings, bossAttack: "physical", bossElement: "火", enemy });
+    const fire = (() => { const { party, coverage } = load(); return estimateTaken(db, party, coverage, party.enemy)!; })();
+    expect(fire[0]!.damage / neutral[0]!.damage).toBeLessThan(0.75);
+  });
+
+  test("想定ボスの入力は範囲外や数でないものをはじき、保存済みの値も読み直すときに確かめる", () => {
+    const { enemy, errors } = enemyFromForm({ enemy_level: "abc", enemy_def: "500", enemy_power: "", enemy_affinity: "weak", enemy_typeRes: "-30" });
+    expect(errors).toEqual(["想定ボスの「Lv」は 1〜999 の数で入れてください"]);
+    expect(enemy).toEqual({ def: 500, typeRes: -30, affinity: "weak" });
+    expect(parseEnemy('{"def":-5,"level":120,"x":1,"affinity":"bad"}')).toEqual({ level: 120 });
+    expect(parseEnemy("not json")).toEqual({});
   });
 });

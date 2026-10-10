@@ -8,6 +8,7 @@ import {
   addMember, createParty, deleteParty, displayTitle, duplicateParty, getParty, listParties, moveMember,
   partyContext, removeMember, setAttacker, sharedPersonalities, updateSettings, type Party,
 } from "./models/parties.ts";
+import { enemyFromForm, estimateDealt, estimateTaken } from "./models/estimate.ts";
 import { candidatesFor, evaluateCoverage, extraFills, fitRank, requirementsFor } from "./models/requirements.ts";
 import { CharacterPage, CharacterSearchPage } from "./views/characters.tsx";
 import { Layout, type Flash } from "./views/layout.tsx";
@@ -30,23 +31,31 @@ export function createApp(db: Db, options: Options = {}) {
     const memberIds = party.members.map((m) => m.id);
     const coverage = evaluateCoverage(db, ctx, memberIds);
     const need = needKey ? requirementsFor(ctx).find((r) => r.key === needKey) ?? null : null;
+    const dealt = estimateDealt(db, ctx, coverage, party.enemy);
+    const taken = estimateTaken(db, party, coverage, party.enemy);
     let candidates: Parameters<typeof PartyPage>[0]["candidates"] = [];
     if (need) {
       const providers = candidatesFor(db, ctx, need, memberIds, 200);
       const ids = providers.map((p) => p.characterId);
       const characters = charactersByIds(db, ids);
       const extras = extraFills(db, ctx, coverage, ids, need.key);
-      // パズルとして、そのまま効く → ほかの枠もたくさん埋まる → 効果量が大きい の順
+      // パズルとして、そのまま効く → ほかの枠もたくさん埋まる → 与ダメの伸び・効果量が大きい の順
       candidates = providers
-        .map((p) => ({ ...p, character: characters.get(p.characterId)!, extra: extras.get(p.characterId) ?? [] }))
+        .map((p) => ({
+          ...p, character: characters.get(p.characterId)!, extra: extras.get(p.characterId) ?? [],
+          // 火力の枠なら、入れたときに与ダメの目安がどれだけ伸びるか（条件付きは入れても数えない）
+          gain: dealt && need.group === "damage" && p.fit.level === "full" ? dealt.gainWith(need.key, p) : null,
+        }))
         .sort((a, b) =>
           fitRank(b.fit) - fitRank(a.fit) ||
           b.extra.length - a.extra.length ||
+          (b.gain ?? 0) - (a.gain ?? 0) ||
           (b.effect.value ?? 0) - (a.effect.value ?? 0))
         .slice(0, 30);
     }
     return page(request, displayTitle(party),
-      <PartyPage party={party} coverage={coverage} need={need} candidates={candidates} shared={sharedPersonalities(db, party.id)} errors={errors} />, status);
+      <PartyPage party={party} coverage={coverage} need={need} candidates={candidates} dealt={dealt} taken={taken}
+        shared={sharedPersonalities(db, party.id)} errors={errors} />, status);
   };
 
   return new Elysia()
@@ -117,9 +126,11 @@ export function createApp(db: Db, options: Options = {}) {
       const party = getParty(db, int(params.id) ?? 0);
       if (!party) return notFound(request);
       const b = (body ?? {}) as Record<string, unknown>;
+      const { enemy, errors: enemyErrors } = enemyFromForm(Object.fromEntries(Object.entries(b).map(([k, v]) => [k, str(v)])));
+      if (enemyErrors.length) return renderParty(request, party, null, enemyErrors, 422);
       const { errors } = updateSettings(db, party, {
         title: str(b.title), memo: str(b.memo), attackElement: str(b.attack_element), attackKind: str(b.attack_kind),
-        bossElement: str(b.boss_element), bossAttack: str(b.boss_attack), bossNeeds: list(b.boss_needs),
+        bossElement: str(b.boss_element), bossAttack: str(b.boss_attack), bossNeeds: list(b.boss_needs), enemy,
       });
       if (errors.length) return renderParty(request, party, null, errors, 422);
       return back(party, { type: "notice", message: "保存しました" });

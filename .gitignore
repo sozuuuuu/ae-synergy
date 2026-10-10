@@ -11,3 +11,4 @@ node_modules/
 /static/app.css
 
 *.log
+.anaden-mcp/
