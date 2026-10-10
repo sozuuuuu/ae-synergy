@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { importCharacters, loadAnadenData } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
-import { addMember, createParty, getParty, moveMember, partyContext, removeMember, updateSettings } from "../src/models/parties.ts";
+import { addMember, createParty, getParty, moveMember, partyContext, removeMember, setAttacker, updateSettings } from "../src/models/parties.ts";
 import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
 import { extractEffects } from "../src/models/effect-extract.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
@@ -131,6 +131,12 @@ describe("枠の判定", () => {
     const after = coverageOf(db, partyId);
     expect(after.elem_atk_up!.status).toBe("ok");
     expect(after.elem_atk_up!.providers[0]!.fit.note).toBe("条件OK: 烈火陣展開時");
+    // SB はそのターンだけの効果なので、全属性耐性DOWN は「SB時のみ」として並ぶが枠は埋めない
+    const sb = after.elem_res_down!.providers.find((p) => p.characterId === idOf(db, "テスト陣"))!;
+    expect(sb.fit).toEqual({ level: "sb", note: "SB(天の刻)発動時のみ" });
+    const zoneOnly = createParty(db, idOf(db, "テスト陣"))!;
+    updateSettings(db, getParty(db, zoneOnly)!, { title: "", memo: "", attackElement: "火", attackKind: "斬", bossElement: "", bossAttack: "", bossNeeds: [] });
+    expect(coverageOf(db, zoneOnly).elem_res_down).toMatchObject({ status: "missing", providers: [{ fit: { level: "sb" } }] });
   });
 
   test("位置・人数・ZONE の条件は編成で判定し、戦闘の流れ次第や未分類のものは判定しない", () => {
@@ -160,6 +166,33 @@ describe("枠の判定", () => {
     const guest = { id: 9, personalities: ["陰"], ls_type: "冥", weapon: "katana", gender: null, zones: [] };
     expect(evaluateCondition([yin("main", 3)], "", 9, members, guest).state).toBe("met");
     expect(evaluateCondition([{ neighbors: { personalities: ["陰"] } }], "", 9, members, guest).state).toBe("unknown");
+  });
+
+  test("習得スキルにない攻撃種を選ぶと臨機応変の枠が出て、付与できる味方で埋まる", () => {
+    const { db, partyId } = setup();
+    expect(coverageOf(db, partyId).kind_change).toBeUndefined();
+    const settings = { title: "", memo: "", attackElement: "火", bossElement: "", bossAttack: "", bossNeeds: [] };
+    updateSettings(db, getParty(db, partyId)!, { ...settings, attackKind: "突" });
+    expect(coverageOf(db, partyId).kind_change!).toMatchObject({ status: "missing", req: { label: "臨機応変<突>" } });
+    addMember(db, getParty(db, partyId)!, idOf(db, "テスト陣"));
+    expect(coverageOf(db, partyId).kind_change!.status).toBe("ok");
+    updateSettings(db, getParty(db, partyId)!, { ...settings, attackKind: "魔法" });
+    expect(coverageOf(db, partyId).kind_change!).toMatchObject({ status: "missing", req: { label: "臨機応変<魔>" } });
+  });
+
+  test("★がなくても火力の枠は出て、本人のみのバフは △、武器種バフはどの武器でも埋まる。★はもう一度押すと外れる", () => {
+    const { db, partyId } = setup();
+    const attacker = idOf(db, "テストアタッカー");
+    setAttacker(db, getParty(db, partyId)!, attacker);
+    const party = getParty(db, partyId)!;
+    expect(party.attacker_id).toBeNull();
+    expect(party.attack_kind).toBe("斬");
+    const c = coverageOf(db, partyId);
+    expect(c.unity!.status).toBe("partial");
+    expect(c.unity!.providers[0]!.fit.note).toBe("本人のみ");
+    expect(c.weapon_up!.req.label).toBe("武器種バフ");
+    expect(c.weapon_up!.req.match("弓装備者ダメージUP")).toBe(true);
+    expect(c.kind_change).toBeUndefined();
   });
 
   test("候補には枠を埋められるメンバー外のキャラが出る", () => {

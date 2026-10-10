@@ -103,7 +103,7 @@ export function createApp(db: Db, options: Options = {}) {
 
     .post("/parties", ({ body }) => {
       const id = createParty(db, int((body as any)?.attacker_id) ?? 0);
-      return id ? redirect(`/parties/${id}`, { type: "notice", message: "このキャラをアタッカー（★）にして組み始めました。支援役から始めたときは、アタッカーを追加して★を付け替えてください。" })
+      return id ? redirect(`/parties/${id}`, { type: "notice", message: "このキャラをアタッカー（★）にして組み始めました。支援役から始めたときは、★を外すかアタッカーに付け替えてください。" })
         : redirect("/characters", { type: "alert", message: "キャラクターが見つかりません" });
     })
 

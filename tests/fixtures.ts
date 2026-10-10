@@ -34,7 +34,12 @@ export const ROWS = [
     _id: "z1", name: "テスト陣", engName: "Zone", class: "陣師", style: "NS", rarity: 4, weaponType: "lance",
     armorType: "necklace", lsType: "天", gender: "不明", obtain: "夢見以外", isAlter: false, isSA: false,
     personalities: ["槍", "火"],
-    skills: [{ no: 1, name: "烈火招来", mpCost: 30, effects: [{ description: "烈火陣を展開する", types: "烈火陣展開" }] }],
+    skills: [
+      { no: 1, name: "烈火招来", mpCost: 30, effects: [{ description: "烈火陣を展開する", types: "烈火陣展開" }] },
+      { no: 2, name: "槍の構え", mpCost: 20, effects: [{ description: "味方全体に臨機応変<突>(3ターン)", types: "臨機応変(突)", targets: "味方全体", turn: 3 }] },
+    ],
+    sbEnhance: [{ description: "敵全体に全属性耐性40%DOWN(ターン終了時まで)", types: "全属性耐性DOWN", targets: "敵全体", value: 40, conditions: "SB(天の刻)発動時",
+      _condition: { text: "SB(天の刻)発動時", clauses: [{ battle: "SB(天の刻)発動時" }] } }],
   },
   {
     _id: "d1", name: "同名", class: "甲", style: "NS", rarity: 5, weaponType: "sword", personalities: ["剣"], skills: [],
