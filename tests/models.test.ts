@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { importCharacters, loadAnadenData } from "../src/models/character-import.ts";
+import { importCharacters, kanaSortKey, loadAnadenData } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, setAttacker, updateSettings } from "../src/models/parties.ts";
 import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
@@ -33,6 +33,16 @@ describe("取り込み", () => {
     await expect(loadAnadenData(await write(ROWS))).rejects.toThrow("補強済みデータ");
     await expect(loadAnadenData("storage/does-not-exist.json")).rejects.toThrow("anaden export");
     for (const f of new Bun.Glob("test-anaden-*.json").scanSync(`${import.meta.dir}/../storage`)) await Bun.file(`${import.meta.dir}/../storage/${f}`).delete();
+  });
+});
+
+describe("並び順", () => {
+  test("五十音順のキーは漢字名なら読みを使い、カタカナ・長音・括弧をならす", () => {
+    expect(kanaSortKey("ヴェルダンタ")).toBe("うぇるだんた");
+    expect(kanaSortKey("ハーディー(AS)")).toBe("はあでぃい");
+    expect(kanaSortKey("月華の令嬢(AS)", "げっかのれいじょう(AS)")).toBe("げっかのれいじょう");
+    const keys = ["ねここ", "アルド", "月華の令嬢", "エイミ"].map((n) => kanaSortKey(n, n === "月華の令嬢" ? "げっかのれいじょう" : null)).sort();
+    expect(keys).toEqual(["あるど", "えいみ", "げっかのれいじょう", "ねここ"]);
   });
 });
 

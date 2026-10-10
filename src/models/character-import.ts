@@ -21,6 +21,24 @@ const WEAPON_PERSONALITIES = new Set(Object.values(WEAPONS));
 const personalityCategory = (name: string) =>
   (ELEMENTS as readonly string[]).includes(name) ? "element" : WEAPON_PERSONALITIES.has(name) ? "weapon" : "other";
 
+// 長音（ー）は直前の音の母音として並べる
+const VOWEL_ROWS: [string, string][] = [
+  ["あ", "あかさたなはまやらわがざだばぱぁゃゎ"], ["い", "いきしちにひみりぎじぢびぴぃ"], ["う", "うくすつぬふむゆるぐずづぶぷぅゅっゔ"],
+  ["え", "えけせてねへめれげぜでべぺぇ"], ["お", "おこそとのほもよろをごぞどぼぽぉょ"],
+];
+const VOWEL = new Map(VOWEL_ROWS.flatMap(([v, chars]) => [...chars].map((c) => [c, v] as const)));
+
+/** 五十音順に並べるキー。漢字名は読みを使い、カタカナはひらがなにし、(AS) などの括弧は外す */
+export function kanaSortKey(name: string, reading?: string | null): string {
+  const hira = (reading || name)
+    .replace(/[(（][^)）]*[)）]/g, "")
+    .replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
+    .replace(/ゔ/g, "う"); // ヴはウの行に並べる
+  let key = "";
+  for (const c of hira) key += c === "ー" ? VOWEL.get(key.at(-1) ?? "") ?? "" : c;
+  return key;
+}
+
 export type ImportResult = { created: number; updated: number; unchanged: number; total: number };
 
 export function importCharacters(db: Db, rows: unknown): ImportResult {
@@ -36,14 +54,14 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
   const findCharacter = db.query<{ id: number; data: string }, any>("SELECT id, data FROM characters WHERE external_id = $external_id");
   const insertCharacter = db.query<{ id: number }, any>(
     `INSERT INTO characters (external_id, name, label, eng_name, class_name, true_name, style, rarity, weapon, armor, ls_type,
-       element, gender, obtain, is_alter, is_sa, search_text, data)
+       element, gender, obtain, is_alter, is_sa, search_text, sort_key, data)
      VALUES ($external_id, $name, $label, $eng_name, $class_name, $true_name, $style, $rarity, $weapon, $armor, $ls_type,
-       $element, $gender, $obtain, $is_alter, $is_sa, $search_text, $data) RETURNING id`,
+       $element, $gender, $obtain, $is_alter, $is_sa, $search_text, $sort_key, $data) RETURNING id`,
   );
   const updateCharacter = db.query(
     `UPDATE characters SET name = $name, label = $label, eng_name = $eng_name, class_name = $class_name, true_name = $true_name,
        style = $style, rarity = $rarity, weapon = $weapon, armor = $armor, ls_type = $ls_type, element = $element,
-       gender = $gender, obtain = $obtain, is_alter = $is_alter, is_sa = $is_sa, search_text = $search_text,
+       gender = $gender, obtain = $obtain, is_alter = $is_alter, is_sa = $is_sa, search_text = $search_text, sort_key = $sort_key,
        data = $data, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
      WHERE id = $id`,
   );
@@ -84,6 +102,7 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
         is_alter: row.isAlter ? 1 : 0,
         is_sa: row.isSA ? 1 : 0,
         search_text: normalize([row.name, row.engName, row.class, row.trueName, row.reading].filter(Boolean).join(" ")),
+        sort_key: kanaSortKey(row.name, row.reading),
         data: json,
       };
 
