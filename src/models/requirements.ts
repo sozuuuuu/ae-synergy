@@ -134,7 +134,9 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
   }
   reqs.push(
     { key: "endure", group: "durability", label: "踏ん張る", hint: "致死ダメージをHP1で耐える", to: "party", match: oneOf("踏ん張る") },
-    { key: "tank", group: "durability", label: "挑発・庇い", hint: "挑発・庇立て・守護", to: "any", match: oneOf("挑発", "庇立て", "守護") },
+    // 挑発は単体攻撃、庇立ては全体攻撃だけを引き受けるので別枠。守護はどちらも肩代わりする
+    { key: "cover_single", group: "durability", label: "単体攻撃の引き受け", hint: "挑発・守護", to: "any", match: oneOf("挑発", "守護") },
+    { key: "cover_all", group: "durability", label: "全体攻撃の引き受け", hint: "庇立て（被ダメ2倍）・守護", to: "any", match: oneOf("庇立て", "守護") },
     { key: "cure", group: "durability", label: "状態異常回復", hint: "", to: "party", match: oneOf("状態異常回復") },
     { key: "mp", group: "durability", label: "MP回復", hint: "", to: "party", match: (t) => /^MP(回復|治癒)/.test(t) },
   );
