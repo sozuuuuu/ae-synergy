@@ -1,7 +1,7 @@
 import type { CharacterSummary } from "../models/characters.ts";
 import { displayTitle, memberAt, SLOT_COUNTS, SLOT_NAMES, type Member, type Party, type Slot } from "../models/parties.ts";
 import {
-  ATTACK_ELEMENTS, ATTACK_KINDS, BOSS_NEEDS, GROUP_NAMES,
+  ATTACK_ELEMENTS, ATTACK_KINDS, BOSS_NEEDS, fitRank, GROUP_NAMES,
   type Coverage, type Group, type Provider, type Requirement,
 } from "../models/requirements.ts";
 import {
@@ -120,8 +120,8 @@ export function PartyPage({ party, coverage, need, candidates, shared, errors }:
         <div class="min-w-0">
           <h1 class="truncate text-2xl font-bold">{displayTitle(party)}</h1>
           <p class="mt-1 text-sm text-muted">
-            {attacker ? <>アタッカー <span class="font-semibold text-gold">★ {attacker.label}</span></> : "アタッカー未設定"}
-            {party.attack_kind && <> ・ {[party.attack_element, party.attack_kind].filter(Boolean).join("・")}</>}
+            {attacker && <>アタッカー <span class="font-semibold text-gold">★ {attacker.label}</span> ・ </>}
+            攻撃 {[party.attack_element, party.attack_kind].filter(Boolean).join("・") || "未設定"}
           </p>
         </div>
         <div class="flex shrink-0 gap-1.5">
@@ -160,8 +160,8 @@ export function PartyPage({ party, coverage, need, candidates, shared, errors }:
         {/* 枠のタイルと候補 */}
         <div class="space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           {!attacker && (
-            <p class="rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-[#ffd892]">
-              アタッカーが未設定です。メンバーの ★ を押すと、そのキャラを基準に火力の枠を判定します。
+            <p class="rounded-xl border border-line bg-panel-2 p-3 text-sm text-muted">
+              メンバーに ★ を付けると、そのキャラを基準に武器種バフ・臨機応変・本人のみのバフまで判定します。
             </p>
           )}
           {GROUPS.map((group) => {
@@ -224,7 +224,8 @@ function SlotTile({ party, member: m }: { party: Party; member: Member }) {
         <span class="line-clamp-2 text-[12.5px] leading-tight font-semibold break-all">{m.label}</span>
       </a>
       <div class="flex justify-between gap-0.5 px-1.5 pb-1.5">
-        {attacker ? <span class="size-6"></span> : <PostButton action={`/parties/${party.id}/attacker`} fields={{ character_id: m.id }} label="★" title="アタッカーにする" class={icon} />}
+        <PostButton action={`/parties/${party.id}/attacker`} fields={{ character_id: m.id }} label="★" title={attacker ? "★を外す" : "アタッカーにする"}
+          class={attacker ? `${icon} border-gold/70 text-gold hover:text-gold` : icon} />
         <PostButton action={`/parties/${party.id}/members/move`} fields={{ character_id: m.id }} label={m.slot === "main" ? "↓" : "↑"} title={m.slot === "main" ? "後衛へ" : "前衛へ"} class={icon} />
         <PostButton action={`/parties/${party.id}/members/remove`} fields={{ character_id: m.id }} label="✕" title="外す" class={icon} />
       </div>
@@ -243,7 +244,7 @@ function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage
   const names = new Map(party.members.map((m) => [m.id, m.name]));
   const shown = c.providers.slice(0, 3);
   // 一番良い供給元（そのまま効くもの優先・効果量順に並んでいる）の強さをタイルの顔にする
-  const best = c.providers[0];
+  const best = c.providers[0] && fitRank(c.providers[0].fit) > 0 ? c.providers[0] : undefined;
   const bestValue = best ? formatValue(best.effect.type, best.effect.value) : "";
   const pct = best ? strengthOf(best.effect.type, best.effect.value) : null;
   return (
@@ -272,11 +273,12 @@ function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage
           <span class="mt-1 space-y-px">
             {shown.map((p) => (
               <span class="block text-[11px] leading-snug text-muted">
-                <span class="text-ink/85">{names.get(p.characterId)}</span>
+                <span class={p.characterId === party.attacker_id ? "font-semibold text-gold" : "text-ink/85"}>{p.characterId === party.attacker_id && "★"}{names.get(p.characterId)}</span>
                 {p.effect.type !== c.req.label && <> {shortType(p.effect.type)}</>}
                 {[formatValue(p.effect.type, p.effect.value), turnsLabel(p.effect.turns)].filter(Boolean).map((part) => <> <span class="whitespace-nowrap text-ink/70">{part}</span></>)}
                 {p.fit.level === "partial" && <span class="text-warn"> △</span>}
                 {p.fit.level === "unmet" && <span class="text-faint" title="今の編成では条件を満たさない"> ✗</span>}
+                {p.fit.level === "sb" && <span class="text-faint" title="SB発動ターンだけの効果なので枠は埋めない"> SB</span>}
               </span>
             ))}
             {c.providers.length > shown.length && <span class="block text-[11px] text-faint">他{c.providers.length - shown.length}人</span>}
@@ -392,6 +394,7 @@ function CandidateRow({ party, need, c, full }: { party: Party; need: Requiremen
           </span>
           {c.fit.level === "partial" && <span class="rounded bg-warn/15 px-1.5 text-[11px] leading-5 font-semibold text-warn">条件付き</span>}
           {c.fit.level === "unmet" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted">条件未達</span>}
+          {c.fit.level === "sb" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted" title={c.fit.note}>SB時のみ</span>}
           <Tags c={c.character} compact />
         </div>
         <p class="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">

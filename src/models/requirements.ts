@@ -50,13 +50,15 @@ export const BOSS_NEEDS: Requirement[] = [
   { key: "dispel", group: "boss", label: "敵のバフ解除", hint: "", to: "enemy", match: oneOf("バフ解除", "バフ/デバフ解除") },
   { key: "buff_reversal", group: "boss", label: "バフリバーサル", hint: "敵のステータス・耐性・攻撃バフをデバフに反転", to: "enemy", match: oneOf("バフリバーサル") },
   { key: "cleanse", group: "boss", label: "味方のデバフ解除", hint: "", to: "party", match: oneOf("デバフ解除", "バフ/デバフ解除") },
+  { key: "debuff_reversal", group: "boss", label: "デバフリバーサル", hint: "味方が受けたステータス・耐性・攻撃デバフをバフに反転", to: "party", match: oneOf("デバフリバーサル") },
   { key: "break", group: "boss", label: "ブレイク", hint: "ブレイク・ウェポン／エレメンタルブレイク", to: "any", match: (t) => /ブレイク/.test(t) && t !== "ブレイク無効" },
   { key: "revive", group: "boss", label: "戦闘不能回復", hint: "", to: "any", match: oneOf("戦闘不能回復") },
   { key: "af", group: "boss", label: "AF支援", hint: "AFゲージ回復・蓄積・コンボ倍率", to: "any", match: (t) => /^AF(ゲージ(回復|蓄積|増加量UP)|コンボ倍率増加)/.test(t) },
 ];
 
 export type PartyContext = {
-  attacker: { id: number; weapon: string; ls_type: string | null; personalities: string[] } | null;
+  /** kinds: 習得スキルが元々持つ攻撃種（これ以外の攻撃種で殴るには臨機応変が要る） */
+  attacker: { id: number; weapon: string; ls_type: string | null; personalities: string[]; kinds: string[] } | null;
   attackElement: string;
   attackKind: string;
   bossElement: string;
@@ -71,12 +73,23 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
   const E = ctx.attackElement;
   const K = ctx.attackKind;
 
-  if (ctx.attacker && K) {
-    const magic = K === "魔法";
-    const weapon = WEAPONS[ctx.attacker.weapon] ?? "";
+  // 火力の枠はアタッカー（★）がいなくても出す。★がいれば武器種や臨機応変まで絞り込み、届くかの判定も厳密にする
+  {
+    // 攻撃種が未設定なら物理・魔法の両方を候補にする
+    const phys = K !== "魔法";
+    const mag = !K || K === "魔法";
+    const both = <T,>(p: T, m: T): T[] => [...(phys ? [p] : []), ...(mag ? [m] : [])];
+    const attacker = ctx.attacker;
+    // 習得スキルにない攻撃種で殴るなら、臨機応変で種別を変えてもらう必要がある
+    if (attacker && K && !attacker.kinds.includes(K)) {
+      const short = K === "魔法" ? "魔" : K;
+      reqs.push({ key: "kind_change", group: "damage", label: `臨機応変<${short}>`, hint: `アタッカーの攻撃を${K}に変える`, to: "attacker",
+        match: oneOf(`臨機応変(${short})`, "臨機応変(種別変化)"),
+        caveat: (t) => (t === "臨機応変(種別変化)" ? "種別は相手の武器種・弱点・ZONE次第" : null) });
+    }
+    const typeRes = K === "魔法" ? ["魔法耐性DOWN"] : K ? [`${K}耐性DOWN`, "物理耐性DOWN"] : [...ATTACK_KINDS.map((k) => `${k}耐性DOWN`), "物理耐性DOWN"];
     reqs.push(
-      { key: "type_res_down", group: "damage", label: `${magic ? "魔法" : K}耐性DOWN`, hint: "敵の攻撃種耐性を下げる", to: "enemy",
-        match: magic ? oneOf("魔法耐性DOWN") : oneOf(`${K}耐性DOWN`, "物理耐性DOWN") },
+      { key: "type_res_down", group: "damage", label: K ? `${K}耐性DOWN` : "攻撃種耐性DOWN", hint: "敵の攻撃種耐性を下げる", to: "enemy", match: oneOf(...typeRes) },
     );
     if (E && E !== "無") {
       reqs.push(
@@ -84,28 +97,35 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
         { key: "elem_atk_up", group: "damage", label: `${E}属性攻撃UP`, hint: "アタッカーに届く属性攻撃バフ", to: "attacker", match: oneOf(`${E}属性攻撃UP`, "全属性攻撃UP") },
       );
     }
+    const weapon = attacker ? WEAPONS[attacker.weapon] ?? "" : "";
+    const stats = both("腕力", "知性");
+    const defs = both("耐久", "精神");
+    const crit = both("物理", "魔法");
     reqs.push(
-      { key: "weapon_up", group: "damage", label: `${weapon}装備者ダメージUP`, hint: "武器種バフ", to: "attacker", match: oneOf(`${weapon}装備者ダメージUP`, "全武器種装備者ダメージUP") },
-      { key: "stat_up", group: "damage", label: magic ? "知性UP" : "腕力UP", hint: "ステータスバフ", to: "attacker", match: (t) => t.startsWith(magic ? "知性UP" : "腕力UP") },
-      { key: "def_down", group: "damage", label: magic ? "精神DOWN" : "耐久DOWN", hint: magic ? "敵の魔防を下げる" : "敵の防御を下げる", to: "enemy",
-        match: statDown(magic ? "精神" : "耐久") },
+      weapon
+        ? { key: "weapon_up", group: "damage", label: `${weapon}装備者ダメージUP`, hint: "武器種バフ", to: "attacker", match: oneOf(`${weapon}装備者ダメージUP`, "全武器種装備者ダメージUP") }
+        : { key: "weapon_up", group: "damage", label: "武器種バフ", hint: "★を付けるとアタッカーの武器種に絞る", to: "attacker", match: (t) => t.endsWith("装備者ダメージUP") },
+      { key: "stat_up", group: "damage", label: `${stats.join("・")}UP`, hint: "ステータスバフ", to: "attacker", match: (t) => stats.some((s) => t.startsWith(`${s}UP`)) },
+      { key: "def_down", group: "damage", label: `${defs.join("・")}DOWN`, hint: both("敵の防御を下げる", "敵の魔防を下げる").join("・"), to: "enemy",
+        match: statDown(...defs) },
       // 特殊バフは乗算では同じ枠だが重ねがけでき、精神統一・心技一体が高いほど他も伸びるので分けて埋める
-      magic
-        ? { key: "concentration", group: "damage", label: "精神統一", hint: "最大MPに応じて魔法ダメージUP", to: "attacker", match: oneOf("精神統一") }
-        : { key: "unity", group: "damage", label: "心技一体", hint: "最大MPに応じて物理ダメージUP", to: "attacker", match: oneOf("心技一体") },
+      ...both<Requirement>(
+        { key: "unity", group: "damage", label: "心技一体", hint: "最大MPに応じて物理ダメージUP", to: "attacker", match: oneOf("心技一体") },
+        { key: "concentration", group: "damage", label: "精神統一", hint: "最大MPに応じて魔法ダメージUP", to: "attacker", match: oneOf("精神統一") },
+      ),
       { key: "underdog", group: "damage", label: "下克上", hint: "敵のLvが高いほどダメージUP", to: "attacker", match: oneOf("下克上") },
       { key: "ambush", group: "damage", label: "虎視眈眈", hint: "敵の行動後に動くとダメージUP", to: "attacker", match: oneOf("虎視眈眈") },
       { key: "zone", group: "damage", label: "ZONE", hint: [E, K].map((x) => ZONES[x]).filter(Boolean).map((z) => `${z}陣`).join("・"), to: "any",
         match: (t) => /陣.*展開$/.test(t) && !/^(.*)陣展開時/.test(t),
         caveat: (t) => (zoneFits(t, E, K) ? null : "属性・攻撃種と一致しない陣") },
       { key: "dot", group: "damage", label: "毒・ペイン", hint: "", to: "enemy", match: oneOf("毒", "猛毒", "ペイン") },
-      { key: "over_crit", group: "damage", label: magic ? "魔法オーバークリティカル" : "オーバークリティカル", hint: "クリ率100%超の分だけ別枠でダメージ2倍", to: "attacker",
-        match: oneOf(magic ? "魔法オーバークリティカル" : "オーバークリティカル") },
-      { key: "crit_rate", group: "damage", label: magic ? "魔法クリティカル率UP" : "物理クリティカル率UP", hint: "クリダメ・オーバークリティカルの前提", to: "attacker",
-        match: oneOf(magic ? "魔法クリティカル率UP" : "物理クリティカル率UP") },
-      { key: "crit_dmg", group: "damage", label: magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP", hint: "単純加算・上限なし", to: "attacker",
-        match: oneOf(magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP") },
-      { key: "devotion", group: "damage", label: "ルナティック(挺身)", hint: magic ? "精神を魔力に加算" : "耐久を攻撃に加算", to: "attacker",
+      { key: "over_crit", group: "damage", label: both("オーバークリティカル", "魔法オーバークリティカル").join("・"), hint: "クリ率100%超の分だけ別枠でダメージ2倍", to: "attacker",
+        match: oneOf(...both("オーバークリティカル", "魔法オーバークリティカル")) },
+      { key: "crit_rate", group: "damage", label: `${crit.join("・")}クリティカル率UP`, hint: "クリダメ・オーバークリティカルの前提", to: "attacker",
+        match: oneOf(...crit.map((c) => `${c}クリティカル率UP`)) },
+      { key: "crit_dmg", group: "damage", label: `${crit.join("・")}クリティカルダメージUP`, hint: "単純加算・上限なし", to: "attacker",
+        match: oneOf(...crit.map((c) => `${c}クリティカルダメージUP`)) },
+      { key: "devotion", group: "damage", label: "ルナティック(挺身)", hint: both("耐久を攻撃に加算", "精神を魔力に加算").join("・"), to: "attacker",
         match: oneOf("ルナティック(挺身)") },
       // 心眼・捨身はルナティックの乗算枠で、互いにも乗算になる
       { key: "insight", group: "damage", label: "ルナティック(心眼)", hint: "ダメージ1.5倍＋弱点倍率+1", to: "attacker", match: oneOf("ルナティック(心眼)") },
@@ -162,19 +182,24 @@ export type EffectRow = {
   source: string;
 };
 
-/** full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない / null: 効かない */
-export type Fit = { level: "full" | "partial" | "unmet"; note: string };
+/**
+ * full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない /
+ * sb: SB 発動ターンだけ効く（並べるが枠は埋めない） / null: 効かない
+ */
+export type Fit = { level: "full" | "partial" | "unmet" | "sb"; note: string };
 export const fitRank = (f: Fit) => (f.level === "full" ? 2 : f.level === "partial" ? 1 : 0);
 
 export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?: Guest): Fit | null {
   if (!req.match(e.type)) return null;
   const isAttacker = ctx.attacker?.id === e.character_id;
-  const clauses = JSON.parse(e.condition_clauses || "[]") as Clause[];
+  const sb = sbOnly(e);
+  // SB の条件は発動ターンかどうかだけなので、判定には使わず sb として扱う
+  const clauses = sb ? [] : (JSON.parse(e.condition_clauses || "[]") as Clause[]);
   const cond = clauses.length ? evaluateCondition(clauses, e.conditions, e.character_id, ctx.members, guest) : null;
   const caveat = req.caveat?.(e.type) ?? "";
   const result = (level: Fit["level"], note = ""): Fit => ({
-    level: cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
-    note: [caveat, note, cond?.note ?? ""].filter(Boolean).join(" / "),
+    level: sb ? "sb" : cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
+    note: [sb ? `${e.conditions || "SB発動時"}のみ` : "", caveat, note, cond?.note ?? ""].filter(Boolean).join(" / "),
   });
 
   switch (req.to) {
@@ -186,6 +211,9 @@ export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?:
       if (isAttacker && e.scope !== "enemy") return result("full");
       if (e.scope === "party") return result("full");
       if (e.scope === "ally") return result("partial", `対象: ${e.targets}`);
+      // ★がいないと誰に届けばいいか決まらないので、本人のみ・特定の味方向けは △ にしておく
+      if (!ctx.attacker && e.scope === "self") return result("partial", "本人のみ");
+      if (!ctx.attacker && e.scope === "conditional") return result("partial", `対象: ${e.targets}`);
       if (e.scope === "conditional") return conditionalFit(e, ctx) ? result("full", `対象: ${e.targets}`) : null;
       return null;
     case "party":
@@ -195,6 +223,8 @@ export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?:
       return null;
   }
 }
+
+const sbOnly = (e: EffectRow) => e.source === "SB強化" || /^SB(\(.の刻\))?(発動)?時$/.test(e.conditions);
 
 /** 「天の味方」「特定パーソナリティの味方」などがアタッカーに当たるか */
 function conditionalFit(e: EffectRow, ctx: PartyContext): boolean {
@@ -220,6 +250,16 @@ export function defaultAttack(db: Db, characterId: number): { element: string; k
   if (!row) return { element: "", kind: "" };
   const element = row.element && (ATTACK_ELEMENTS as readonly string[]).includes(row.element) ? row.element : "無";
   return { element, kind: ATTACK_TYPES[row.type] ?? "" };
+}
+
+/** 習得スキルの攻撃種（臨機応変なしで出せる攻撃種） */
+export function attackKindsOf(db: Db, characterId: number): string[] {
+  return db
+    .query<{ type: string }, any>(
+      `SELECT DISTINCT type FROM character_effects WHERE character_id = $id AND type IN ('斬攻撃', '突攻撃', '打攻撃', '魔法攻撃')`,
+    )
+    .all({ id: characterId })
+    .map((r) => ATTACK_TYPES[r.type]!);
 }
 
 let typeCache: string[] | null = null;

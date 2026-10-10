@@ -182,7 +182,7 @@ export function searchCharacters(db: Db, filters: CharacterFilters, { page = 1, 
   const { where, params } = filterSql(filters);
   const total = db.query<{ n: number }, any>(`SELECT COUNT(*) AS n FROM characters c ${where}`).get(params)!.n;
   const rows = db
-    .query<CharacterSummary, any>(`SELECT ${SUMMARY_COLUMNS} FROM characters c ${where} ORDER BY c.name, c.style, c.id LIMIT $limit OFFSET $offset`)
+    .query<CharacterSummary, any>(`SELECT ${SUMMARY_COLUMNS} FROM characters c ${where} ORDER BY c.sort_key, CASE c.style WHEN 'NS' THEN 0 WHEN 'AS' THEN 1 ELSE 2 END, c.id LIMIT $limit OFFSET $offset`)
     .all({ ...params, limit: perPage, offset: (page - 1) * perPage });
   const matches = matchingEffects(db, rows.map((r) => r.id), filters);
   const characters = rows.map((row) => ({ ...row, matches: matches.get(row.id) ?? [] }));
@@ -212,7 +212,7 @@ export function charactersByLabels(db: Db, labels: string[]): Map<string, Charac
 /** 投稿フォームの候補（datalist）用 */
 export function allCharacterOptions(db: Db) {
   return db.query<{ label: string; class_name: string | null; style: string }, []>(
-    "SELECT label, class_name, style FROM characters ORDER BY name, style, id",
+    "SELECT label, class_name, style FROM characters ORDER BY sort_key, CASE style WHEN 'NS' THEN 0 WHEN 'AS' THEN 1 ELSE 2 END, id",
   ).all();
 }
 
