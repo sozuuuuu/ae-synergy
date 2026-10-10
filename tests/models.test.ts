@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { importCharacters } from "../src/models/character-import.ts";
+import { importCharacters, loadAnadenData } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, updateSettings } from "../src/models/parties.ts";
+import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
+import { extractEffects } from "../src/models/effect-extract.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
 
@@ -17,6 +19,35 @@ describe("取り込み", () => {
     const db = testDb();
     importCharacters(db, ROWS.filter((r) => r._id !== "z1"));
     expect(db.query("SELECT 1 FROM characters WHERE external_id = 'z1'").get()).toBeNull();
+  });
+
+  test("anaden-mcp の補強済みデータだけを受け付ける", async () => {
+    const write = async (data: unknown) => {
+      const path = `${import.meta.dir}/../storage/test-anaden-${crypto.randomUUID()}.json`;
+      await Bun.write(path, JSON.stringify(data));
+      return path;
+    };
+    const ok = await write({ format: "anaden-mcp/characters", version: 1, generatedAt: "", characters: ROWS });
+    expect(await loadAnadenData(ok)).toHaveLength(ROWS.length);
+    // anaden-gear の生データ（ただの配列）は拒否する
+    await expect(loadAnadenData(await write(ROWS))).rejects.toThrow("補強済みデータ");
+    await expect(loadAnadenData("storage/does-not-exist.json")).rejects.toThrow("anaden export");
+    for (const f of new Bun.Glob("test-anaden-*.json").scanSync(`${import.meta.dir}/../storage`)) await Bun.file(`${import.meta.dir}/../storage/${f}`).delete();
+  });
+});
+
+describe("効果の分解", () => {
+  test("発動条件は anaden-mcp が付けた _condition の条件文と構造化した条件をそのまま使う", () => {
+    const clauses: Clause[] = [{ slot: "main" }, { neighbors: { personalities: ["陰"] } }];
+    const [effect, plain] = extractEffects({
+      uniqueAbility: [{ effects: [
+        { description: "前衛でターン開始時、…", types: "ルナティック(捨身)", targets: "自身", _condition: { text: "前衛でターン開始時、両隣に<陰>", clauses } },
+        { description: "腕力+10%", types: "腕力UP", value: 10 },
+      ] }],
+    });
+    expect(effect!.conditions).toBe("前衛でターン開始時、両隣に<陰>");
+    expect(JSON.parse(effect!.condition_clauses)).toEqual(clauses);
+    expect([plain!.conditions, plain!.condition_clauses]).toEqual(["", "[]"]);
   });
 });
 
@@ -78,10 +109,10 @@ describe("枠の判定", () => {
 
   test("アタッカー本人の自己バフはアタッカーの枠を埋める", () => {
     const { db, partyId } = setup();
-    expect(coverageOf(db, partyId).special!.status).toBe("ok");
+    expect(coverageOf(db, partyId).unity!.status).toBe("ok");
   });
 
-  test("支援役の効果は対象・条件に応じて ok / partial になる", () => {
+  test("支援役の効果は対象・条件に応じて ok / 条件未達 になる", () => {
     const { db, partyId } = setup();
     addMember(db, getParty(db, partyId)!, idOf(db, "テスト支援"));
     const c = coverageOf(db, partyId);
@@ -90,10 +121,45 @@ describe("枠の判定", () => {
     expect(c.heal!.status).toBe("ok");
     // <東方>の味方への腕力UPは、東方のアタッカーに当たる
     expect(c.stat_up!.status).toBe("ok");
-    // 烈火陣展開時の条件付きバフは partial
-    expect(c.elem_atk_up!.status).toBe("partial");
-    expect(c.elem_atk_up!.providers[0]!.fit.note).toContain("烈火陣展開時");
+    // 烈火陣を張れる味方がいないので、烈火陣展開時のバフは ✗ として並ぶだけで枠は埋まらない
+    expect(c.elem_atk_up!.status).toBe("missing");
+    expect(c.elem_atk_up!.providers[0]!.fit).toEqual({ level: "unmet", note: "条件未達: 烈火陣展開時" });
     expect(c.zone!.status).toBe("missing");
+
+    // 烈火陣を張れる味方を入れると条件を満たす
+    addMember(db, getParty(db, partyId)!, idOf(db, "テスト陣"));
+    const after = coverageOf(db, partyId);
+    expect(after.elem_atk_up!.status).toBe("ok");
+    expect(after.elem_atk_up!.providers[0]!.fit.note).toBe("条件OK: 烈火陣展開時");
+  });
+
+  test("位置・人数・ZONE の条件は編成で判定し、戦闘の流れ次第や未分類のものは判定しない", () => {
+    const m = (id: number, slot: "main" | "sub", position: number, personalities: string[], zones: string[] = []) =>
+      ({ id, slot, position, personalities, ls_type: "冥", weapon: "katana", gender: null, zones });
+    const members = [m(1, "main", 0, ["陰"]), m(2, "main", 1, ["火"], ["極・刻陰陣展開"]), m(3, "main", 2, ["陰"]), m(4, "sub", 0, ["陰"])];
+    const state = (clauses: Clause[], subject = 2) => evaluateCondition(clauses, "", subject, members).state;
+    const front = { slot: "main" } as const;
+    expect(state([front, { neighbors: { personalities: ["陰"] } }])).toBe("met");
+    expect(state([front, { neighbors: { personalities: ["陰"] } }], 1)).toBe("unmet");
+    const yin = (region: "main" | "all", min: number): Clause => ({ count: { region, who: { personalities: ["陰"] }, min } });
+    expect(state([yin("main", 3)])).toBe("unmet"); // 後衛の陰は数えない
+    expect(state([yin("all", 3)])).toBe("met");
+    expect(state([{ count: { region: "main", who: { personalities: ["陰"] }, min: 2, max: 2 } }])).toBe("met");
+    expect(state([{ count: { region: "main", who: { ls: "冥" }, min: 3 } }])).toBe("met");
+    expect(state([{ anyOf: [[yin("main", 3)], [{ count: { region: "main", who: { ls: "冥" }, min: 3 } }]] }])).toBe("met");
+    expect(state([{ slot: "sub" }])).toBe("unmet");
+    expect(state([{ zone: { names: ["刻陰陣"] } }])).toBe("met");
+    expect(state([{ zone: { names: ["刻陰陣"], tier: "極・" } }])).toBe("met");
+    expect(state([{ zone: { names: ["烈火陣"] } }])).toBe("unmet");
+    expect(state([{ frontElements: { distinct: true } }])).toBe("unmet");
+    expect(state([front, { battle: "殺意50以上蓄積時" }])).toBe("unknown");
+    expect(state([{ unclassified: "新しい条件" }])).toBe("unknown");
+    // 判定できない部分があっても、満たさない部分があれば ✗
+    expect(state([{ slot: "sub" }, { battle: "HP100%未満" }])).toBe("unmet");
+    // 候補（パーティ外）は前衛に置く前提。並び次第の両隣は判定しない
+    const guest = { id: 9, personalities: ["陰"], ls_type: "冥", weapon: "katana", gender: null, zones: [] };
+    expect(evaluateCondition([yin("main", 3)], "", 9, members, guest).state).toBe("met");
+    expect(evaluateCondition([{ neighbors: { personalities: ["陰"] } }], "", 9, members, guest).state).toBe("unknown");
   });
 
   test("候補には枠を埋められるメンバー外のキャラが出る", () => {
@@ -102,6 +168,28 @@ describe("枠の判定", () => {
     const ctx = partyContext(db, party);
     const zone = requirementsFor(ctx).find((r) => r.key === "zone")!;
     expect(candidatesFor(db, ctx, zone, [idOf(db, "テストアタッカー")]).map((p) => p.characterId)).toEqual([idOf(db, "テスト陣")]);
+  });
+
+  test("オーバークリティカル・挺身・踏ん張るの枠があり、魔法アタッカーなら魔法オーバークリティカルになる", () => {
+    const { db, partyId } = setup();
+    const party = getParty(db, partyId)!;
+    const ctx = partyContext(db, party);
+    expect(requirementsFor(ctx).map((r) => r.key)).toEqual(expect.arrayContaining(["over_crit", "devotion", "endure"]));
+    const magic = requirementsFor({ ...ctx, attackKind: "魔法" });
+    expect(magic.find((r) => r.key === "over_crit")!.label).toBe("魔法オーバークリティカル");
+    expect(magic.find((r) => r.key === "devotion")!.hint).toBe("精神を魔力に加算");
+  });
+
+  test("敵へのステータスデバフは、固定値版や全ステータスDOWNも含めて攻撃種・想定ボスに合うものだけ一致する", () => {
+    const { db, partyId } = setup();
+    const ctx = partyContext(db, getParty(db, partyId)!);
+    const req = (c: typeof ctx, key: string) => requirementsFor(c).find((r) => r.key === key)!;
+    expect(req(ctx, "def_down").match("耐久DOWN(固定値)")).toBe(true);
+    expect(req(ctx, "def_down").match("精神DOWN")).toBe(false);
+    expect(req({ ...ctx, attackKind: "魔法" }, "def_down").match("精神DOWN")).toBe(true);
+    expect(req(ctx, "enemy_atk_down").match("知性DOWN")).toBe(true);
+    expect(req({ ...ctx, bossAttack: "physical" }, "enemy_atk_down").match("知性DOWN")).toBe(false);
+    expect(req({ ...ctx, bossAttack: "physical" }, "enemy_atk_down").match("全ステータスDOWN")).toBe(true);
   });
 
   test("想定ボスの設定で耐久・ボス対策の枠が増える", () => {

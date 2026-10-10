@@ -1,4 +1,6 @@
 // 取り込み元の1キャラ分のデータから、効果を「種別1つ = 1行」に分解する。
+// 発動条件は anaden-mcp が各効果に付けた _condition（条件文と構造化した条件）をそのまま使う。
+import type { Clause } from "./conditions.ts";
 
 export type Scope = "self" | "party" | "ally" | "conditional" | "enemy" | "other";
 
@@ -10,6 +12,7 @@ export type ExtractedEffect = {
   turns: number | null;
   element: string | null;
   conditions: string;
+  condition_clauses: string; // Clause[] の JSON
   personalities: string;
   description: string;
   source: string;
@@ -47,14 +50,14 @@ const text = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").tri
 export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
   const out: ExtractedEffect[] = [];
 
-  const walk = (node: unknown, source: string, inherited: { conditions: string; targets: string }) => {
+  const walk = (node: unknown, source: string, inherited: { targets: string }) => {
     if (Array.isArray(node)) {
       node.forEach((child) => walk(child, source, inherited));
       return;
     }
     if (!node || typeof node !== "object") return;
     const n = node as Record<string, any>;
-    const conditions = [inherited.conditions, text(n.conditions)].filter(Boolean).join(" / ");
+    const condition = n._condition as { text: string; clauses: Clause[] } | undefined;
     const targets = text(n.targets) || inherited.targets;
 
     for (const type of [n.types].flat()) {
@@ -66,19 +69,20 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
         value: num(n.value),
         turns: num(n.turn),
         element: typeof n.element === "string" ? n.element : null,
-        conditions,
+        conditions: condition?.text ?? "",
+        condition_clauses: JSON.stringify(condition?.clauses ?? []),
         personalities: Array.isArray(n.personalities) ? n.personalities.join("、") : "",
         description: text(n.description),
         source,
       });
     }
     for (const [key, child] of Object.entries(n)) {
-      if (key === "personalities" || !child || typeof child !== "object") continue;
-      walk(child, source, { conditions, targets });
+      if (key === "personalities" || key === "_condition" || !child || typeof child !== "object") continue;
+      walk(child, source, { targets });
     }
   };
 
-  const none = { conditions: "", targets: "" };
+  const none = { targets: "" };
   for (const skill of Array.isArray(row.skills) ? row.skills : []) {
     walk(skill?.effects, text(skill?.name) || "スキル", none);
   }
@@ -88,7 +92,7 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
   // アビリティ・固有アビリティは対象の記載がなければ本人への常時効果
   const selfByDefault = new Set(["abilities", "uniqueAbility"]);
   for (const [key, label] of Object.entries(SECTION_SOURCES)) {
-    if (row[key]) walk(row[key], label, selfByDefault.has(key) ? { conditions: "", targets: "自身" } : none);
+    if (row[key]) walk(row[key], label, selfByDefault.has(key) ? { targets: "自身" } : none);
   }
   return out;
 }

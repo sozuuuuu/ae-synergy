@@ -8,7 +8,7 @@ import {
   addMember, createParty, deleteParty, displayTitle, duplicateParty, getParty, listParties, moveMember,
   partyContext, removeMember, setAttacker, sharedPersonalities, updateSettings, type Party,
 } from "./models/parties.ts";
-import { candidatesFor, evaluateCoverage, extraFills, requirementsFor } from "./models/requirements.ts";
+import { candidatesFor, evaluateCoverage, extraFills, fitRank, requirementsFor } from "./models/requirements.ts";
 import { CharacterPage, CharacterSearchPage } from "./views/characters.tsx";
 import { Layout, type Flash } from "./views/layout.tsx";
 import { PartyListPage, PartyPage, summarize } from "./views/parties.tsx";
@@ -40,7 +40,7 @@ export function createApp(db: Db, options: Options = {}) {
       candidates = providers
         .map((p) => ({ ...p, character: characters.get(p.characterId)!, extra: extras.get(p.characterId) ?? [] }))
         .sort((a, b) =>
-          (b.fit.level === "full" ? 1 : 0) - (a.fit.level === "full" ? 1 : 0) ||
+          fitRank(b.fit) - fitRank(a.fit) ||
           b.extra.length - a.extra.length ||
           (b.effect.value ?? 0) - (a.effect.value ?? 0))
         .slice(0, 30);

@@ -3,14 +3,18 @@ import { normalize } from "../lib/text.ts";
 import { ELEMENTS, WEAPONS } from "./characters.ts";
 import { extractEffects } from "./effect-extract.ts";
 
-/** キャラクターデータを取り込む。source は URL かローカルの JSON ファイル */
-export async function loadSource(source: string): Promise<unknown> {
-  if (/^https?:\/\//.test(source)) {
-    const res = await fetch(source);
-    if (!res.ok) throw new Error(`GET ${source} -> ${res.status}`);
-    return res.json();
+/**
+ * anaden-mcp が書き出す補強済みのキャラデータ（各効果に構造化した発動条件 _condition がつく）を読む。
+ * anaden-gear の生データは条件が自由文だけなので受け付けない。
+ */
+export async function loadAnadenData(path: string): Promise<unknown[]> {
+  const file = Bun.file(path);
+  if (!(await file.exists())) throw new Error(`${path} がありません。anaden-mcp で \`anaden export\` を実行してください`);
+  const data = await file.json();
+  if (data?.format !== "anaden-mcp/characters" || data.version !== 1 || !Array.isArray(data.characters)) {
+    throw new Error(`${path} は anaden-mcp の補強済みデータ（format: anaden-mcp/characters, version: 1）ではありません`);
   }
-  return Bun.file(source).json();
+  return data.characters;
 }
 
 const WEAPON_PERSONALITIES = new Set(Object.values(WEAPONS));
@@ -47,8 +51,8 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
   const addPersonality = db.query("INSERT OR IGNORE INTO character_personalities (character_id, personality_id) VALUES ($id, $pid)");
   const clearEffects = db.query("DELETE FROM character_effects WHERE character_id = $id");
   const addEffect = db.query(
-    `INSERT INTO character_effects (character_id, type, scope, targets, value, turns, element, conditions, personalities, description, source, search_text)
-     VALUES ($id, $type, $scope, $targets, $value, $turns, $element, $conditions, $personalities, $description, $source, $search_text)`,
+    `INSERT INTO character_effects (character_id, type, scope, targets, value, turns, element, conditions, condition_clauses, personalities, description, source, search_text)
+     VALUES ($id, $type, $scope, $targets, $value, $turns, $element, $conditions, $condition_clauses, $personalities, $description, $source, $search_text)`,
   );
 
   const result: ImportResult = { created: 0, updated: 0, unchanged: 0, total: rows.length };

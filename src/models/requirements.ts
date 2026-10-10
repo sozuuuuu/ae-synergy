@@ -1,7 +1,8 @@
 // パーティに必要な「枠」と、キャラの効果がその枠を埋めるかの判定ルール。
-// 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。
+// 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。仕様の根拠は doc/battle-mechanics.md。
 import type { Db } from "../db.ts";
 import { WEAPONS } from "./characters.ts";
+import { type Clause, type CondMember, evaluateCondition, type Guest, loadCondMembers } from "./conditions.ts";
 
 export type Group = "damage" | "durability" | "boss";
 export const GROUP_NAMES: Record<Group, string> = { damage: "火力", durability: "耐久", boss: "ボス対策" };
@@ -30,6 +31,8 @@ const ZONES: Record<string, string> = {
 };
 
 const oneOf = (...types: string[]) => (t: string) => types.includes(t);
+/** 敵へのステータスデバフ（固定値版と全ステータスDOWNも含む） */
+const statDown = (...stats: string[]) => (t: string) => t === "全ステータスDOWN" || stats.some((s) => t.startsWith(`${s}DOWN`));
 
 /** 陣の種別がこの属性・攻撃種のダメージを上げるか（双撃陣・斬魔なども含む） */
 export function zoneFits(type: string, element: string, kind: string): boolean {
@@ -45,6 +48,7 @@ export const BOSS_NEEDS: Requirement[] = [
   { key: "status_resist", group: "boss", label: "状態異常耐性UP", hint: "", to: "party", match: oneOf("状態異常耐性UP") },
   { key: "knockback", group: "boss", label: "吹き飛ばし無効", hint: "前衛を入れ替えてくるボス向け", to: "party", match: oneOf("吹き飛ばし無効") },
   { key: "dispel", group: "boss", label: "敵のバフ解除", hint: "", to: "enemy", match: oneOf("バフ解除", "バフ/デバフ解除") },
+  { key: "buff_reversal", group: "boss", label: "バフリバーサル", hint: "敵のステータス・耐性・攻撃バフをデバフに反転", to: "enemy", match: oneOf("バフリバーサル") },
   { key: "cleanse", group: "boss", label: "味方のデバフ解除", hint: "", to: "party", match: oneOf("デバフ解除", "バフ/デバフ解除") },
   { key: "break", group: "boss", label: "ブレイク", hint: "ブレイク・ウェポン／エレメンタルブレイク", to: "any", match: (t) => /ブレイク/.test(t) && t !== "ブレイク無効" },
   { key: "revive", group: "boss", label: "戦闘不能回復", hint: "", to: "any", match: oneOf("戦闘不能回復") },
@@ -58,6 +62,8 @@ export type PartyContext = {
   bossElement: string;
   bossAttack: string; // physical / magic / ""
   bossNeeds: string[];
+  /** 発動条件の判定用（並び・パーソナリティ・展開できる ZONE） */
+  members: CondMember[];
 };
 
 export function requirementsFor(ctx: PartyContext): Requirement[] {
@@ -81,11 +87,30 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
     reqs.push(
       { key: "weapon_up", group: "damage", label: `${weapon}装備者ダメージUP`, hint: "武器種バフ", to: "attacker", match: oneOf(`${weapon}装備者ダメージUP`, "全武器種装備者ダメージUP") },
       { key: "stat_up", group: "damage", label: magic ? "知性UP" : "腕力UP", hint: "ステータスバフ", to: "attacker", match: (t) => t.startsWith(magic ? "知性UP" : "腕力UP") },
-      { key: "special", group: "damage", label: "特殊バフ", hint: "精神統一・心技一体・下克上・虎視眈眈", to: "attacker", match: oneOf("精神統一", "心技一体", "下克上", "虎視眈眈") },
+      { key: "def_down", group: "damage", label: magic ? "精神DOWN" : "耐久DOWN", hint: magic ? "敵の魔防を下げる" : "敵の防御を下げる", to: "enemy",
+        match: statDown(magic ? "精神" : "耐久") },
+      // 特殊バフは乗算では同じ枠だが重ねがけでき、精神統一・心技一体が高いほど他も伸びるので分けて埋める
+      magic
+        ? { key: "concentration", group: "damage", label: "精神統一", hint: "最大MPに応じて魔法ダメージUP", to: "attacker", match: oneOf("精神統一") }
+        : { key: "unity", group: "damage", label: "心技一体", hint: "最大MPに応じて物理ダメージUP", to: "attacker", match: oneOf("心技一体") },
+      { key: "underdog", group: "damage", label: "下克上", hint: "敵のLvが高いほどダメージUP", to: "attacker", match: oneOf("下克上") },
+      { key: "ambush", group: "damage", label: "虎視眈眈", hint: "敵の行動後に動くとダメージUP", to: "attacker", match: oneOf("虎視眈眈") },
       { key: "zone", group: "damage", label: "ZONE", hint: [E, K].map((x) => ZONES[x]).filter(Boolean).map((z) => `${z}陣`).join("・"), to: "any",
         match: (t) => /陣.*展開$/.test(t) && !/^(.*)陣展開時/.test(t),
         caveat: (t) => (zoneFits(t, E, K) ? null : "属性・攻撃種と一致しない陣") },
       { key: "dot", group: "damage", label: "毒・ペイン", hint: "", to: "enemy", match: oneOf("毒", "猛毒", "ペイン") },
+      { key: "over_crit", group: "damage", label: magic ? "魔法オーバークリティカル" : "オーバークリティカル", hint: "クリ率100%超の分だけ別枠でダメージ2倍", to: "attacker",
+        match: oneOf(magic ? "魔法オーバークリティカル" : "オーバークリティカル") },
+      { key: "crit_rate", group: "damage", label: magic ? "魔法クリティカル率UP" : "物理クリティカル率UP", hint: "クリダメ・オーバークリティカルの前提", to: "attacker",
+        match: oneOf(magic ? "魔法クリティカル率UP" : "物理クリティカル率UP") },
+      { key: "crit_dmg", group: "damage", label: magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP", hint: "単純加算・上限なし", to: "attacker",
+        match: oneOf(magic ? "魔法クリティカルダメージUP" : "物理クリティカルダメージUP") },
+      { key: "devotion", group: "damage", label: "ルナティック(挺身)", hint: magic ? "精神を魔力に加算" : "耐久を攻撃に加算", to: "attacker",
+        match: oneOf("ルナティック(挺身)") },
+      // 心眼・捨身はルナティックの乗算枠で、互いにも乗算になる
+      { key: "insight", group: "damage", label: "ルナティック(心眼)", hint: "ダメージ1.5倍＋弱点倍率+1", to: "attacker", match: oneOf("ルナティック(心眼)") },
+      { key: "abandon", group: "damage", label: "ルナティック(捨身)", hint: "ダメージ1.7倍＋クリ率100%UP（毎行動HP20%自傷）", to: "attacker",
+        match: oneOf("ルナティック(捨身)") },
       { key: "weak", group: "damage", label: "弱点時ダメージUP", hint: "弱点を突けるとき", to: "attacker", match: oneOf("弱点時ダメージUP") },
     );
   }
@@ -98,12 +123,17 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
       match: (t) => /^(バリア|シールド)/.test(t) && !["バリア貫通", "バリア効果量増加"].includes(t) },
     { key: "res_up", group: "durability", label: physical ? "物理耐性UP" : magical ? "魔法耐性UP" : "物理・魔法耐性UP", hint: "", to: "party",
       match: physical ? oneOf("物理耐性UP") : magical ? oneOf("魔法耐性UP") : oneOf("物理耐性UP", "魔法耐性UP") },
+    // 敵の腕力・知性は攻撃値A・Bの両方に入るので、味方への耐性バフよりよく効く
+    { key: "enemy_atk_down", group: "durability", label: physical ? "腕力DOWN" : magical ? "知性DOWN" : "腕力・知性DOWN", hint: "敵の攻撃力を下げる", to: "enemy",
+      match: statDown(...(physical ? ["腕力"] : magical ? ["知性"] : ["腕力", "知性"])) },
+    { key: "enemy_spd_down", group: "durability", label: "速度DOWN", hint: "敵より先に動ける（虎視眈眈とは逆）", to: "enemy", match: statDown("速度") },
   );
   if (ctx.bossElement && ctx.bossElement !== "無") {
     reqs.push({ key: "elem_res_up", group: "durability", label: `${ctx.bossElement}属性耐性UP`, hint: "ボスの攻撃属性への耐性", to: "party",
       match: oneOf(`${ctx.bossElement}属性耐性UP`, "全属性耐性UP") });
   }
   reqs.push(
+    { key: "endure", group: "durability", label: "踏ん張る", hint: "致死ダメージをHP1で耐える", to: "party", match: oneOf("踏ん張る") },
     { key: "tank", group: "durability", label: "挑発・庇い", hint: "挑発・庇立て・守護", to: "any", match: oneOf("挑発", "庇立て", "守護") },
     { key: "cure", group: "durability", label: "状態異常回復", hint: "", to: "party", match: oneOf("状態異常回復") },
     { key: "mp", group: "durability", label: "MP回復", hint: "", to: "party", match: (t) => /^MP(回復|治癒)/.test(t) },
@@ -124,22 +154,25 @@ export type EffectRow = {
   value: number | null;
   turns: number | null;
   conditions: string;
+  condition_clauses: string; // Clause[] の JSON
   personalities: string;
   description: string;
   source: string;
 };
 
-/** full: そのまま効く / partial: 位置・条件次第や本人のみ / null: 効かない */
-export type Fit = { level: "full" | "partial"; note: string };
+/** full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない / null: 効かない */
+export type Fit = { level: "full" | "partial" | "unmet"; note: string };
+export const fitRank = (f: Fit) => (f.level === "full" ? 2 : f.level === "partial" ? 1 : 0);
 
-export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext): Fit | null {
+export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?: Guest): Fit | null {
   if (!req.match(e.type)) return null;
   const isAttacker = ctx.attacker?.id === e.character_id;
-  const condition = e.conditions ? `条件: ${e.conditions}` : "";
+  const clauses = JSON.parse(e.condition_clauses || "[]") as Clause[];
+  const cond = clauses.length ? evaluateCondition(clauses, e.conditions, e.character_id, ctx.members, guest) : null;
   const caveat = req.caveat?.(e.type) ?? "";
   const result = (level: Fit["level"], note = ""): Fit => ({
-    level: level === "full" && (e.conditions || caveat) ? "partial" : level,
-    note: [caveat, note, condition].filter(Boolean).join(" / "),
+    level: cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
+    note: [caveat, note, cond?.note ?? ""].filter(Boolean).join(" / "),
   });
 
   switch (req.to) {
@@ -203,7 +236,7 @@ export function effectsForCharacters(db: Db, characterIds: number[], types: stri
   types.forEach((t, i) => (params[`t${i}`] = t));
   return db
     .query<EffectRow, any>(
-      `SELECT character_id, type, scope, targets, value, turns, conditions, personalities, description, source FROM character_effects
+      `SELECT character_id, type, scope, targets, value, turns, conditions, condition_clauses, personalities, description, source FROM character_effects
        WHERE character_id IN (${characterIds.map((_, i) => `$c${i}`).join(", ")}) AND type IN (${types.map((_, i) => `$t${i}`).join(", ")})`,
     )
     .all(params);
@@ -212,8 +245,7 @@ export function effectsForCharacters(db: Db, characterIds: number[], types: stri
 export type Provider = { characterId: number; fit: Fit; effect: EffectRow };
 export type Coverage = { req: Requirement; status: "ok" | "partial" | "missing"; providers: Provider[] };
 
-const better = (a: Provider, b: Provider) =>
-  (a.fit.level === "full" ? 1 : 0) - (b.fit.level === "full" ? 1 : 0) || (a.effect.value ?? 0) - (b.effect.value ?? 0);
+const better = (a: Provider, b: Provider) => fitRank(a.fit) - fitRank(b.fit) || (a.effect.value ?? 0) - (b.effect.value ?? 0);
 
 /** 各枠を誰がどう埋めているか。キャラごとに一番良い効果だけを残す */
 export function evaluateCoverage(db: Db, ctx: PartyContext, memberIds: number[]): Coverage[] {
@@ -230,7 +262,8 @@ export function evaluateCoverage(db: Db, ctx: PartyContext, memberIds: number[])
       if (!current || better(p, current) > 0) best.set(effect.character_id, p);
     }
     const providers = [...best.values()].sort((a, b) => better(b, a));
-    const status = providers.some((p) => p.fit.level === "full") ? "ok" : providers.length ? "partial" : "missing";
+    // 条件を満たさない供給元は ✗ として並べるだけで、枠は埋めない
+    const status = providers.some((p) => p.fit.level === "full") ? "ok" : providers.some((p) => p.fit.level === "partial") ? "partial" : "missing";
     return { req, status, providers };
   });
 }
@@ -243,16 +276,17 @@ export function candidatesFor(db: Db, ctx: PartyContext, req: Requirement, exclu
   types.forEach((t, i) => (params[`t${i}`] = t));
   const rows = db
     .query<EffectRow, any>(
-      `SELECT character_id, type, scope, targets, value, turns, conditions, personalities, description, source FROM character_effects
+      `SELECT character_id, type, scope, targets, value, turns, conditions, condition_clauses, personalities, description, source FROM character_effects
        WHERE type IN (${types.map((_, i) => `$t${i}`).join(", ")})`,
     )
     .all(params);
   const exclude = new Set(excludeIds);
+  const guests = loadCondMembers(db, [...new Set(rows.filter((r) => r.condition_clauses !== "[]" && !exclude.has(r.character_id)).map((r) => r.character_id))]);
   // 候補はまだアタッカーではないので、アタッカー本人の自己バフ扱いにはしない
   const best = new Map<number, Provider>();
   for (const effect of rows) {
     if (exclude.has(effect.character_id)) continue;
-    const fit = fitOf(req, effect, ctx);
+    const fit = fitOf(req, effect, ctx, guests.get(effect.character_id));
     if (!fit) continue;
     const p = { characterId: effect.character_id, fit, effect };
     const current = best.get(effect.character_id);
@@ -266,9 +300,10 @@ export function extraFills(db: Db, ctx: PartyContext, coverage: Coverage[], cand
   const open = coverage.filter((c) => c.status !== "ok" && c.req.key !== exceptKey).map((c) => c.req);
   const types = allEffectTypes(db).filter((t) => open.some((r) => r.match(t)));
   const fills = new Map<number, Set<string>>();
+  const guests = loadCondMembers(db, candidateIds);
   for (const effect of effectsForCharacters(db, candidateIds, types)) {
     for (const req of open) {
-      if (fitOf(req, effect, ctx)?.level !== "full") continue;
+      if (fitOf(req, effect, ctx, guests.get(effect.character_id))?.level !== "full") continue;
       if (!fills.has(effect.character_id)) fills.set(effect.character_id, new Set());
       fills.get(effect.character_id)!.add(req.label);
     }

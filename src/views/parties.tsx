@@ -266,7 +266,7 @@ function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage
             <span class={`block h-full rounded-full ${strengthBar(pct)}`} style={`width:${pct}%`}></span>
           </span>
         )}
-        {c.status === "missing" ? (
+        {c.providers.length === 0 ? (
           <span class="mt-1 block truncate text-[11px] text-faint">{c.req.hint || "候補を見る"}</span>
         ) : (
           <span class="mt-1 space-y-px">
@@ -276,6 +276,7 @@ function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage
                 {p.effect.type !== c.req.label && <> {shortType(p.effect.type)}</>}
                 {[formatValue(p.effect.type, p.effect.value), turnsLabel(p.effect.turns)].filter(Boolean).map((part) => <> <span class="whitespace-nowrap text-ink/70">{part}</span></>)}
                 {p.fit.level === "partial" && <span class="text-warn"> △</span>}
+                {p.fit.level === "unmet" && <span class="text-faint" title="今の編成では条件を満たさない"> ✗</span>}
               </span>
             ))}
             {c.providers.length > shown.length && <span class="block text-[11px] text-faint">他{c.providers.length - shown.length}人</span>}
@@ -379,7 +380,6 @@ function Candidates({ party, need, candidates }: { party: Party; need: Requireme
 function CandidateRow({ party, need, c, full }: { party: Party; need: Requirement; c: Candidate; full: boolean }) {
   const value = formatValue(c.effect.type, c.effect.value);
   const pct = strengthOf(c.effect.type, c.effect.value);
-  const ok = c.fit.level === "full";
   return (
     <li class="flex gap-3 p-3 sm:px-4">
       <ElementMark element={c.character.element} />
@@ -390,7 +390,8 @@ function CandidateRow({ party, need, c, full }: { party: Party; need: Requiremen
           <span class="text-[11px] text-muted">
             {[c.effect.type !== need.label ? shortType(c.effect.type) : "", turnsLabel(c.effect.turns)].filter(Boolean).join(" ")}
           </span>
-          {!ok && <span class="rounded bg-warn/15 px-1.5 text-[11px] leading-5 font-semibold text-warn">条件付き</span>}
+          {c.fit.level === "partial" && <span class="rounded bg-warn/15 px-1.5 text-[11px] leading-5 font-semibold text-warn">条件付き</span>}
+          {c.fit.level === "unmet" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted">条件未達</span>}
           <Tags c={c.character} compact />
         </div>
         <p class="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
