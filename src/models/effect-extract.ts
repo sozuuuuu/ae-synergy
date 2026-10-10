@@ -41,6 +41,17 @@ export function scopeOf(targets: string): Scope {
   return "other";
 }
 
+/**
+ * 取り込み元の conditions が空でも、説明文の頭に「〜場合、」「〜時、」で条件が書かれていることがある。
+ * 後ろの「※」注記は除き、最後の「場合、」「時、」までを条件とみなす
+ */
+export function conditionInDescription(description: string): string {
+  const body = description.split("※")[0]!;
+  const m = body.match(/^(.*(?:場合|時))、/);
+  const cond = m?.[1]!.trim() ?? "";
+  return /(この|その)時$/.test(cond) ? "" : cond; // 「この時、」は直前の文を指すだけ
+}
+
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const text = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
 
@@ -54,7 +65,8 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
     }
     if (!node || typeof node !== "object") return;
     const n = node as Record<string, any>;
-    const conditions = [inherited.conditions, text(n.conditions)].filter(Boolean).join(" / ");
+    const own = text(n.conditions) || conditionInDescription(text(n.description));
+    const conditions = inherited.conditions.includes(own) ? inherited.conditions : [inherited.conditions, own].filter(Boolean).join(" / ");
     const targets = text(n.targets) || inherited.targets;
 
     for (const type of [n.types].flat()) {

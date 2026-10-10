@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { importCharacters } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, updateSettings } from "../src/models/parties.ts";
+import { conditionInDescription, extractEffects } from "../src/models/effect-extract.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
 
@@ -17,6 +18,23 @@ describe("取り込み", () => {
     const db = testDb();
     importCharacters(db, ROWS.filter((r) => r._id !== "z1"));
     expect(db.query("SELECT 1 FROM characters WHERE external_id = 'z1'").get()).toBeNull();
+  });
+});
+
+describe("効果の分解", () => {
+  test("conditions が空でも、説明文の頭の「〜場合、」「〜時、」を条件として拾う", () => {
+    expect(conditionInDescription("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合、 自身にルナティック<捨身>(ターン終了時まで)"))
+      .toBe("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合");
+    expect(conditionInDescription("ベズナギア15以上蓄積時、15消費して弱点看破 ※攻撃対象が全て打弱点の場合、消費しない")).toBe("ベズナギア15以上蓄積時");
+    expect(conditionInDescription("呪いを即座に発動させる この時、威力が増加")).toBe("");
+    expect(conditionInDescription("敵全体に火属性耐性50%DOWN(3ターン)")).toBe("");
+  });
+
+  test("親の条件と同じ内容は重ねない", () => {
+    const [effect] = extractEffects({
+      skills: [{ name: "覚醒", effects: [{ conditions: "自身でZONE覚醒時", effects: [{ description: "自身でZONE覚醒時、 自身にルナティック<挺身>(3ターン)", types: "ルナティック(挺身)", targets: "自身" }] }] }],
+    });
+    expect(effect!.conditions).toBe("自身でZONE覚醒時");
   });
 });
 
