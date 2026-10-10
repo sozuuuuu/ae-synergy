@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@source "../src";
+
+/* 夜空の濃紺に金のアクセント */
+@theme {
+  --color-night: #0a0f1e;
+  --color-panel: #121a2f;
+  --color-panel-2: #18223d;
+  --color-line: #263252;
+  --color-ink: #e7eaf3;
+  --color-muted: #8c95b2;
+  --color-faint: #5b6585;
+  --color-gold: #e8c46e;
+  --color-gold-deep: #b8913b;
+  --color-ok: #3dd3a0;
+  --color-warn: #f2b64d;
+
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background:
+      radial-gradient(1200px 500px at 50% -200px, rgb(232 196 110 / 0.08), transparent 70%),
+      var(--color-night);
+  }
+  ::selection {
+    background: rgb(232 196 110 / 0.35);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@utility panel {
+  @apply rounded-2xl border border-line bg-panel;
+}
+@utility label-caps {
+  @apply text-[11px] font-semibold tracking-[0.12em] text-muted uppercase;
+}
+@utility field {
+  @apply w-full rounded-lg border border-line bg-night px-3 py-2 text-sm text-ink placeholder:text-faint focus:border-gold focus:outline-none;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors;
+}
+@utility btn-gold {
+  @apply btn bg-gold text-night hover:bg-[#f3d58f];
+}
+@utility btn-ghost {
+  @apply btn border border-line text-ink hover:border-faint hover:bg-panel-2;
+}
+@utility btn-xs {
+  @apply inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-semibold transition-colors;
+}

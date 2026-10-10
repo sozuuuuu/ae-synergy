@@ -1,100 +1,47 @@
 # AE Synergy
 
-アナザーエデンのキャラクターシナジー共有サイト
+アナザーエデンのパーティを、好きなキャラから組み立てるための一人用ツール。
 
-## 機能
+アタッカー（★）を決めると、その攻撃属性・攻撃種から火力の別枠（耐性DOWN・属性攻撃UP・武器種バフ・特殊バフ・ZONE など）を割り出し、
+耐久（回復・バリア・耐性UP・挑発）や想定ボスへの必須能力（状態異常無効・吹き飛ばし無効・ブレイクなど）と合わせて、
+どの枠が埋まっているかを表示する。足りない枠からは、その枠を埋められるキャラを候補として出し、そのまま編成に加えられる。
 
-- **キャラクターWiki**: キャラクター情報の管理・検索
-- **リアルタイム検索**: 属性・武器種・パーソナリティでフィルタリング
-- **シナジー投稿**: 2人以上のキャラクターの組み合わせを共有
-- **パーティ編成投稿**: 6人編成（メイン4+サブ2）を共有
-- **投票・コメント**: 投稿への評価とディスカッション
-- **バージョン履歴**: キャラクター情報の編集履歴（PaperTrail）
+- ✓ そのまま効く / △ 条件付き・本人のみ・位置次第 / ✗ 未充足
+- 候補の「＋」は、そのキャラを入れると同時に埋まるほかの枠
+- 共通パーソナリティ（2人以上）も表示する（天冥アビリティやグラスタの条件確認用）
+
+## 構成
+
+- [Bun](https://bun.sh) + [Elysia](https://elysiajs.com)（サーバー側で JSX を HTML にして返す。文字列は自前のランタイムで必ずエスケープ）
+- `bun:sqlite`（`migrations/*.sql` を起動時に適用）
+- Tailwind CSS v4
+
+認証はない。tailnet 内での個人利用を前提にしており、他サイトからの POST は Origin で拒否する。
 
 ## セットアップ
 
-### 必要要件
-
-- Ruby 3.2.8
-- PostgreSQL 14+
-- Node.js 18+
-
-### インストール
-
 ```bash
-# リポジトリのクローン
-git clone https://github.com/yourusername/ae-synergy.git
-cd ae-synergy
-
-# 依存関係のインストール
-bundle install
-
-# データベースの作成・マイグレーション
-rails db:create
-rails db:migrate
-
-# 初期データの投入
-rails db:seed
-
-# サーバーの起動
-rails server
+bun install
+echo "CHARACTER_SOURCE=<取り込み元の URL>" > .env
+bun run import:characters      # キャラデータを取り込む（再実行で差分更新）
+bun run dev                    # http://127.0.0.1:3000
 ```
 
-### テストユーザー
+`import:characters` には URL のほか、ローカルの JSON ファイルのパスも渡せる。
 
-- メール: `admin@example.com`
-- パスワード: `password123`
+## コマンド
 
-## キャラクターデータの管理
+| コマンド | 内容 |
+|---|---|
+| `bun run dev` | 開発サーバー（ファイル変更で再起動・CSS 監視） |
+| `bun run start` | CSS をビルドして起動 |
+| `bun test` | テスト |
+| `bun run typecheck` | 型チェック |
 
-キャラクター情報は `db/data/characters.yml` で管理されています。
+環境変数: `PORT`（既定 3000）、`HOST`（既定 127.0.0.1）、`DATABASE_PATH`（既定 `storage/ae-synergy.sqlite3`）、
+`PUBLIC_ORIGIN`（リバースプロキシ越しの公開 URL。Origin 検査に使う）
 
-### 新しいキャラクターの追加
+## 枠の判定
 
-`db/data/characters.yml` を編集して、以下の形式でキャラクターを追加します：
-
-```yaml
-characters:
-  - name: キャラクター名
-    rarity: ☆5  # ☆4, ☆5, AS, ES, Alter
-    element: Fire  # Fire, Water, Earth, Wind, Thunder, Shade, Crystal, None
-    weapon_type: Sword  # Sword, Katana, Axe, Lance, Bow, Staff, Fists, Hammer
-    light_shadow_type: Light  # Light, Shadow
-    notes: キャラクターの説明
-    image_url: https://example.com/image.jpg
-    personality_tags:
-      - 人間
-      - IDA学園
-    skills:
-      - name: スキル名
-        effects: スキルの効果
-        mp_cost: 50
-        position: 1
-```
-
-### データの反映
-
-YAMLファイルを編集した後、以下のコマンドでデータベースに反映します：
-
-```bash
-rails db:seed
-```
-
-全データをリセットして再投入する場合：
-
-```bash
-rails db:seed:replant
-```
-
-## 技術スタック
-
-- **フレームワーク**: Ruby on Rails 8.1.1
-- **データベース**: PostgreSQL
-- **フロントエンド**: Hotwire (Turbo + Stimulus), Tailwind CSS
-- **認証**: has_secure_password
-- **バージョン管理**: PaperTrail
-- **ページネーション**: Kaminari
-
-## ライセンス
-
-MIT
+`src/models/requirements.ts` にルールがある。取り込み時にキャラの効果を「種別・対象・数値・条件・出典」の行に分解して
+`character_effects` に保存し、判定は実行時にこのルールで行うので、ルールを変えても再取り込みは不要。
