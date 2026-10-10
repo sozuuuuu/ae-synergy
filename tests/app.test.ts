@@ -66,6 +66,27 @@ describe("パーティ操作", () => {
   });
 });
 
+describe("火力・被ダメの目安", () => {
+  test("想定ボスの能力を保存すると、倍率・与ダメ・被ダメを表示し、入力が範囲外なら 422", async () => {
+    const { db, get, post } = setup();
+    const res = await post("/parties", { attacker_id: String(idOf(db, "テストアタッカー")) });
+    const path = new URL(res.headers.get("location")!, ORIGIN).pathname;
+    expect(await (await get(path)).text()).toContain("想定ボスの物理／魔法と攻撃");
+
+    const settings = { title: "", memo: "", attack_element: "火", attack_kind: "斬", boss_attack: "physical" };
+    expect((await post(`${path}/settings`, { ...settings, enemy_def: "400", enemy_atk: "600", enemy_affinity: "weak" })).status).toBe(303);
+    const page = await (await get(path)).text();
+    expect(page).toContain("支援なしから");
+    expect(page).toContain("与ダメ平均");
+    expect(page).toContain("HP 3,000");
+    expect(page).toContain('name="enemy_def" value="400"');
+
+    const bad = await post(`${path}/settings`, { ...settings, enemy_level: "0" });
+    expect(bad.status).toBe(422);
+    expect(await bad.text()).toContain("想定ボスの「Lv」は 1〜999 の数で入れてください");
+  });
+});
+
 describe("CSRF", () => {
   test("他サイトからの POST は 403", async () => {
     const { db, post } = setup();

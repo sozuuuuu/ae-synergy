@@ -1,4 +1,5 @@
 import type { CharacterSummary } from "../models/characters.ts";
+import { AFFINITIES, type Dealt, ENEMY_FIELDS, type Taken } from "../models/estimate.ts";
 import { displayTitle, memberAt, SLOT_COUNTS, SLOT_NAMES, type Member, type Party, type Slot } from "../models/parties.ts";
 import {
   ATTACK_ELEMENTS, ATTACK_KINDS, BOSS_NEEDS, fitRank, GROUP_NAMES,
@@ -102,13 +103,23 @@ function MiniStrip({ party }: { party: Party }) {
   );
 }
 
-type Candidate = Provider & { character: CharacterSummary; extra: string[] };
+type Candidate = Provider & { character: CharacterSummary; extra: string[]; gain: number | null };
 
-export function PartyPage({ party, coverage, need, candidates, shared, errors }: {
+/** ダメージの表示（万・億で丸める） */
+export function formatDamage(n: number): string {
+  if (n >= 1e8) return `${(n / 1e8).toFixed(2)}億`;
+  if (n >= 1e4) return `${(n / 1e4).toFixed(1)}万`;
+  return Math.round(n).toLocaleString("ja-JP");
+}
+const formatGain = (gain: number) => `+${(gain * 100).toFixed(gain < 0.1 ? 1 : 0)}%`;
+
+export function PartyPage({ party, coverage, need, candidates, dealt, taken, shared, errors }: {
   party: Party;
   coverage: Coverage[];
   need: Requirement | null;
   candidates: Candidate[];
+  dealt: Dealt | null;
+  taken: Taken[] | null;
   shared: { name: string; category: string; count: number; members: string }[];
   errors: string[];
 }) {
@@ -174,7 +185,7 @@ export function PartyPage({ party, coverage, need, candidates, shared, errors }:
                   <span class="text-xs text-muted tabular-nums">{summary[group].ok}/{summary[group].total}</span>
                 </div>
                 <ul class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {list.map((c) => <CoverageTile party={party} coverage={c} selected={need?.key === c.req.key} />)}
+                  {list.map((c) => <CoverageTile party={party} coverage={c} selected={need?.key === c.req.key} gain={dealt?.gains.get(c.req.key) ?? null} />)}
                 </ul>
               </section>
             );
@@ -184,6 +195,7 @@ export function PartyPage({ party, coverage, need, candidates, shared, errors }:
 
         {/* 条件・メモ・共通パーソナリティ */}
         <div class="space-y-4 lg:col-start-1">
+          <EstimatePanel party={party} dealt={dealt} taken={taken} />
           <SettingsForm party={party} />
           {party.memo && (
             <section class="panel p-4">
@@ -240,7 +252,86 @@ const TILE_STYLES = {
 } as const;
 const DOT_STYLES = { ok: "bg-ok", partial: "bg-warn", missing: "border border-faint" } as const;
 
-function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage: Coverage; selected: boolean }) {
+/** 火力の倍率と与ダメ、メンバーごとの被ダメの目安 */
+function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | null; taken: Taken[] | null }) {
+  const attacker = party.members.find((m) => m.id === party.attacker_id);
+  const steps = dealt ? (dealt.crit ? dealt.result.stepsCrit : dealt.result.steps) : [];
+  const def = dealt?.result.hits[0]?.parts.def ?? 0;
+  const defKey = party.attack_kind === "魔法" ? "mdef" : "def";
+  return (
+    <section class="panel p-4" aria-label="火力と被ダメの目安">
+      <div class="mb-3 flex items-baseline justify-between gap-2">
+        <h2 class="label-caps">火力の目安</h2>
+        {dealt && <span class="text-[11px] text-faint">{dealt.crit ? "クリティカル前提" : "クリティカルなし"}</span>}
+      </div>
+      {!dealt ? (
+        <p class="text-sm text-muted">
+          {!attacker ? "★を付けると、アタッカーの与ダメと、支援なしから何倍になったかを出します。" : "条件でアタッカーの攻撃種を選ぶと、与ダメの目安を出します。"}
+        </p>
+      ) : (
+        <>
+          <div class="flex flex-wrap items-end gap-x-6 gap-y-2">
+            <div>
+              <span class="block text-3xl leading-none font-bold text-gold tabular-nums">×{dealt.multiplier.toFixed(dealt.multiplier < 10 ? 2 : 1)}</span>
+              <span class="mt-1 block text-[11px] text-muted">支援なしから</span>
+            </div>
+            <div class="min-w-0">
+              <span class="block text-xl leading-none font-bold tabular-nums">{formatDamage(dealt.avg)}</span>
+              <span class="mt-1 block truncate text-[11px] text-muted" title={dealt.skill.description}>
+                与ダメ平均 ・ {dealt.skill.source}（{dealt.skill.target === "single" ? "単体" : "全体"} {Math.round(dealt.skill.rate)}%）
+              </span>
+            </div>
+          </div>
+          {steps.length > 0 && (
+            <ul class="mt-3 flex flex-wrap gap-1">
+              {steps.map((s) => (
+                <li class="rounded-md bg-panel-2 px-1.5 text-[11px] leading-5 text-ink/85">
+                  {s.label} <span class="font-semibold tabular-nums">×{s.factor.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p class="mt-2 text-[11px] leading-relaxed text-faint">
+            守備値 {Math.round(def)}{party.enemy[defKey] == null && "（未入力なので 0）"} ・ 武器 {party.enemy.weapon ?? 300}{dealt.weaponAssumed && "（仮定）"} で計算。
+            △の効果・装備やグラスタ・挺身・毒ペインは含めていません。
+          </p>
+        </>
+      )}
+
+      <h2 class="label-caps mt-5 mb-2">被ダメの目安</h2>
+      {!taken ? (
+        <p class="text-sm text-muted">条件で想定ボスの物理／魔法と攻撃（腕力・知性）を入れると、全体攻撃1回で各メンバーが受けるダメージを出します。</p>
+      ) : (
+        <>
+          <ul class="space-y-1.5">
+            {taken.map((t) => {
+              const ratio = t.hp > 0 ? t.damage / t.hp : 1;
+              return (
+                <li>
+                  <div class="flex items-baseline justify-between gap-2 text-xs">
+                    <span class="truncate">{t.member.label}</span>
+                    <span class={`shrink-0 tabular-nums ${ratio >= 1 ? "font-semibold text-red-300" : ratio >= 0.5 ? "text-warn" : "text-muted"}`}>
+                      {formatDamage(t.damage)} <span class="text-faint">/ HP {t.hp.toLocaleString("ja-JP")}</span>{ratio >= 1 && " 落ちる"}
+                    </span>
+                  </div>
+                  <span class="mt-0.5 block h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
+                    <span class={`block h-full rounded-full ${ratio >= 1 ? "bg-red-400" : ratio >= 0.5 ? "bg-warn" : "bg-ok"}`} style={`width:${Math.min(100, ratio * 100)}%`}></span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          <p class="mt-2 text-[11px] leading-relaxed text-faint">
+            威力 {party.enemy.power ?? 100}% の{party.boss_attack === "magic" ? "魔法" : "物理"}全体攻撃1回・クリティカルなし。
+            ✓ の耐性UP・{party.boss_attack === "magic" ? "知性" : "腕力"}DOWN・バリアと本人のみの耐性を含む。防具 {party.enemy.armor ?? 0}。
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function CoverageTile({ party, coverage: c, selected, gain }: { party: Party; coverage: Coverage; selected: boolean; gain: number | null }) {
   const names = new Map(party.members.map((m) => [m.id, m.name]));
   const shown = c.providers.slice(0, 3);
   // 一番良い供給元（そのまま効くもの優先・効果量順に並んでいる）の強さをタイルの顔にする
@@ -266,6 +357,9 @@ function CoverageTile({ party, coverage: c, selected }: { party: Party; coverage
           <span class="mt-1.5 block h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
             <span class={`block h-full rounded-full ${strengthBar(pct)}`} style={`width:${pct}%`}></span>
           </span>
+        )}
+        {gain != null && gain >= 0.005 && (
+          <span class="mt-1 block text-[11px] font-semibold text-gold tabular-nums" title="この枠の効果を外したときと比べた与ダメの伸び">与ダメ {formatGain(gain)}</span>
         )}
         {c.providers.length === 0 ? (
           <span class="mt-1 block truncate text-[11px] text-faint">{c.req.hint || "候補を見る"}</span>
@@ -335,6 +429,16 @@ function SettingsForm({ party }: { party: Party }) {
               <option value="magic" selected={party.boss_attack === "magic"}>魔法中心</option>
             </select>
           </div>
+          <div class="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {ENEMY_FIELDS.filter((f) => f.key !== "weapon" && f.key !== "armor").map((f) => <EnemyInput party={party} field={f} />)}
+            <label class="block" title="アタッカーの攻撃の属性に対して">
+              <span class="mb-1 block text-[11px] text-muted">弱点・耐性</span>
+              <select name="enemy_affinity" class="field">
+                <option value="">通常</option>
+                {Object.entries(AFFINITIES).map(([value, label]) => <option value={value} selected={party.enemy.affinity === value}>{label}</option>)}
+              </select>
+            </label>
+          </div>
           <div class="flex flex-wrap gap-1.5">
             {BOSS_NEEDS.map((n) => (
               <label class="cursor-pointer" title={n.hint}>
@@ -344,6 +448,12 @@ function SettingsForm({ party }: { party: Party }) {
                 </span>
               </label>
             ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend class="label-caps mb-1.5">味方の装備（目安の計算用の仮定）</legend>
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {ENEMY_FIELDS.filter((f) => f.key === "weapon" || f.key === "armor").map((f) => <EnemyInput party={party} field={f} />)}
           </div>
         </fieldset>
         <label class="block">
@@ -356,6 +466,16 @@ function SettingsForm({ party }: { party: Party }) {
   );
 }
 
+function EnemyInput({ party, field: f }: { party: Party; field: (typeof ENEMY_FIELDS)[number] }) {
+  return (
+    <label class="block" title={f.hint}>
+      <span class="mb-1 block truncate text-[11px] text-muted">{f.label}</span>
+      <input class="field" type="number" step="any" min={String(f.min)} max={String(f.max)} name={`enemy_${f.key}`}
+        value={party.enemy[f.key] == null ? "" : String(party.enemy[f.key])} placeholder="未入力" />
+    </label>
+  );
+}
+
 function Candidates({ party, need, candidates }: { party: Party; need: Requirement; candidates: Candidate[] }) {
   const full = party.members.length >= SLOT_COUNTS.main + SLOT_COUNTS.sub;
   return (
@@ -364,7 +484,7 @@ function Candidates({ party, need, candidates }: { party: Party; need: Requireme
         <div>
           <h2 class="font-bold"><span class="text-gold">{need.label}</span> を埋める</h2>
           <p class="mt-0.5 text-xs text-muted">
-            そのまま効く → ほかの枠も多く埋まる → 効果量の大きい順
+            そのまま効く → ほかの枠も多く埋まる → 与ダメの伸び・効果量の大きい順
             {full && <span class="text-warn"> ・ 満員なので、追加するには誰かを外してください</span>}
           </p>
         </div>
@@ -389,6 +509,11 @@ function CandidateRow({ party, need, c, full }: { party: Party; need: Requiremen
         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <a href={`/characters/${c.character.id}`} class="font-semibold hover:text-gold">{c.character.label}</a>
           {value && <span class={`text-sm font-bold tabular-nums ${strengthText(pct)}`}>{value}</span>}
+          {c.gain != null && (
+            <span class="rounded bg-gold/15 px-1.5 text-[11px] leading-5 font-semibold text-gold tabular-nums" title="入れたときの与ダメの伸び（この枠の分だけ）">
+              与ダメ {c.gain >= 0.0005 ? formatGain(c.gain) : "±0%"}
+            </span>
+          )}
           <span class="text-[11px] text-muted">
             {[c.effect.type !== need.label ? shortType(c.effect.type) : "", turnsLabel(c.effect.turns)].filter(Boolean).join(" ")}
           </span>
