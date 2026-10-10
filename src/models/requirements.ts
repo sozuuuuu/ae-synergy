@@ -2,6 +2,7 @@
 // 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。仕様の根拠は doc/battle-mechanics.md。
 import type { Db } from "../db.ts";
 import { WEAPONS } from "./characters.ts";
+import { type CondMember, evaluateCondition, loadCondMembers } from "./conditions.ts";
 
 export type Group = "damage" | "durability" | "boss";
 export const GROUP_NAMES: Record<Group, string> = { damage: "火力", durability: "耐久", boss: "ボス対策" };
@@ -61,6 +62,8 @@ export type PartyContext = {
   bossElement: string;
   bossAttack: string; // physical / magic / ""
   bossNeeds: string[];
+  /** 発動条件の判定用（並び・パーソナリティ・展開できる ZONE） */
+  members: CondMember[];
 };
 
 export function requirementsFor(ctx: PartyContext): Requirement[] {
@@ -156,17 +159,20 @@ export type EffectRow = {
   source: string;
 };
 
-/** full: そのまま効く / partial: 位置・条件次第や本人のみ / null: 効かない */
-export type Fit = { level: "full" | "partial"; note: string };
+/** full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない / null: 効かない */
+export type Fit = { level: "full" | "partial" | "unmet"; note: string };
+export const fitRank = (f: Fit) => (f.level === "full" ? 2 : f.level === "partial" ? 1 : 0);
+/** 候補（まだパーティにいないキャラ）の条件判定用の情報 */
+type Guest = Parameters<typeof evaluateCondition>[3];
 
-export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext): Fit | null {
+export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?: Guest): Fit | null {
   if (!req.match(e.type)) return null;
   const isAttacker = ctx.attacker?.id === e.character_id;
-  const condition = e.conditions ? `条件: ${e.conditions}` : "";
+  const cond = e.conditions ? evaluateCondition(e.conditions, e.character_id, ctx.members, guest) : null;
   const caveat = req.caveat?.(e.type) ?? "";
   const result = (level: Fit["level"], note = ""): Fit => ({
-    level: level === "full" && (e.conditions || caveat) ? "partial" : level,
-    note: [caveat, note, condition].filter(Boolean).join(" / "),
+    level: cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
+    note: [caveat, note, cond?.note ?? ""].filter(Boolean).join(" / "),
   });
 
   switch (req.to) {
@@ -239,8 +245,7 @@ export function effectsForCharacters(db: Db, characterIds: number[], types: stri
 export type Provider = { characterId: number; fit: Fit; effect: EffectRow };
 export type Coverage = { req: Requirement; status: "ok" | "partial" | "missing"; providers: Provider[] };
 
-const better = (a: Provider, b: Provider) =>
-  (a.fit.level === "full" ? 1 : 0) - (b.fit.level === "full" ? 1 : 0) || (a.effect.value ?? 0) - (b.effect.value ?? 0);
+const better = (a: Provider, b: Provider) => fitRank(a.fit) - fitRank(b.fit) || (a.effect.value ?? 0) - (b.effect.value ?? 0);
 
 /** 各枠を誰がどう埋めているか。キャラごとに一番良い効果だけを残す */
 export function evaluateCoverage(db: Db, ctx: PartyContext, memberIds: number[]): Coverage[] {
@@ -257,7 +262,8 @@ export function evaluateCoverage(db: Db, ctx: PartyContext, memberIds: number[])
       if (!current || better(p, current) > 0) best.set(effect.character_id, p);
     }
     const providers = [...best.values()].sort((a, b) => better(b, a));
-    const status = providers.some((p) => p.fit.level === "full") ? "ok" : providers.length ? "partial" : "missing";
+    // 条件を満たさない供給元は ✗ として並べるだけで、枠は埋めない
+    const status = providers.some((p) => p.fit.level === "full") ? "ok" : providers.some((p) => p.fit.level === "partial") ? "partial" : "missing";
     return { req, status, providers };
   });
 }
@@ -275,11 +281,12 @@ export function candidatesFor(db: Db, ctx: PartyContext, req: Requirement, exclu
     )
     .all(params);
   const exclude = new Set(excludeIds);
+  const guests = loadCondMembers(db, [...new Set(rows.filter((r) => r.conditions && !exclude.has(r.character_id)).map((r) => r.character_id))]);
   // 候補はまだアタッカーではないので、アタッカー本人の自己バフ扱いにはしない
   const best = new Map<number, Provider>();
   for (const effect of rows) {
     if (exclude.has(effect.character_id)) continue;
-    const fit = fitOf(req, effect, ctx);
+    const fit = fitOf(req, effect, ctx, guests.get(effect.character_id));
     if (!fit) continue;
     const p = { characterId: effect.character_id, fit, effect };
     const current = best.get(effect.character_id);
@@ -293,9 +300,10 @@ export function extraFills(db: Db, ctx: PartyContext, coverage: Coverage[], cand
   const open = coverage.filter((c) => c.status !== "ok" && c.req.key !== exceptKey).map((c) => c.req);
   const types = allEffectTypes(db).filter((t) => open.some((r) => r.match(t)));
   const fills = new Map<number, Set<string>>();
+  const guests = loadCondMembers(db, candidateIds);
   for (const effect of effectsForCharacters(db, candidateIds, types)) {
     for (const req of open) {
-      if (fitOf(req, effect, ctx)?.level !== "full") continue;
+      if (fitOf(req, effect, ctx, guests.get(effect.character_id))?.level !== "full") continue;
       if (!fills.has(effect.character_id)) fills.set(effect.character_id, new Set());
       fills.get(effect.character_id)!.add(req.label);
     }

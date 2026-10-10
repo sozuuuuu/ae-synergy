@@ -1,5 +1,6 @@
 import type { Db } from "../db.ts";
 import type { CharacterSummary } from "./characters.ts";
+import { loadCondMembers } from "./conditions.ts";
 import { ATTACK_ELEMENTS, ATTACK_KINDS, BOSS_NEEDS, defaultAttack, type PartyContext } from "./requirements.ts";
 
 export const SLOT_NAMES = { main: "前衛", sub: "後衛" } as const;
@@ -208,18 +209,18 @@ export function deleteParty(db: Db, id: number) {
 /** 判定ルールに渡す文脈 */
 export function partyContext(db: Db, party: Party): PartyContext {
   const attacker = party.members.find((m) => m.id === party.attacker_id) ?? null;
-  const personalities = attacker
-    ? db.query<{ name: string }, any>(
-        "SELECT p.name FROM character_personalities cp JOIN personalities p ON p.id = cp.personality_id WHERE cp.character_id = $id",
-      ).all({ id: attacker.id }).map((r) => r.name)
-    : [];
+  const info = loadCondMembers(db, party.members.map((m) => m.id));
   return {
-    attacker: attacker ? { id: attacker.id, weapon: attacker.weapon, ls_type: attacker.ls_type, personalities } : null,
+    attacker: attacker ? { id: attacker.id, weapon: attacker.weapon, ls_type: attacker.ls_type, personalities: info.get(attacker.id)?.personalities ?? [] } : null,
     attackElement: party.attack_element,
     attackKind: party.attack_kind,
     bossElement: party.boss_element,
     bossAttack: party.boss_attack,
     bossNeeds: party.boss_needs,
+    members: party.members.flatMap((m) => {
+      const i = info.get(m.id);
+      return i ? [{ ...i, slot: m.slot, position: m.position }] : [];
+    }),
   };
 }
 

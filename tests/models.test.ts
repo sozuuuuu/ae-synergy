@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { importCharacters } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, updateSettings } from "../src/models/parties.ts";
+import { evaluateCondition } from "../src/models/conditions.ts";
 import { conditionInDescription, extractEffects } from "../src/models/effect-extract.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
@@ -28,6 +29,31 @@ describe("効果の分解", () => {
     expect(conditionInDescription("ベズナギア15以上蓄積時、15消費して弱点看破 ※攻撃対象が全て打弱点の場合、消費しない")).toBe("ベズナギア15以上蓄積時");
     expect(conditionInDescription("呪いを即座に発動させる この時、威力が増加")).toBe("");
     expect(conditionInDescription("敵全体に火属性耐性50%DOWN(3ターン)")).toBe("");
+  });
+
+  test("蓄積の効果は、その蓄積が溜まっている時という条件になる", () => {
+    const [effect] = extractEffects({
+      stack: [{ name: "特製マタタビ", cond: [{ stack: "スキル「神鏡」使用時、1蓄積", cons: ["1ターン経過後に全て消費"] }],
+        effects: [{ description: "ルナティック(捨身)の効果", types: "ルナティック(捨身)", targets: "味方" }] }],
+    });
+    expect(effect!.conditions).toBe("特製マタタビ蓄積時（スキル「神鏡」使用時、1蓄積）");
+    expect(evaluateCondition(effect!.conditions, 1, []).state).toBe("unknown");
+  });
+
+  test("歌唱・祈祷・モードチェンジの効果は、その状態の間だけという条件になる", () => {
+    const conditions = extractEffects({
+      sing: [{ no: 1, name: "アーデインアスピダ", effects: [{ description: "ルナティック<捨身>", types: "ルナティック(捨身)", targets: "味方全体" }] }],
+      prayerActivate: [{ name: "レズィストンス", actTiming: "ターン開始時", ver: "極・招雷陣展開時", effects: [{ description: "", types: "庇立て", targets: "自身" }] }],
+      modeChange: [{ name: "天の導き", modeCond: [{ act: "前衛で戦闘開始時、前衛に天の味方が3人以上の場合に変化", deact: "永続" }],
+        effects: [{ description: "ターン開始時、自身に心技一体(1ターン)", types: "心技一体", targets: "自身", conditions: "ターン開始時" }] }],
+    }).map((e) => e.conditions);
+    expect(conditions.sort()).toEqual([
+      "モード「天の導き」中（前衛で戦闘開始時、前衛に天の味方が3人以上の場合に変化） / ターン開始時",
+      "歌唱「アーデインアスピダ」中",
+      "祈祷「レズィストンス」中のターン開始時、極・招雷陣展開時",
+    ]);
+    // モードの変化条件が編成で満たせなければ ✗
+    expect(evaluateCondition(conditions[0]!, 1, [{ id: 1, slot: "main", position: 0, personalities: [], ls_type: "冥", weapon: "staff", gender: null, zones: [] }]).state).toBe("unmet");
   });
 
   test("親の条件と同じ内容は重ねない", () => {
@@ -99,7 +125,7 @@ describe("枠の判定", () => {
     expect(coverageOf(db, partyId).unity!.status).toBe("ok");
   });
 
-  test("支援役の効果は対象・条件に応じて ok / partial になる", () => {
+  test("支援役の効果は対象・条件に応じて ok / 条件未達 になる", () => {
     const { db, partyId } = setup();
     addMember(db, getParty(db, partyId)!, idOf(db, "テスト支援"));
     const c = coverageOf(db, partyId);
@@ -108,10 +134,36 @@ describe("枠の判定", () => {
     expect(c.heal!.status).toBe("ok");
     // <東方>の味方への腕力UPは、東方のアタッカーに当たる
     expect(c.stat_up!.status).toBe("ok");
-    // 烈火陣展開時の条件付きバフは partial
-    expect(c.elem_atk_up!.status).toBe("partial");
-    expect(c.elem_atk_up!.providers[0]!.fit.note).toContain("烈火陣展開時");
+    // 烈火陣を張れる味方がいないので、烈火陣展開時のバフは ✗ として並ぶだけで枠は埋まらない
+    expect(c.elem_atk_up!.status).toBe("missing");
+    expect(c.elem_atk_up!.providers[0]!.fit).toEqual({ level: "unmet", note: "条件未達: 烈火陣展開時" });
     expect(c.zone!.status).toBe("missing");
+
+    // 烈火陣を張れる味方を入れると条件を満たす
+    addMember(db, getParty(db, partyId)!, idOf(db, "テスト陣"));
+    const after = coverageOf(db, partyId);
+    expect(after.elem_atk_up!.status).toBe("ok");
+    expect(after.elem_atk_up!.providers[0]!.fit.note).toBe("条件OK: 烈火陣展開時");
+  });
+
+  test("位置・人数の条件は並びとパーソナリティで判定し、戦闘の流れ次第のものは判定しない", () => {
+    const m = (id: number, slot: "main" | "sub", position: number, personalities: string[]) =>
+      ({ id, slot, position, personalities, ls_type: "冥", weapon: "katana", gender: null, zones: [] });
+    const members = [m(1, "main", 0, ["陰"]), m(2, "main", 1, ["火"]), m(3, "main", 2, ["陰"]), m(4, "sub", 0, ["陰"])];
+    const state = (text: string, subject = 2) => evaluateCondition(text, subject, members).state;
+    expect(state("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合")).toBe("met");
+    expect(state("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合", 1)).toBe("unmet");
+    expect(state("前衛の<陰>パーソナリティの味方3人以上")).toBe("unmet"); // 後衛の陰は数えない
+    expect(state("味方前衛後衛の<陰>パーソナリティの味方3人以上")).toBe("met");
+    expect(state("前衛の冥の味方3人以上")).toBe("met");
+    expect(state("後衛でターン開始時")).toBe("unmet");
+    expect(state("ZONE展開時")).toBe("unmet");
+    expect(state("殺意50以上蓄積時")).toBe("unknown");
+    expect(state("前衛でターン開始時、自身のHPが100%未満の場合")).toBe("unknown");
+    // 候補（パーティ外）は前衛に置く前提。並び次第の両隣は判定しない
+    const guest = { id: 9, personalities: ["陰"], ls_type: "冥", weapon: "katana", gender: null, zones: [] };
+    expect(evaluateCondition("前衛の<陰>パーソナリティの味方3人以上", 9, members, guest).state).toBe("met");
+    expect(evaluateCondition("自身の前衛両隣に<陰>パーソナリティの味方がいる場合", 9, members, guest).state).toBe("unknown");
   });
 
   test("候補には枠を埋められるメンバー外のキャラが出る", () => {

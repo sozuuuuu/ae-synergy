@@ -65,7 +65,10 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
     }
     if (!node || typeof node !== "object") return;
     const n = node as Record<string, any>;
-    const own = text(n.conditions) || conditionInDescription(text(n.description));
+    // 蓄積の効果は、その蓄積が溜まっている間だけ。溜まり方は cond[].stack に書かれている
+    const stacking = Array.isArray(n.cond) ? n.cond.flatMap((c: any) => [c?.stack].flat().map(text)).filter(Boolean) : [];
+    const stackCondition = stacking.length ? `${text(n.name) || "蓄積"}蓄積時（${stacking.join("／")}）` : "";
+    const own = text(n.conditions) || stackCondition || conditionInDescription(text(n.description));
     const conditions = inherited.conditions.includes(own) ? inherited.conditions : [inherited.conditions, own].filter(Boolean).join(" / ");
     const targets = text(n.targets) || inherited.targets;
 
@@ -100,7 +103,24 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
   // アビリティ・固有アビリティは対象の記載がなければ本人への常時効果
   const selfByDefault = new Set(["abilities", "uniqueAbility"]);
   for (const [key, label] of Object.entries(SECTION_SOURCES)) {
-    if (row[key]) walk(row[key], label, selfByDefault.has(key) ? { conditions: "", targets: "自身" } : none);
+    if (!row[key]) continue;
+    if (key in WHILE_ACTIVE && Array.isArray(row[key])) {
+      for (const entry of row[key]) walk(entry, label, { conditions: WHILE_ACTIVE[key]!(entry), targets: "" });
+      continue;
+    }
+    walk(row[key], label, selfByDefault.has(key) ? { conditions: "", targets: "自身" } : none);
   }
   return out;
 }
+
+/** 歌唱・祈祷・モードチェンジの効果は、その状態の間だけ。項目ごとに「〇〇中」を条件にする */
+const WHILE_ACTIVE: Record<string, (entry: any) => string> = {
+  sing: (e) => `歌唱「${text(e?.name)}」中`,
+  singActivate: (e) => `歌唱「${text(e?.name)}」中の${text(e?.actTiming)}`,
+  prayer: (e) => `祈祷「${text(e?.name)}」中`,
+  prayerActivate: (e) => [`祈祷「${text(e?.name)}」中の${text(e?.actTiming)}`, e?.ver && e.ver !== "通常時" ? text(e.ver) : ""].filter(Boolean).join("、"),
+  modeChange: (e) => {
+    const acts = (Array.isArray(e?.modeCond) ? e.modeCond : []).map((c: any) => text(c?.act)).filter(Boolean);
+    return `モード「${text(e?.name)}」中${acts.length ? `（${acts.join("／")}）` : ""}`;
+  },
+};
