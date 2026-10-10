@@ -23,11 +23,11 @@
 ```bash
 bun install
 echo "CHARACTER_SOURCE=<取り込み元の URL>" > .env
-bun run import:characters      # キャラデータを取り込む（再実行で差分更新）
 bun run dev                    # http://127.0.0.1:3000
 ```
 
-`import:characters` には URL のほか、ローカルの JSON ファイルのパスも渡せる。
+キャラデータはリポジトリに含めていない。DB が空のまま起動すると、`CHARACTER_SOURCE` から自動で取り込む。
+データを更新するときは `bun run import:characters`（差分だけ反映）。URL のほか、ローカルの JSON ファイルのパスも渡せる。
 
 ## コマンド
 
