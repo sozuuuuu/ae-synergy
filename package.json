@@ -1,0 +1,26 @@
+{
+  "name": "ae-synergy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run css:build && concurrently -k \"bun --watch src/index.ts\" \"bun run css:watch\"",
+    "start": "bun run css:build && bun run src/index.ts",
+    "build": "bun run css:build",
+    "css:build": "tailwindcss -i styles/app.css -o static/app.css --minify",
+    "css:watch": "tailwindcss -i styles/app.css -o static/app.css --watch",
+    "import:characters": "bun run scripts/import-characters.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@elysiajs/static": "^1.4.10",
+    "elysia": "^1.4.30"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "@types/bun": "^1.4.2",
+    "concurrently": "^10.0.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  }
+}
