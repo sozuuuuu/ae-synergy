@@ -9,9 +9,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # 火力計算のエンジン（link:anaden-mcp）。anaden-mcp は private なので、読み取り専用のトークンで取ってくる
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: sozuuuuu/anaden-mcp
           token: ${{ secrets.ANADEN_MCP_TOKEN }}
