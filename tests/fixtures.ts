@@ -1,7 +1,7 @@
 import { openDb } from "../src/db.ts";
 import { importCharacters } from "../src/models/character-import.ts";
 
-/** 取り込み元と同じ形の架空キャラ */
+/** anaden-mcp の補強済みデータと同じ形の架空キャラ（発動条件は _condition） */
 export const ROWS = [
   {
     _id: "a1", name: "テストアタッカー", engName: "Attacker", class: "剣士", style: "AS", rarity: 5, weaponType: "katana",
@@ -25,7 +25,8 @@ export const ROWS = [
       { no: 2, name: "癒しの雨", mpCost: 40, effects: [{ description: "味方全体のHPを回復", types: "HP回復(割合)", targets: "味方全体", value: 30 }] },
       { no: 3, name: "鼓舞", mpCost: 40, effects: [
         { description: "<東方>パーソナリティの味方に腕力50%UP", types: "腕力UP", targets: "特定パーソナリティの味方", value: 50, personalities: ["東方"] },
-        { description: "烈火陣展開時、味方全体に火属性攻撃40%UP", types: "火属性攻撃UP", targets: "味方全体", value: 40, conditions: "烈火陣展開時" },
+        { description: "烈火陣展開時、味方全体に火属性攻撃40%UP", types: "火属性攻撃UP", targets: "味方全体", value: 40, conditions: "烈火陣展開時",
+          _condition: { text: "烈火陣展開時", clauses: [{ zone: { names: ["烈火陣"] } }] } },
       ] },
     ],
   },

@@ -1,5 +1,6 @@
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
 
 const env = process.env;
 const databasePath = env.DATABASE_PATH ?? (env.NODE_ENV === "test" ? ":memory:" : "storage/ae-synergy.sqlite3");
@@ -12,4 +13,6 @@ export const config = {
   production: env.NODE_ENV === "production",
   /** Origin 検査用の公開 URL のオリジン（例: https://host.ts.net:8443）。未設定ならリクエストの Host と比較する */
   publicOrigin: env.PUBLIC_ORIGIN,
+  /** キャラデータ。anaden-mcp が書き出す、発動条件を構造化した補強済みデータだけを正とする */
+  anadenData: env.ANADEN_DATA ?? join(homedir(), ".cache", "anaden-mcp", "characters.enriched.json"),
 };

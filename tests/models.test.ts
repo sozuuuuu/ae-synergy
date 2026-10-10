@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { importCharacters } from "../src/models/character-import.ts";
+import { importCharacters, loadAnadenData } from "../src/models/character-import.ts";
 import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, updateSettings } from "../src/models/parties.ts";
-import { evaluateCondition } from "../src/models/conditions.ts";
-import { conditionInDescription, extractEffects } from "../src/models/effect-extract.ts";
+import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
+import { extractEffects } from "../src/models/effect-extract.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
 
@@ -20,47 +20,34 @@ describe("取り込み", () => {
     importCharacters(db, ROWS.filter((r) => r._id !== "z1"));
     expect(db.query("SELECT 1 FROM characters WHERE external_id = 'z1'").get()).toBeNull();
   });
+
+  test("anaden-mcp の補強済みデータだけを受け付ける", async () => {
+    const write = async (data: unknown) => {
+      const path = `${import.meta.dir}/../storage/test-anaden-${crypto.randomUUID()}.json`;
+      await Bun.write(path, JSON.stringify(data));
+      return path;
+    };
+    const ok = await write({ format: "anaden-mcp/characters", version: 1, generatedAt: "", characters: ROWS });
+    expect(await loadAnadenData(ok)).toHaveLength(ROWS.length);
+    // anaden-gear の生データ（ただの配列）は拒否する
+    await expect(loadAnadenData(await write(ROWS))).rejects.toThrow("補強済みデータ");
+    await expect(loadAnadenData("storage/does-not-exist.json")).rejects.toThrow("anaden export");
+    for (const f of new Bun.Glob("test-anaden-*.json").scanSync(`${import.meta.dir}/../storage`)) await Bun.file(`${import.meta.dir}/../storage/${f}`).delete();
+  });
 });
 
 describe("効果の分解", () => {
-  test("conditions が空でも、説明文の頭の「〜場合、」「〜時、」を条件として拾う", () => {
-    expect(conditionInDescription("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合、 自身にルナティック<捨身>(ターン終了時まで)"))
-      .toBe("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合");
-    expect(conditionInDescription("ベズナギア15以上蓄積時、15消費して弱点看破 ※攻撃対象が全て打弱点の場合、消費しない")).toBe("ベズナギア15以上蓄積時");
-    expect(conditionInDescription("呪いを即座に発動させる この時、威力が増加")).toBe("");
-    expect(conditionInDescription("敵全体に火属性耐性50%DOWN(3ターン)")).toBe("");
-  });
-
-  test("蓄積の効果は、その蓄積が溜まっている時という条件になる", () => {
-    const [effect] = extractEffects({
-      stack: [{ name: "特製マタタビ", cond: [{ stack: "スキル「神鏡」使用時、1蓄積", cons: ["1ターン経過後に全て消費"] }],
-        effects: [{ description: "ルナティック(捨身)の効果", types: "ルナティック(捨身)", targets: "味方" }] }],
+  test("発動条件は anaden-mcp が付けた _condition の条件文と構造化した条件をそのまま使う", () => {
+    const clauses: Clause[] = [{ slot: "main" }, { neighbors: { personalities: ["陰"] } }];
+    const [effect, plain] = extractEffects({
+      uniqueAbility: [{ effects: [
+        { description: "前衛でターン開始時、…", types: "ルナティック(捨身)", targets: "自身", _condition: { text: "前衛でターン開始時、両隣に<陰>", clauses } },
+        { description: "腕力+10%", types: "腕力UP", value: 10 },
+      ] }],
     });
-    expect(effect!.conditions).toBe("特製マタタビ蓄積時（スキル「神鏡」使用時、1蓄積）");
-    expect(evaluateCondition(effect!.conditions, 1, []).state).toBe("unknown");
-  });
-
-  test("歌唱・祈祷・モードチェンジの効果は、その状態の間だけという条件になる", () => {
-    const conditions = extractEffects({
-      sing: [{ no: 1, name: "アーデインアスピダ", effects: [{ description: "ルナティック<捨身>", types: "ルナティック(捨身)", targets: "味方全体" }] }],
-      prayerActivate: [{ name: "レズィストンス", actTiming: "ターン開始時", ver: "極・招雷陣展開時", effects: [{ description: "", types: "庇立て", targets: "自身" }] }],
-      modeChange: [{ name: "天の導き", modeCond: [{ act: "前衛で戦闘開始時、前衛に天の味方が3人以上の場合に変化", deact: "永続" }],
-        effects: [{ description: "ターン開始時、自身に心技一体(1ターン)", types: "心技一体", targets: "自身", conditions: "ターン開始時" }] }],
-    }).map((e) => e.conditions);
-    expect(conditions.sort()).toEqual([
-      "モード「天の導き」中（前衛で戦闘開始時、前衛に天の味方が3人以上の場合に変化） / ターン開始時",
-      "歌唱「アーデインアスピダ」中",
-      "祈祷「レズィストンス」中のターン開始時、極・招雷陣展開時",
-    ]);
-    // モードの変化条件が編成で満たせなければ ✗
-    expect(evaluateCondition(conditions[0]!, 1, [{ id: 1, slot: "main", position: 0, personalities: [], ls_type: "冥", weapon: "staff", gender: null, zones: [] }]).state).toBe("unmet");
-  });
-
-  test("親の条件と同じ内容は重ねない", () => {
-    const [effect] = extractEffects({
-      skills: [{ name: "覚醒", effects: [{ conditions: "自身でZONE覚醒時", effects: [{ description: "自身でZONE覚醒時、 自身にルナティック<挺身>(3ターン)", types: "ルナティック(挺身)", targets: "自身" }] }] }],
-    });
-    expect(effect!.conditions).toBe("自身でZONE覚醒時");
+    expect(effect!.conditions).toBe("前衛でターン開始時、両隣に<陰>");
+    expect(JSON.parse(effect!.condition_clauses)).toEqual(clauses);
+    expect([plain!.conditions, plain!.condition_clauses]).toEqual(["", "[]"]);
   });
 });
 
@@ -146,24 +133,33 @@ describe("枠の判定", () => {
     expect(after.elem_atk_up!.providers[0]!.fit.note).toBe("条件OK: 烈火陣展開時");
   });
 
-  test("位置・人数の条件は並びとパーソナリティで判定し、戦闘の流れ次第のものは判定しない", () => {
-    const m = (id: number, slot: "main" | "sub", position: number, personalities: string[]) =>
-      ({ id, slot, position, personalities, ls_type: "冥", weapon: "katana", gender: null, zones: [] });
-    const members = [m(1, "main", 0, ["陰"]), m(2, "main", 1, ["火"]), m(3, "main", 2, ["陰"]), m(4, "sub", 0, ["陰"])];
-    const state = (text: string, subject = 2) => evaluateCondition(text, subject, members).state;
-    expect(state("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合")).toBe("met");
-    expect(state("前衛でターン開始時、自身の前衛両隣に<陰>パーソナリティの味方がいる場合", 1)).toBe("unmet");
-    expect(state("前衛の<陰>パーソナリティの味方3人以上")).toBe("unmet"); // 後衛の陰は数えない
-    expect(state("味方前衛後衛の<陰>パーソナリティの味方3人以上")).toBe("met");
-    expect(state("前衛の冥の味方3人以上")).toBe("met");
-    expect(state("後衛でターン開始時")).toBe("unmet");
-    expect(state("ZONE展開時")).toBe("unmet");
-    expect(state("殺意50以上蓄積時")).toBe("unknown");
-    expect(state("前衛でターン開始時、自身のHPが100%未満の場合")).toBe("unknown");
+  test("位置・人数・ZONE の条件は編成で判定し、戦闘の流れ次第や未分類のものは判定しない", () => {
+    const m = (id: number, slot: "main" | "sub", position: number, personalities: string[], zones: string[] = []) =>
+      ({ id, slot, position, personalities, ls_type: "冥", weapon: "katana", gender: null, zones });
+    const members = [m(1, "main", 0, ["陰"]), m(2, "main", 1, ["火"], ["極・刻陰陣展開"]), m(3, "main", 2, ["陰"]), m(4, "sub", 0, ["陰"])];
+    const state = (clauses: Clause[], subject = 2) => evaluateCondition(clauses, "", subject, members).state;
+    const front = { slot: "main" } as const;
+    expect(state([front, { neighbors: { personalities: ["陰"] } }])).toBe("met");
+    expect(state([front, { neighbors: { personalities: ["陰"] } }], 1)).toBe("unmet");
+    const yin = (region: "main" | "all", min: number): Clause => ({ count: { region, who: { personalities: ["陰"] }, min } });
+    expect(state([yin("main", 3)])).toBe("unmet"); // 後衛の陰は数えない
+    expect(state([yin("all", 3)])).toBe("met");
+    expect(state([{ count: { region: "main", who: { personalities: ["陰"] }, min: 2, max: 2 } }])).toBe("met");
+    expect(state([{ count: { region: "main", who: { ls: "冥" }, min: 3 } }])).toBe("met");
+    expect(state([{ anyOf: [[yin("main", 3)], [{ count: { region: "main", who: { ls: "冥" }, min: 3 } }]] }])).toBe("met");
+    expect(state([{ slot: "sub" }])).toBe("unmet");
+    expect(state([{ zone: { names: ["刻陰陣"] } }])).toBe("met");
+    expect(state([{ zone: { names: ["刻陰陣"], tier: "極・" } }])).toBe("met");
+    expect(state([{ zone: { names: ["烈火陣"] } }])).toBe("unmet");
+    expect(state([{ frontElements: { distinct: true } }])).toBe("unmet");
+    expect(state([front, { battle: "殺意50以上蓄積時" }])).toBe("unknown");
+    expect(state([{ unclassified: "新しい条件" }])).toBe("unknown");
+    // 判定できない部分があっても、満たさない部分があれば ✗
+    expect(state([{ slot: "sub" }, { battle: "HP100%未満" }])).toBe("unmet");
     // 候補（パーティ外）は前衛に置く前提。並び次第の両隣は判定しない
     const guest = { id: 9, personalities: ["陰"], ls_type: "冥", weapon: "katana", gender: null, zones: [] };
-    expect(evaluateCondition("前衛の<陰>パーソナリティの味方3人以上", 9, members, guest).state).toBe("met");
-    expect(evaluateCondition("自身の前衛両隣に<陰>パーソナリティの味方がいる場合", 9, members, guest).state).toBe("unknown");
+    expect(evaluateCondition([yin("main", 3)], "", 9, members, guest).state).toBe("met");
+    expect(evaluateCondition([{ neighbors: { personalities: ["陰"] } }], "", 9, members, guest).state).toBe("unknown");
   });
 
   test("候補には枠を埋められるメンバー外のキャラが出る", () => {

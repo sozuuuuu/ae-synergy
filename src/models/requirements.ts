@@ -2,7 +2,7 @@
 // 火力は乗算の別枠ごとに1つずつ（埋まっていない枠を埋めるほど伸びる）。仕様の根拠は doc/battle-mechanics.md。
 import type { Db } from "../db.ts";
 import { WEAPONS } from "./characters.ts";
-import { type CondMember, evaluateCondition, loadCondMembers } from "./conditions.ts";
+import { type Clause, type CondMember, evaluateCondition, type Guest, loadCondMembers } from "./conditions.ts";
 
 export type Group = "damage" | "durability" | "boss";
 export const GROUP_NAMES: Record<Group, string> = { damage: "火力", durability: "耐久", boss: "ボス対策" };
@@ -154,6 +154,7 @@ export type EffectRow = {
   value: number | null;
   turns: number | null;
   conditions: string;
+  condition_clauses: string; // Clause[] の JSON
   personalities: string;
   description: string;
   source: string;
@@ -162,13 +163,12 @@ export type EffectRow = {
 /** full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない / null: 効かない */
 export type Fit = { level: "full" | "partial" | "unmet"; note: string };
 export const fitRank = (f: Fit) => (f.level === "full" ? 2 : f.level === "partial" ? 1 : 0);
-/** 候補（まだパーティにいないキャラ）の条件判定用の情報 */
-type Guest = Parameters<typeof evaluateCondition>[3];
 
 export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?: Guest): Fit | null {
   if (!req.match(e.type)) return null;
   const isAttacker = ctx.attacker?.id === e.character_id;
-  const cond = e.conditions ? evaluateCondition(e.conditions, e.character_id, ctx.members, guest) : null;
+  const clauses = JSON.parse(e.condition_clauses || "[]") as Clause[];
+  const cond = clauses.length ? evaluateCondition(clauses, e.conditions, e.character_id, ctx.members, guest) : null;
   const caveat = req.caveat?.(e.type) ?? "";
   const result = (level: Fit["level"], note = ""): Fit => ({
     level: cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
@@ -236,7 +236,7 @@ export function effectsForCharacters(db: Db, characterIds: number[], types: stri
   types.forEach((t, i) => (params[`t${i}`] = t));
   return db
     .query<EffectRow, any>(
-      `SELECT character_id, type, scope, targets, value, turns, conditions, personalities, description, source FROM character_effects
+      `SELECT character_id, type, scope, targets, value, turns, conditions, condition_clauses, personalities, description, source FROM character_effects
        WHERE character_id IN (${characterIds.map((_, i) => `$c${i}`).join(", ")}) AND type IN (${types.map((_, i) => `$t${i}`).join(", ")})`,
     )
     .all(params);
@@ -276,12 +276,12 @@ export function candidatesFor(db: Db, ctx: PartyContext, req: Requirement, exclu
   types.forEach((t, i) => (params[`t${i}`] = t));
   const rows = db
     .query<EffectRow, any>(
-      `SELECT character_id, type, scope, targets, value, turns, conditions, personalities, description, source FROM character_effects
+      `SELECT character_id, type, scope, targets, value, turns, conditions, condition_clauses, personalities, description, source FROM character_effects
        WHERE type IN (${types.map((_, i) => `$t${i}`).join(", ")})`,
     )
     .all(params);
   const exclude = new Set(excludeIds);
-  const guests = loadCondMembers(db, [...new Set(rows.filter((r) => r.conditions && !exclude.has(r.character_id)).map((r) => r.character_id))]);
+  const guests = loadCondMembers(db, [...new Set(rows.filter((r) => r.condition_clauses !== "[]" && !exclude.has(r.character_id)).map((r) => r.character_id))]);
   // 候補はまだアタッカーではないので、アタッカー本人の自己バフ扱いにはしない
   const best = new Map<number, Provider>();
   for (const effect of rows) {

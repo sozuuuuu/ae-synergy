@@ -1,7 +1,20 @@
-// 効果の発動条件のうち、パーティの編成だけで決まるもの（位置・人数・ZONE）を判定する。
-// 蓄積・HP・ターン数・敵の状態など戦闘の流れ次第のものは判定せず unknown にする。
+// 効果の発動条件を、今のパーティ編成で満たしているか判定する。
+// 条件は anaden-mcp が構造化したもの（Clause）だけを読み、自由文は解釈しない。
+// battle（戦闘の流れ次第）と unclassified（anaden-mcp の辞書にまだない）は判定せず unknown にする。
 import type { Db } from "../db.ts";
-import { ELEMENTS, WEAPONS } from "./characters.ts";
+import { ELEMENTS } from "./characters.ts";
+
+type Who = { personalities: string[] } | { ls: string } | { gender: string } | { weapons: string[] };
+export type Clause =
+  | { slot: "main" | "sub" }
+  | { neighbors: { personalities: string[] } }
+  | { count: { region: "main" | "sub" | "all"; who: Who; min?: number; max?: number } }
+  | { anyOf: Clause[][] }
+  | { zone: { names: string[]; tier?: string } }
+  | { anyZone: true }
+  | { frontElements: { distinct?: boolean; min?: number; excludeSelf?: boolean } }
+  | { battle: string }
+  | { unclassified: string };
 
 export type CondMember = {
   id: number;
@@ -14,6 +27,7 @@ export type CondMember = {
   /** このキャラが展開できる ZONE の種別（例: 極・烈火陣展開） */
   zones: string[];
 };
+export type Guest = Omit<CondMember, "slot" | "position">;
 
 export type CondState = "met" | "unmet" | "unknown";
 export type CondResult = { state: CondState; note: string };
@@ -21,8 +35,8 @@ export type CondResult = { state: CondState; note: string };
 const ZONE_TYPE = /^(極・|絶・)?(.+陣(・.+)?)展開$/;
 
 /** 条件判定に使うキャラの情報（パーソナリティと展開できる ZONE）をまとめて読む */
-export function loadCondMembers(db: Db, ids: number[]): Map<number, Omit<CondMember, "slot" | "position">> {
-  const map = new Map<number, Omit<CondMember, "slot" | "position">>();
+export function loadCondMembers(db: Db, ids: number[]): Map<number, Guest> {
+  const map = new Map<number, Guest>();
   if (ids.length === 0) return map;
   const params = Object.fromEntries(ids.map((id, i) => [`i${i}`, id]));
   const list = ids.map((_, i) => `$i${i}`).join(", ");
@@ -44,111 +58,66 @@ export function loadCondMembers(db: Db, ids: number[]): Map<number, Omit<CondMem
   return map;
 }
 
-type Region = "前衛" | "後衛" | "全体";
-const regionOf = (s: string | undefined): Region | null =>
-  !s ? null : s === "前衛" ? "前衛" : s === "後衛" ? "後衛" : "全体";
-const inRegion = (m: CondMember, r: Region) => r === "全体" || (r === "前衛") === (m.slot === "main");
-const WEAPON_CODES = Object.fromEntries(Object.entries(WEAPONS).map(([code, name]) => [name, code]));
-const names = (s: string) => [...s.matchAll(/[<「]([^>」]+)[>」]/g)].map((m) => m[1]!);
-
 /**
  * subject はその効果を持つキャラ。パーティにいなければ guest（候補）として前衛に加えた前提で数える。
- * 位置の条件は、候補なら置き場所を選べるので満たせる扱い、両隣は並び次第なので unknown。
+ * 本人の位置の条件は、候補なら置き場所を選べるので満たせる扱い、両隣は並び次第なので unknown。
  */
-export function evaluateCondition(text: string, subjectId: number, members: CondMember[], guest?: Omit<CondMember, "slot" | "position">): CondResult {
+export function evaluateCondition(clauses: Clause[], text: string, subjectId: number, members: CondMember[], guest?: Guest): CondResult {
   const member = members.find((m) => m.id === subjectId);
-  const isGuest = !member;
   const subject: CondMember | null = member ?? (guest ? { ...guest, slot: "main", position: -1 } : null);
-  const all = isGuest && subject ? [...members, subject] : members;
-  const zones = all.flatMap((m) => m.zones);
-
-  const states: CondState[] = [];
-  const unmet: string[] = [];
-  for (const clause of text.split(/ \/ |、/).map((c) => c.trim()).filter(Boolean)) {
-    const s = evaluateClause(clause, subject, isGuest, all, zones);
-    states.push(s);
-    if (s === "unmet") unmet.push(clause);
-  }
-  if (unmet.length) return { state: "unmet", note: `条件未達: ${unmet.join("、")}` };
+  const ctx: Ctx = { subject, isGuest: !member, all: !member && subject ? [...members, subject] : members };
+  const states = clauses.map((c) => judge(c, ctx));
+  if (states.includes("unmet")) return { state: "unmet", note: `条件未達: ${text}` };
   if (states.every((s) => s === "met")) return { state: "met", note: `条件OK: ${text}` };
   return { state: "unknown", note: `条件: ${text}` };
 }
 
-function evaluateClause(clause: string, subject: CondMember | null, isGuest: boolean, all: CondMember[], zones: string[]): CondState {
-  let rest = clause;
-  const found: CondState[] = [];
-  const take = (re: RegExp, judge: (m: RegExpMatchArray) => CondState) => {
-    rest = rest.replace(re, (...args) => {
-      const m = args.slice(0, -2) as unknown as RegExpMatchArray;
-      found.push(judge(m));
-      return " ";
-    });
-  };
-  const count = (region: Region, pred: (m: CondMember) => boolean) => all.filter((m) => inRegion(m, region) && pred(m)).length;
-  const compare = (n: number, need: number, op: string | undefined) => (op === "以下" ? n <= need : n >= need) ? "met" : "unmet";
+type Ctx = { subject: CondMember | null; isGuest: boolean; all: CondMember[] };
+const ok = (b: boolean): CondState => (b ? "met" : "unmet");
+const elementOf = (m: CondMember) => m.personalities.find((p) => (ELEMENTS as readonly string[]).includes(p)) ?? "";
 
-  // 両隣に<X>の味方がいる
-  take(/(?:自身の)?(?:前衛)?両隣に((?:<[^>]+>)+)パーソナリティの味方がいる/g, (m) => {
+function matches(m: CondMember, who: Who): boolean {
+  if ("personalities" in who) return who.personalities.some((p) => m.personalities.includes(p));
+  if ("ls" in who) return m.ls_type === who.ls;
+  if ("gender" in who) return m.gender === who.gender;
+  return who.weapons.includes(m.weapon);
+}
+
+function judge(c: Clause, { subject, isGuest, all }: Ctx): CondState {
+  if ("battle" in c || "unclassified" in c) return "unknown";
+  if ("anyOf" in c) {
+    const alts = c.anyOf.map((alt) => alt.map((x) => judge(x, { subject, isGuest, all })));
+    if (alts.some((a) => a.every((s) => s === "met"))) return "met";
+    return alts.every((a) => a.includes("unmet")) ? "unmet" : "unknown";
+  }
+  if ("slot" in c) {
+    if (!subject) return "unknown";
+    return isGuest ? "met" : ok(subject.slot === c.slot);
+  }
+  if ("neighbors" in c) {
     if (!subject || isGuest) return "unknown";
     if (subject.slot !== "main") return "unmet";
-    const want = names(m[1]!);
     const side = (d: number) => all.find((x) => x.slot === "main" && x.position === subject.position + d);
-    return [side(-1), side(1)].every((x) => x && want.some((w) => x.personalities.includes(w))) ? "met" : "unmet";
-  });
-
-  // 前衛の属性パーソナリティの種類（重複なし / N種類以上）
-  const elementsIn = (pred: (m: CondMember) => boolean) =>
-    all.filter((m) => m.slot === "main" && pred(m)).map((m) => m.personalities.find((p) => (ELEMENTS as readonly string[]).includes(p)) ?? "");
-  take(/前衛の味方全員の属性パーソナリティが重複していない/g, () => {
-    const els = elementsIn(() => true);
-    return new Set(els).size === els.length ? "met" : "unmet";
-  });
-  take(/(自身を除く)?前衛の属性パーソナリティが(\d)種類以上/g, (m) =>
-    new Set(elementsIn((x) => !m[1] || x.id !== subject?.id).filter(Boolean)).size >= Number(m[2]) ? "met" : "unmet");
-
-  // 人数（パーソナリティ・天冥・性別・武器）。「がいる」は1人以上、「または」は OR、地域の省略は直前のものを引き継ぐ
-  let region: Region = "前衛";
-  const counts: CondState[] = [];
-  rest = rest.replace(
-    /(味方前衛後衛|前衛後衛|前衛|後衛)?(?:の|に)?(?:(天|冥)の|(男性|女性)の|((?:<[^>]+>|「[^」]+」)+)(?:パーソナリティ)?の)味方(?:が?(\d)人(以上|以下)?|がいる)|(味方前衛後衛|前衛後衛|前衛|後衛)?(?:の|に)?([杖剣刀斧槍弓拳槌・]+)装備者(\d)人(以上|以下)?/g,
-    (_all, r1, ls, gender, pers, n1, op1, r2, weapons, n2, op2) => {
-      region = regionOf(r1 ?? r2) ?? region;
-      if (weapons) {
-        const codes = String(weapons).split("・").map((w) => WEAPON_CODES[w]).filter(Boolean);
-        counts.push(compare(count(region, (m) => codes.includes(m.weapon)), Number(n2), op2));
-      } else {
-        n1 ??= "1";
-        const pred = ls ? (m: CondMember) => m.ls_type === ls
-          : gender ? (m: CondMember) => m.gender === gender
-          : (m: CondMember) => names(pers).some((p) => m.personalities.includes(p));
-        counts.push(compare(count(region, pred), Number(n1), op1));
-      }
-      return " ";
-    },
-  );
-  if (counts.length) found.push(/または/.test(clause) ? (counts.includes("met") ? "met" : "unmet") : counts.includes("unmet") ? "unmet" : "met");
-  rest = rest.replace(/または/g, " ");
-
-  // 本人の位置（「アルテナが前衛で」「自身が前衛にいる」のような本人の名前つきも含む）
-  take(/(?:[^\s、/]{1,8}が)?(前衛|後衛)(?:での?|にいる)/g, (m) => {
-    if (!subject) return "unknown";
-    if (isGuest) return "met";
-    return (subject.slot === "main") === (m[1] === "前衛") ? "met" : "unmet";
-  });
-
-  // ZONE（特定の陣、または何かの ZONE）。絶ZONE・ANOTHER ZONE・非ZONE は戦闘の流れ次第なので触らない
-  // 「水天陣/轟打陣展開時」のように / で並ぶものはどれか1つでよい
-  const ZONE_NAME = String.raw`(?:極・|絶・)?(?:双撃陣・[^\s、/]+?|[^\s、/・]+?陣)`;
-  take(new RegExp(String.raw`(${ZONE_NAME}(?:\/${ZONE_NAME})*)展開時`, "g"), (m) =>
-    m[1]!.split("/").some((name) => {
-      const [, prefix = "", base] = name.match(/^(極・|絶・)?(.+)$/)!;
-      return zones.some((z) => { const zm = z.match(ZONE_TYPE); return !!zm && zm[2] === base && (!prefix || zm[1] === prefix); });
-    }) ? "met" : "unmet");
-  take(/(?<![非絶A-Za-z ])(?:属性\/攻撃種別|属性|攻撃種別)?ZONE展開時/g, () => (zones.length ? "met" : "unmet"));
-
-  // 毎ターン来るタイミングや助詞だけが残っていれば、判定済みの部分だけで決まる
-  const leftover = rest.replace(/戦闘開始時|ターン開始時|ターン終了時|の時|時|場合|自身|[のにがで\s]/g, "");
-  if (leftover) found.push("unknown");
-  if (found.length === 0) return "unknown";
-  return found.includes("unmet") ? "unmet" : found.includes("unknown") ? "unknown" : "met";
+    return ok([side(-1), side(1)].every((x) => x && c.neighbors.personalities.some((p) => x.personalities.includes(p))));
+  }
+  if ("count" in c) {
+    const { region, who, min, max } = c.count;
+    const n = all.filter((m) => (region === "all" || m.slot === region) && matches(m, who)).length;
+    return ok((min === undefined || n >= min) && (max === undefined || n <= max));
+  }
+  if ("zone" in c) {
+    const { names, tier } = c.zone;
+    return ok(all.some((m) => m.zones.some((z) => {
+      const zm = z.match(ZONE_TYPE);
+      return !!zm && names.includes(zm[2]!) && (!tier || zm[1] === tier);
+    })));
+  }
+  if ("anyZone" in c) return ok(all.some((m) => m.zones.length > 0));
+  if ("frontElements" in c) {
+    const { distinct, min, excludeSelf } = c.frontElements;
+    const els = all.filter((m) => m.slot === "main" && !(excludeSelf && m.id === subject?.id)).map(elementOf);
+    if (distinct) return ok(new Set(els).size === els.length);
+    return ok(new Set(els.filter(Boolean)).size >= (min ?? 0));
+  }
+  return "unknown"; // anaden-mcp が知らない形を足しても、判定できないだけで壊れない
 }
