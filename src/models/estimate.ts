@@ -5,24 +5,33 @@ import type { Db } from "../db.ts";
 import type { Member, Party } from "./parties.ts";
 import { type Coverage, type PartyContext, type Provider, zoneFits } from "./requirements.ts";
 
-/** 想定ボスの能力と味方の装備の仮定。パーティごとに parties.enemy（JSON）に入れる。未入力は undefined */
+/**
+ * 想定ボスの能力と味方の装備の仮定。パーティごとに parties.enemy（JSON）に入れたものだけを保存し、未入力は既定値で計算する。
+ * 既定値は終盤の隠しボスを想定した大まかな値（実測ではない）。
+ */
 export const ENEMY_FIELDS = [
-  { key: "level", label: "Lv", hint: "下克上の計算に使う（新八妖 120・第3部の隠しボス 140 が目安）", min: 1, max: 999 },
-  { key: "def", label: "防御", hint: "物理攻撃の守備値", min: 0, max: 99999 },
-  { key: "mdef", label: "魔防", hint: "魔法攻撃の守備値", min: 0, max: 99999 },
-  { key: "typeRes", label: "攻撃種耐性 %", hint: "常時の耐性バフ（Eバフ）。弱いならマイナス", min: -100, max: 500 },
-  { key: "elemRes", label: "属性耐性 %", hint: "常時の耐性バフ（Eバフ）。弱いならマイナス", min: -100, max: 500 },
-  { key: "atk", label: "攻撃（腕力・知性）", hint: "被ダメの計算に使う。物理なら腕力、魔法なら知性", min: 0, max: 99999 },
-  { key: "power", label: "技の威力 %", hint: "全体攻撃の倍率。未入力なら 100%", min: 1, max: 100000 },
-  { key: "weapon", label: "武器の攻撃力・魔力", hint: "アタッカーの装備（仮定）。未入力なら 300", min: 0, max: 9999 },
-  { key: "armor", label: "防具の防御・魔防", hint: "味方の装備（仮定）。未入力なら 0", min: 0, max: 9999 },
+  { key: "level", label: "Lv", hint: "下克上の計算に使う（新八妖 120・第3部の隠しボス 140 が目安）", min: 1, max: 999, default: 140 },
+  { key: "def", label: "防御", hint: "物理攻撃の守備値", min: 0, max: 99999, default: 300 },
+  { key: "mdef", label: "魔防", hint: "魔法攻撃の守備値", min: 0, max: 99999, default: 300 },
+  { key: "typeRes", label: "攻撃種耐性 %", hint: "常時の耐性バフ（Eバフ）。弱いならマイナス", min: -100, max: 500, default: 0 },
+  { key: "elemRes", label: "属性耐性 %", hint: "常時の耐性バフ（Eバフ）。弱いならマイナス", min: -100, max: 500, default: 0 },
+  { key: "atk", label: "攻撃（腕力・知性）", hint: "被ダメの計算に使う。物理なら腕力、魔法なら知性", min: 0, max: 99999, default: 600 },
+  { key: "power", label: "技の威力 %", hint: "被ダメの計算に使う全体攻撃の倍率", min: 1, max: 100000, default: 150 },
+  { key: "weapon", label: "武器の攻撃力・魔力", hint: "アタッカーの装備（仮定）", min: 0, max: 9999, default: 300 },
+  { key: "armor", label: "防具の防御・魔防", hint: "味方の装備（仮定）", min: 0, max: 9999, default: 0 },
 ] as const;
 export type EnemyKey = (typeof ENEMY_FIELDS)[number]["key"];
 export const AFFINITIES = { weak: "弱点", resist: "耐性" } as const;
 export type Enemy = Partial<Record<EnemyKey, number>> & { affinity?: keyof typeof AFFINITIES };
+type Filled = Record<EnemyKey, number> & { affinity?: keyof typeof AFFINITIES };
 
-const DEFAULT_WEAPON = 300;
-const DEFAULT_POWER = 100;
+/** 未入力を既定値で埋める。assumed は既定値を使った項目 */
+export function withDefaults(enemy: Enemy): { values: Filled; assumed: (typeof ENEMY_FIELDS)[number][] } {
+  const values = { ...enemy } as Filled;
+  const assumed = ENEMY_FIELDS.filter((f) => enemy[f.key] == null);
+  for (const f of assumed) values[f.key] = f.default;
+  return { values, assumed };
+}
 
 export function parseEnemy(json: string): Enemy {
   let raw: any;
@@ -117,16 +126,16 @@ function zoneRate(type: string, element: string, kind: string): number {
   return 1;
 }
 
-type Base = { stats: Stats; skill: AttackSkill; ctx: PartyContext; enemy: Enemy };
+type Base = { stats: Stats; skill: AttackSkill; ctx: PartyContext; enemy: Filled };
 
 function scenarioOf({ stats, skill, ctx, enemy }: Base, list: Support[]): { scenario: Scenario; crit: boolean } {
   const E = ctx.attackElement;
   const K = ctx.attackKind;
   const magic = K === "魔法";
-  const res = (v: number | undefined) => (v == null ? { up: [], down: [] } : v >= 0 ? { up: [v / 100], down: [] } : { up: [], down: [-v / 100] });
+  const res = (v: number) => (v >= 0 ? { up: [v / 100], down: [] } : { up: [], down: [-v / 100] });
   const typeRes = res(enemy.typeRes);
   const elemRes = res(enemy.elemRes);
-  const weapon = enemy.weapon ?? DEFAULT_WEAPON;
+  const weapon = enemy.weapon;
   const zone = Math.max(1, ...list.filter((s) => s.key === "zone").map((s) => zoneRate(s.type, E, K)));
   const ambush = ratios(list, "ambush");
   // クリ率が 100% に届けばクリティカル前提で見る（捨身はクリ率 +100%）
@@ -147,7 +156,7 @@ function scenarioOf({ stats, skill, ctx, enemy }: Base, list: Support[]): { scen
         elemDebuffs: [...ratios(list, "elem_res_down"), ...elemRes.down], elemBuffs: elemRes.up,
       },
       special: {
-        shingi: has(list, "unity"), seishin: has(list, "concentration"), gekokujo: has(list, "underdog") && enemy.level != null,
+        shingi: has(list, "unity"), seishin: has(list, "concentration"), gekokujo: has(list, "underdog"),
         koshi: has(list, "ambush") ? Math.max(0.6, ...ambush) : false,
       },
       elemAtkBuffs: ratios(list, "elem_atk_up"),
@@ -177,7 +186,6 @@ export type Dealt = {
   gains: Map<string, number>;
   /** 候補を入れたときの伸び */
   gainWith: (key: string, p: Provider) => number;
-  weaponAssumed: boolean;
 };
 
 /** アタッカー（★）の与ダメの目安。★がいないかステータスや攻撃スキルが分からなければ null */
@@ -186,7 +194,7 @@ export function estimateDealt(db: Db, ctx: PartyContext, coverage: Coverage[], e
   const stats = loadStats(db, [ctx.attacker.id]).get(ctx.attacker.id);
   const skill = attackSkill(db, ctx.attacker.id, ctx.attackElement, ctx.attackKind);
   if (!stats || !skill) return null;
-  const base: Base = { stats, skill, ctx, enemy };
+  const base: Base = { stats, skill, ctx, enemy: withDefaults(enemy).values };
   const list = supportsOf(coverage, "damage");
   const now = evaluate(base, list);
   const bare = evaluate(base, []);
@@ -200,43 +208,52 @@ export function estimateDealt(db: Db, ctx: PartyContext, coverage: Coverage[], e
     multiplier: bare.avg > 0 ? now.avg / bare.avg : 1,
     gains,
     gainWith: (key, p) => (now.avg > 0 ? evaluate(base, [...list, toSupport(key, p)]).avg / now.avg - 1 : 0),
-    weaponAssumed: enemy.weapon == null,
   };
 }
 
-export type Taken = { member: Member; damage: number; hp: number };
+export type Taken = {
+  member: Member;
+  /** 想定ボスの攻撃を入れたときだけの実数（未入力なら null。ボスの攻撃は2乗で効くので、既定値では実数を出さない） */
+  damage: number | null;
+  hp: number;
+  /** 支援（✓ の耐性UP・腕力/知性DOWN・バリアと本人のみの耐性）でどれだけ被ダメが減るか */
+  reduction: number;
+};
 
 /**
  * 想定ボスの全体攻撃1回で、メンバーそれぞれが受けるダメージの目安。
- * 物理・魔法と攻撃（腕力・知性）が入っていなければ null。クリティカル・ブレイク・敵のバフは入れない。
+ * 物理・魔法が未設定なら物理として計算する。クリティカル・ブレイク・敵のバフは入れない。
  */
-export function estimateTaken(db: Db, party: Party, coverage: Coverage[], enemy: Enemy): Taken[] | null {
-  if (!party.boss_attack || enemy.atk == null) return null;
+export function estimateTaken(db: Db, party: Party, coverage: Coverage[], input: Enemy): Taken[] {
+  const enemy = withDefaults(input).values;
   const magic = party.boss_attack === "magic";
   const list = supportsOf(coverage, "durability");
   // 本人のみの耐性・バリアは、そのキャラ自身にだけ効く
   const selfOnly = coverage
     .filter((c) => c.req.group === "durability")
     .flatMap((c) => c.providers.filter((p) => p.fit.level === "partial" && p.effect.scope === "self").map((p) => toSupport(c.req.key, p)));
-  // 敵の腕力（知性）は攻撃値A・Bの両方に入る
-  const atk = enemy.atk * (1 - Math.min(1, stackDecay(ratios(list, "enemy_atk_down"))));
   const element = party.boss_element && party.boss_element !== "無" ? party.boss_element : undefined;
   const stats = loadStats(db, party.members.map((m) => m.id));
-  return party.members.flatMap((member) => {
-    const s = stats.get(member.id);
-    if (!s) return [];
-    const mine = [...list, ...selfOnly.filter((x) => x.characterId === member.id)];
-    const barrier = Math.min(1, Math.max(0, ...ratios(mine, "barrier", (x) => x.type.startsWith("バリア"))));
-    const result = computeScenario({
+  const hit = (s: Stats, supports: Support[]) => {
+    // 敵の腕力（知性）は攻撃値A・Bの両方に入る
+    const atk = enemy.atk * (1 - Math.min(1, stackDecay(ratios(supports, "enemy_atk_down"))));
+    const barrier = Math.min(1, Math.max(0, ...ratios(supports, "barrier", (x) => x.type.startsWith("バリア"))));
+    return computeScenario({
       attacker: { A: atk, B: atk, attr: enemy.atk },
-      skill: { kind: magic ? "magic" : "physical", element, target: "all", rate: enemy.power ?? DEFAULT_POWER },
-      enemy: { def: s.end + (enemy.armor ?? 0), mdef: s.spr + (enemy.armor ?? 0) },
+      skill: { kind: magic ? "magic" : "physical", element, target: "all", rate: enemy.power },
+      enemy: { def: s.end + enemy.armor, mdef: s.spr + enemy.armor },
       mods: {
-        resist: { typeBuffs: ratios(mine, "res_up"), elemBuffs: ratios(mine, "elem_res_up") },
+        resist: { typeBuffs: ratios(supports, "res_up"), elemBuffs: ratios(supports, "elem_res_up") },
         barrier: barrier || undefined,
         single: false,
       },
-    });
-    return [{ member, damage: result.total.normal.avg, hp: s.hp }];
+    }).total.normal.avg;
+  };
+  return party.members.flatMap((member) => {
+    const s = stats.get(member.id);
+    if (!s) return [];
+    const damage = hit(s, [...list, ...selfOnly.filter((x) => x.characterId === member.id)]);
+    const bare = hit(s, []);
+    return [{ member, damage: input.atk == null ? null : damage, hp: s.hp, reduction: bare > 0 ? 1 - damage / bare : 0 }];
   });
 }

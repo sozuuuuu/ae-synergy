@@ -1,5 +1,5 @@
 import type { CharacterSummary } from "../models/characters.ts";
-import { AFFINITIES, type Dealt, ENEMY_FIELDS, type Taken } from "../models/estimate.ts";
+import { AFFINITIES, type Dealt, ENEMY_FIELDS, type Taken, withDefaults } from "../models/estimate.ts";
 import { displayTitle, memberAt, SLOT_COUNTS, SLOT_NAMES, type Member, type Party, type Slot } from "../models/parties.ts";
 import {
   ATTACK_ELEMENTS, ATTACK_KINDS, BOSS_NEEDS, fitRank, GROUP_NAMES,
@@ -119,7 +119,7 @@ export function PartyPage({ party, coverage, need, candidates, dealt, taken, sha
   need: Requirement | null;
   candidates: Candidate[];
   dealt: Dealt | null;
-  taken: Taken[] | null;
+  taken: Taken[];
   shared: { name: string; category: string; count: number; members: string }[];
   errors: string[];
 }) {
@@ -253,11 +253,14 @@ const TILE_STYLES = {
 const DOT_STYLES = { ok: "bg-ok", partial: "bg-warn", missing: "border border-faint" } as const;
 
 /** 火力の倍率と与ダメ、メンバーごとの被ダメの目安 */
-function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | null; taken: Taken[] | null }) {
+function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | null; taken: Taken[] }) {
   const attacker = party.members.find((m) => m.id === party.attacker_id);
   const steps = dealt ? (dealt.crit ? dealt.result.stepsCrit : dealt.result.steps) : [];
   const def = dealt?.result.hits[0]?.parts.def ?? 0;
-  const defKey = party.attack_kind === "魔法" ? "mdef" : "def";
+  const { values: e, assumed } = withDefaults(party.enemy);
+  // 攻撃・技の威力・防具は被ダメの実数にしか効かないので、実数を出さないときは既定値として挙げない
+  const shownAssumed = party.enemy.atk == null ? assumed.filter((f) => !["atk", "power", "armor"].includes(f.key)) : assumed;
+  const magic = party.boss_attack === "magic";
   return (
     <section class="panel p-4" aria-label="火力と被ダメの目安">
       <div class="mb-3 flex items-baseline justify-between gap-2">
@@ -292,26 +295,33 @@ function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | n
             </ul>
           )}
           <p class="mt-2 text-[11px] leading-relaxed text-faint">
-            守備値 {Math.round(def)}{party.enemy[defKey] == null && "（未入力なので 0）"} ・ 武器 {party.enemy.weapon ?? 300}{dealt.weaponAssumed && "（仮定）"} で計算。
-            △の効果・装備やグラスタ・挺身・毒ペインは含めていません。
+            守備値 {Math.round(def)} ・ 武器 {e.weapon} で計算。△の効果・装備やグラスタ・挺身・毒ペインは含めていません。
           </p>
         </>
       )}
 
       <h2 class="label-caps mt-5 mb-2">被ダメの目安</h2>
-      {!taken ? (
-        <p class="text-sm text-muted">条件で想定ボスの物理／魔法と攻撃（腕力・知性）を入れると、全体攻撃1回で各メンバーが受けるダメージを出します。</p>
-      ) : (
+      {taken.length > 0 && (
         <>
           <ul class="space-y-1.5">
             {taken.map((t) => {
+              const cut = <span class="text-ok">支援で {t.reduction >= 0.0005 ? `−${(t.reduction * 100).toFixed(0)}%` : "±0%"}</span>;
+              if (t.damage == null) {
+                // 攻撃が未入力なら実数は出さない（ボスの攻撃は2乗で効くので、既定値の実数は当てにならない）
+                return (
+                  <li class="flex items-baseline justify-between gap-2 text-xs">
+                    <span class="truncate">{t.member.label}</span>
+                    <span class="shrink-0 tabular-nums">{cut}</span>
+                  </li>
+                );
+              }
               const ratio = t.hp > 0 ? t.damage / t.hp : 1;
               return (
                 <li>
                   <div class="flex items-baseline justify-between gap-2 text-xs">
                     <span class="truncate">{t.member.label}</span>
                     <span class={`shrink-0 tabular-nums ${ratio >= 1 ? "font-semibold text-red-300" : ratio >= 0.5 ? "text-warn" : "text-muted"}`}>
-                      {formatDamage(t.damage)} <span class="text-faint">/ HP {t.hp.toLocaleString("ja-JP")}</span>{ratio >= 1 && " 落ちる"}
+                      {formatDamage(t.damage)} <span class="text-faint">/ HP {t.hp.toLocaleString("ja-JP")}</span>{ratio >= 1 && " 落ちる"} <span class="text-[11px]">{cut}</span>
                     </span>
                   </div>
                   <span class="mt-0.5 block h-1 overflow-hidden rounded-full bg-line" aria-hidden="true">
@@ -322,10 +332,17 @@ function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | n
             })}
           </ul>
           <p class="mt-2 text-[11px] leading-relaxed text-faint">
-            威力 {party.enemy.power ?? 100}% の{party.boss_attack === "magic" ? "魔法" : "物理"}全体攻撃1回・クリティカルなし。
-            ✓ の耐性UP・{party.boss_attack === "magic" ? "知性" : "腕力"}DOWN・バリアと本人のみの耐性を含む。防具 {party.enemy.armor ?? 0}。
+            {party.enemy.atk == null
+              ? <>支援なしと比べた被ダメの減り方。ボスの攻撃（腕力・知性）を入れると、HP と比べた実数も出します。</>
+              : <>攻撃 {e.atk}・威力 {e.power}% の全体攻撃1回・クリティカルなし。防具 {e.armor}。</>}
+            {magic ? "魔法" : "物理"}{!party.boss_attack && "（未設定なので物理）"}の攻撃に、✓ の耐性UP・{magic ? "知性" : "腕力"}DOWN・バリアと本人のみの耐性を含む。
           </p>
         </>
+      )}
+      {shownAssumed.length > 0 && (
+        <p class="mt-3 border-t border-line pt-2 text-[11px] leading-relaxed text-faint">
+          既定値で計算: {shownAssumed.map((f) => `${f.label} ${f.default}`).join("・")}。条件の「想定ボス」で変えられます。
+        </p>
       )}
     </section>
   );
@@ -471,7 +488,7 @@ function EnemyInput({ party, field: f }: { party: Party; field: (typeof ENEMY_FI
     <label class="block" title={f.hint}>
       <span class="mb-1 block truncate text-[11px] text-muted">{f.label}</span>
       <input class="field" type="number" step="any" min={String(f.min)} max={String(f.max)} name={`enemy_${f.key}`}
-        value={party.enemy[f.key] == null ? "" : String(party.enemy[f.key])} placeholder="未入力" />
+        value={party.enemy[f.key] == null ? "" : String(party.enemy[f.key])} placeholder={`既定 ${f.default}`} />
     </label>
   );
 }

@@ -4,7 +4,7 @@ import { searchCharacters } from "../src/models/characters.ts";
 import { addMember, createParty, getParty, moveMember, partyContext, removeMember, setAttacker, updateSettings } from "../src/models/parties.ts";
 import { type Clause, evaluateCondition } from "../src/models/conditions.ts";
 import { extractEffects } from "../src/models/effect-extract.ts";
-import { enemyFromForm, estimateDealt, estimateTaken, parseEnemy } from "../src/models/estimate.ts";
+import { ENEMY_FIELDS, enemyFromForm, estimateDealt, estimateTaken, parseEnemy, withDefaults } from "../src/models/estimate.ts";
 import { candidatesFor, evaluateCoverage, requirementsFor } from "../src/models/requirements.ts";
 import { idOf, ROWS, testDb } from "./fixtures.ts";
 
@@ -303,7 +303,6 @@ describe("火力・被ダメの目安", () => {
     // 烈火陣展開時の火属性攻撃UP は条件未達なので数えない
     expect(dealt.gains.has("elem_atk_up")).toBe(false);
     expect(dealt.multiplier).toBeGreaterThan(1.8);
-    expect(dealt.weaponAssumed).toBe(true);
   });
 
   test("候補を入れたときの伸びは、その枠の効果だけを足して計算する", () => {
@@ -323,22 +322,27 @@ describe("火力・被ダメの目安", () => {
     expect(estimateDealt(db, ctx, coverage, party.enemy)).toBeNull();
   });
 
-  test("被ダメは想定ボスの物理/魔法と攻撃が入っているときだけ出し、本人のみの属性耐性はその本人にだけ効く", () => {
+  test("被ダメは攻撃が未入力なら支援による軽減率だけ、入れたら実数も出す。本人のみの属性耐性はその本人にだけ効く", () => {
     const { db, partyId, load } = setup([]);
-    const enemy = { atk: 500, power: 200 };
-    {
-      const { party, coverage } = load();
-      expect(estimateTaken(db, party, coverage, party.enemy)).toBeNull();
-    }
-    updateSettings(db, getParty(db, partyId)!, { ...settings, bossAttack: "physical", enemy });
-    const neutral = (() => { const { party, coverage } = load(); return estimateTaken(db, party, coverage, party.enemy)!; })();
-    expect(neutral).toHaveLength(1);
-    expect(neutral[0]!).toMatchObject({ hp: 3000 });
-    expect(neutral[0]!.damage).toBeGreaterThan(0);
-    // テストアタッカーは火属性耐性+30%（アビリティ・本人のみ）
+    const taken = () => { const { party, coverage } = load(); return estimateTaken(db, party, coverage, party.enemy); };
+    // 未入力: 実数は出さず、支援がないので軽減は 0
+    expect(taken()).toEqual([expect.objectContaining({ hp: 3000, damage: null, reduction: 0 })]);
+    // テストアタッカーは火属性耐性+30%（アビリティ・本人のみ）。火属性の攻撃なら 30% 軽減
+    updateSettings(db, getParty(db, partyId)!, { ...settings, bossElement: "火" });
+    expect(taken()[0]!.reduction).toBeCloseTo(0.3, 2);
+    const enemy = { atk: 400 };
     updateSettings(db, getParty(db, partyId)!, { ...settings, bossAttack: "physical", bossElement: "火", enemy });
-    const fire = (() => { const { party, coverage } = load(); return estimateTaken(db, party, coverage, party.enemy)!; })();
-    expect(fire[0]!.damage / neutral[0]!.damage).toBeLessThan(0.75);
+    const fire = taken()[0]!;
+    expect(fire.damage).toBeGreaterThan(0);
+    updateSettings(db, getParty(db, partyId)!, { ...settings, bossAttack: "physical", enemy });
+    expect(fire.damage! / taken()[0]!.damage!).toBeCloseTo(0.7, 2);
+  });
+
+  test("未入力の項目は既定値で埋め、どれを既定値にしたかを返す", () => {
+    const { values, assumed } = withDefaults({ def: 500, affinity: "weak" });
+    expect(values).toMatchObject({ def: 500, mdef: 300, level: 140, atk: 600, power: 150, weapon: 300, armor: 0, affinity: "weak" });
+    expect(assumed.map((f) => f.key)).not.toContain("def");
+    expect(assumed).toHaveLength(ENEMY_FIELDS.length - 1);
   });
 
   test("想定ボスの入力は範囲外や数でないものをはじき、保存済みの値も読み直すときに確かめる", () => {
