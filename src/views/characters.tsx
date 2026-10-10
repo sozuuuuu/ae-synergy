@@ -1,6 +1,6 @@
 import type { Child, SafeHtml } from "@/jsx/jsx-runtime.ts";
 import {
-  ARMORS, ELEMENTS, LS_TYPES, SECTIONS, STAT_NAMES, STYLES, WEAPONS,
+  ARMORS, EFFECT_SOURCES, EFFECT_TARGETS, ELEMENTS, LS_TYPES, SECTIONS, STAT_NAMES, STYLES, WEAPONS,
   type Character, type CharacterFilters, type CharacterSummary,
 } from "../models/characters.ts";
 import { displayTitle, type Party } from "../models/parties.ts";
@@ -9,10 +9,11 @@ import { elementStyle, ElementMark, MultilineText, Pagination, PostButton, Tags 
 type SearchResult = { characters: (CharacterSummary & { matches: string[] })[]; total: number; page: number; pages: number };
 
 /** 検索結果。party があれば「このパーティに追加」、なければ「このキャラから組む」を出す */
-export function CharacterSearchPage({ filters, result, personalities, party, query }: {
+export function CharacterSearchPage({ filters, result, personalities, effectTypes, party, query }: {
   filters: CharacterFilters;
   result: SearchResult;
   personalities: { name: string; count: number }[];
+  effectTypes: { type: string; count: number }[];
   party: Party | null;
   query: URLSearchParams;
 }) {
@@ -21,9 +22,15 @@ export function CharacterSearchPage({ filters, result, personalities, party, que
     q.set("page", String(page));
     return `/characters?${q}`;
   };
+  const withoutPersonality = (name: string) => {
+    const q = new URLSearchParams(query);
+    q.delete("personality", name);
+    q.delete("page");
+    return `/characters?${q}`;
+  };
   const memberIds = new Set(party?.members.map((m) => m.id));
   const full = party ? party.members.length >= 6 : false;
-  const select = "field w-auto py-1.5 pr-8 text-[13px]";
+  const select = "field w-auto max-w-full py-1.5 pr-8 text-[13px]";
   return (
     <>
       <div class="mb-4">
@@ -40,25 +47,60 @@ export function CharacterSearchPage({ filters, result, personalities, party, que
         )}
       </div>
 
-      <form method="get" action="/characters" class="panel mb-4 space-y-3 p-3 sm:p-4">
+      <form method="get" action="/characters" class="panel mb-4 space-y-4 p-3 sm:p-4">
         {party && <input type="hidden" name="party" value={String(party.id)} />}
-        <div class="grid gap-2 sm:grid-cols-2">
-          <input class="field" type="search" name="q" value={filters.q ?? ""} placeholder="名前・クラス名（ひらがなOK）" aria-label="名前・クラス名" />
-          <input class="field" type="search" name="effect" value={filters.effect ?? ""} placeholder="効果（例: 陰属性 耐性DOWN）" aria-label="効果" />
-        </div>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <ElementPicker value={filters.element} />
-          <Select cls={select} name="weapon" value={filters.weapon} label="武器" options={Object.entries(WEAPONS).map(([k, v]) => [k, v])} />
-          <Select cls={select} name="style" value={filters.style} label="スタイル" options={STYLES.map((s) => [s, s])} />
-          <Select cls={select} name="ls" value={filters.ls} label="天冥" options={LS_TYPES.map((s) => [s, s])} />
-          <Select cls={select} name="personality" value={filters.personality?.[0]} label="パーソナリティ" options={personalities.map((p) => [p.name, `${p.name}（${p.count}）`])} />
-          <label class="inline-flex cursor-pointer items-center gap-1.5 px-1 text-[13px] text-muted">
-            <input type="checkbox" name="alter" value="1" checked={filters.alter === "1"} class="accent-[#e8c46e]" /> 異節
-          </label>
-          <span class="ml-auto flex gap-1.5">
-            <a href={party ? `/characters?party=${party.id}` : "/characters"} class="btn-xs border border-line text-muted hover:text-ink">クリア</a>
-            <button type="submit" class="btn-xs bg-gold text-night hover:bg-[#f3d58f]">検索</button>
-          </span>
+        <input class="field" type="search" name="q" value={filters.q ?? ""} placeholder="名前・クラス名（ひらがなOK）" aria-label="名前・クラス名" />
+
+        <fieldset class="min-w-0 space-y-2">
+          <legend class="label-caps mb-2">キャラ</legend>
+          <Row label="属性"><ElementPicker values={filters.element} /></Row>
+          <Row label="武器"><Chips name="weapon" values={filters.weapon} options={Object.entries(WEAPONS)} /></Row>
+          <Row label="スタイル">
+            <span class="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Chips name="style" values={filters.style} options={STYLES.map((s) => [s, s])} />
+              <span class="flex items-center gap-1.5">
+                <span class="text-xs text-faint">天冥</span>
+                <Chips name="ls" values={filters.ls ? [filters.ls] : []} options={LS_TYPES.map((s) => [s, s])} radio />
+              </span>
+              <Select cls={select} name="armor" value={filters.armor} label="防具" options={Object.entries(ARMORS)} />
+            </span>
+          </Row>
+          <Row label="その他">
+            <span class="flex flex-wrap items-center gap-1.5">
+              {(filters.personality ?? []).map((name) => (
+                <>
+                  <input type="hidden" name="personality" value={name} />
+                  <a href={withoutPersonality(name)} class="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-xs text-gold hover:bg-gold/25" title="条件から外す">
+                    {name} <span aria-hidden="true">×</span>
+                  </a>
+                </>
+              ))}
+              <Select cls={select} name="personality" label={filters.personality?.length ? "パーソナリティを追加" : "パーソナリティ"}
+                options={personalities.filter((p) => !filters.personality?.includes(p.name)).map((p) => [p.name, `${p.name}（${p.count}）`])} />
+              <Check name="alter" checked={filters.alter === "1"} label="異節" />
+              <Check name="sa" checked={filters.sa === "1"} label="星の夢（SA）" />
+            </span>
+          </Row>
+        </fieldset>
+
+        <fieldset class="min-w-0 space-y-2">
+          <legend class="label-caps mb-1">効果</legend>
+          <p class="text-xs text-faint">指定した条件すべてに、同じ1つの効果が当てはまるキャラを探します</p>
+          <div class="grid gap-2 sm:grid-cols-2">
+            <input class="field" type="search" name="effect" value={filters.effect ?? ""} placeholder="キーワード（例: 陰属性 耐性DOWN）" aria-label="効果のキーワード" />
+            <input class="field" type="search" name="effect_type" value={filters.effectType ?? ""} list="effect-types" placeholder="種別（例: 腕力UP）" aria-label="効果の種別" autocomplete="off" />
+            <datalist id="effect-types">{effectTypes.map((t) => <option value={t.type}>{`${t.count}人`}</option>)}</datalist>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <Select cls={select} name="target" value={filters.target} label="対象：すべて" options={Object.entries(EFFECT_TARGETS).map(([k, v]) => [k, `対象：${v.label}`])} />
+            <Select cls={select} name="source" value={filters.source} label="出典：すべて" options={Object.entries(EFFECT_SOURCES).map(([k, v]) => [k, `出典：${v}`])} />
+            <Check name="unconditional" checked={filters.unconditional === "1"} label="発動条件なしのみ" />
+          </div>
+        </fieldset>
+
+        <div class="flex justify-end gap-1.5">
+          <a href={party ? `/characters?party=${party.id}` : "/characters"} class="btn-xs border border-line text-muted hover:text-ink">クリア</a>
+          <button type="submit" class="btn-xs bg-gold text-night hover:bg-[#f3d58f]">検索</button>
         </div>
       </form>
 
@@ -98,16 +140,48 @@ export function CharacterSearchPage({ filters, result, personalities, party, que
   );
 }
 
-function ElementPicker({ value }: { value?: string }) {
+function Row({ label, children }: { label: string; children?: Child }) {
   return (
-    <span class="flex gap-1" role="group" aria-label="属性">
+    <div class="grid grid-cols-[4rem_minmax(0,1fr)] items-center gap-2">
+      <span class="text-xs text-muted">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+/** 複数選べる属性ボタン */
+function ElementPicker({ values = [] }: { values?: string[] }) {
+  return (
+    <span class="flex flex-wrap gap-1" role="group" aria-label="属性">
       {ELEMENTS.map((e) => (
         <label class="cursor-pointer">
-          <input type="radio" name="element" value={e} checked={value === e} class="peer sr-only" data-autosubmit data-toggle />
-          <span class={`inline-flex size-7 items-center justify-center rounded-md text-xs font-bold opacity-40 transition-opacity peer-checked:opacity-100 peer-checked:ring-2 peer-checked:ring-gold hover:opacity-80 ${elementStyle(e).solid}`}>{e}</span>
+          <input type="checkbox" name="element" value={e} checked={values.includes(e)} class="peer sr-only" data-autosubmit />
+          <span class={`inline-flex size-7 items-center justify-center rounded-md text-xs font-bold opacity-40 transition-opacity peer-checked:opacity-100 peer-checked:ring-2 peer-checked:ring-gold peer-focus-visible:ring-2 peer-focus-visible:ring-ink hover:opacity-80 ${elementStyle(e).solid}`}>{e}</span>
         </label>
       ))}
     </span>
+  );
+}
+
+/** 押すと選択が切り替わるボタン群。radio なら1つだけ（もう一度押すと外れる） */
+function Chips({ name, values = [], options, radio = false }: { name: string; values?: string[]; options: [string, string][]; radio?: boolean }) {
+  return (
+    <span class="flex flex-wrap gap-1" role="group">
+      {options.map(([value, text]) => (
+        <label class="cursor-pointer">
+          <input type={radio ? "radio" : "checkbox"} name={name} value={value} checked={values.includes(value)} class="peer sr-only" data-autosubmit data-toggle={radio} />
+          <span class="inline-flex h-7 min-w-7 items-center justify-center rounded-md border border-line px-2 text-xs text-muted transition-colors hover:text-ink peer-checked:border-gold peer-checked:bg-gold/15 peer-checked:font-semibold peer-checked:text-gold peer-focus-visible:ring-2 peer-focus-visible:ring-ink">{text}</span>
+        </label>
+      ))}
+    </span>
+  );
+}
+
+function Check({ name, checked, label }: { name: string; checked: boolean; label: string }) {
+  return (
+    <label class="inline-flex cursor-pointer items-center gap-1.5 px-1 text-[13px] text-muted">
+      <input type="checkbox" name={name} value="1" checked={checked} class="accent-[#e8c46e]" data-autosubmit /> {label}
+    </label>
   );
 }
 

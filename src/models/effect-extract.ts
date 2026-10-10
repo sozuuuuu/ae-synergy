@@ -16,7 +16,7 @@ export type ExtractedEffect = {
 };
 
 // 区分（取り込み元のキー => 出典の見出し）。skills と valorChant は個別に出典を付ける
-const SECTION_SOURCES: Record<string, string> = {
+export const SECTION_SOURCES: Record<string, string> = {
   abilities: "アビリティ", uniqueAbility: "固有アビリティ", lsAbility: "天冥アビリティ", sbEnhance: "SB強化",
   stack: "蓄積", modeChange: "モードチェンジ", specialState: "特殊状態", sing: "歌唱", singActivate: "歌唱発動",
   counter: "カウンター", link: "リンク", linkAbility: "リンクアビリティ", chainAbility: "チェインアビリティ",

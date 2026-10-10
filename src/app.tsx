@@ -3,7 +3,7 @@ import { staticPlugin } from "@elysiajs/static";
 import type { SafeHtml } from "@/jsx/jsx-runtime.ts";
 import type { Db } from "./db.ts";
 import { html, int, isSameOriginRequest, list, redirect, str, takeFlash } from "./lib/http.ts";
-import { charactersByIds, getCharacter, listPersonalities, searchCharacters, type CharacterFilters } from "./models/characters.ts";
+import { charactersByIds, getCharacter, listEffectTypes, listPersonalities, searchCharacters, type CharacterFilters } from "./models/characters.ts";
 import {
   addMember, createParty, deleteParty, displayTitle, duplicateParty, getParty, listParties, moveMember,
   partyContext, removeMember, setAttacker, sharedPersonalities, updateSettings, type Party,
@@ -68,21 +68,30 @@ export function createApp(db: Db, options: Options = {}) {
 
     .get("/characters", ({ request }) => {
       const query = new URL(request.url).searchParams;
+      const one = (key: string) => query.get(key) ?? "";
+      const all = (key: string) => query.getAll(key).filter(Boolean);
       const filters: CharacterFilters = {
-        q: query.get("q") ?? "",
-        effect: query.get("effect") ?? "",
-        element: query.get("element") ?? "",
-        weapon: query.get("weapon") ?? "",
-        style: query.get("style") ?? "",
-        ls: query.get("ls") ?? "",
-        alter: query.get("alter") ?? "",
-        personality: query.getAll("personality").filter(Boolean),
+        q: one("q"),
+        effect: one("effect"),
+        effectType: one("effect_type"),
+        target: one("target"),
+        source: one("source"),
+        unconditional: one("unconditional"),
+        element: all("element"),
+        weapon: all("weapon"),
+        style: all("style"),
+        ls: one("ls"),
+        armor: one("armor"),
+        alter: one("alter"),
+        sa: one("sa"),
+        personality: all("personality"),
       };
       const partyId = int(query.get("party"));
       const party = partyId ? getParty(db, partyId) : null;
       const result = searchCharacters(db, filters, { page: Math.max(1, int(query.get("page")) ?? 1) });
       const personalities = listPersonalities(db).filter((p) => p.category === "other");
-      return page(request, "キャラ検索", <CharacterSearchPage filters={filters} result={result} personalities={personalities} party={party} query={query} />);
+      return page(request, "キャラ検索", <CharacterSearchPage filters={filters} result={result} personalities={personalities}
+        effectTypes={listEffectTypes(db)} party={party} query={query} />);
     })
 
     .get("/characters/:id", ({ request, params }) => {

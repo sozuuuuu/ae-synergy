@@ -16,12 +16,12 @@ window.addEventListener("DOMContentLoaded", () => {
   if (y !== null && !location.hash) window.scrollTo(0, Number(y));
 });
 
-// 絞り込みのセレクトは選んだらすぐ検索する
+// 絞り込みのセレクト・チェックボックスは選んだらすぐ検索する
 document.addEventListener("change", (event) => {
-  if (event.target.matches("select[data-autosubmit]")) event.target.form.requestSubmit();
+  if (event.target.matches("select[data-autosubmit], input[type=checkbox][data-autosubmit]")) event.target.form.requestSubmit();
 });
 
-// 選択済みのラジオ（属性ボタン）をもう一度押したら選択を外す
+// 選択済みのラジオ（天冥ボタン）をもう一度押したら選択を外す
 let wasChecked = false;
 document.addEventListener("pointerdown", (event) => {
   const input = event.target.closest("label")?.querySelector("input[type=radio][data-toggle]");
