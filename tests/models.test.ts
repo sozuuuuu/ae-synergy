@@ -31,7 +31,30 @@ describe("キャラ検索", () => {
 
   test("属性はパーソナリティで絞れる", () => {
     const db = testDb();
-    expect(searchCharacters(db, { element: "火" }).characters.map((c) => c.label).sort()).toEqual(["テストアタッカー", "テスト陣"]);
+    expect(searchCharacters(db, { element: ["火"] }).characters.map((c) => c.label).sort()).toEqual(["テストアタッカー", "テスト陣"]);
+  });
+
+  test("属性・武器・スタイルは複数選ぶとどれか（OR）、パーソナリティはすべて（AND）", () => {
+    const db = testDb();
+    const labels = (f: Parameters<typeof searchCharacters>[1]) => searchCharacters(db, f).characters.map((c) => c.label).sort();
+    expect(labels({ element: ["火", "水"] })).toEqual(["テストアタッカー", "テスト支援", "テスト陣"]);
+    expect(labels({ weapon: ["katana", "staff"] })).toEqual(["テストアタッカー", "テスト支援"]);
+    expect(labels({ style: ["AS", "ES"] })).toEqual(["テストアタッカー"]);
+    expect(labels({ personality: ["東方", "火"] })).toEqual(["テストアタッカー"]);
+    expect(labels({ armor: "necklace", sa: "" })).toEqual(["テスト陣"]);
+    expect(labels({ sa: "1" })).toEqual(["テストアタッカー"]);
+  });
+
+  test("効果の種別・対象・出典・発動条件は、同じ1つの効果に対して絞る", () => {
+    const db = testDb();
+    const labels = (f: Parameters<typeof searchCharacters>[1]) => searchCharacters(db, f).characters.map((c) => c.label).sort();
+    expect(labels({ effectType: "腕力UP" })).toEqual(["テスト支援"]);
+    expect(labels({ effect: "火属性", target: "party" })).toEqual(["テスト支援"]);
+    expect(labels({ effect: "火属性", target: "self" })).toEqual(["テストアタッカー"]);
+    expect(labels({ effect: "火属性", source: "ability" })).toEqual(["テストアタッカー"]);
+    expect(labels({ effect: "火属性", source: "skill", target: "enemy" })).toEqual(["テストアタッカー", "テスト支援"]);
+    expect(labels({ effectType: "火属性攻撃UP", unconditional: "1" })).toEqual([]);
+    expect(searchCharacters(db, { effect: "腕力", target: "ally" }).characters[0]!.matches).toEqual(["<東方>パーソナリティの味方に腕力50%UP"]);
   });
 });
 
