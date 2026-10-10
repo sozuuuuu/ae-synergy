@@ -71,7 +71,10 @@ describe("火力・被ダメの目安", () => {
     const { db, get, post } = setup();
     const res = await post("/parties", { attacker_id: String(idOf(db, "テストアタッカー")) });
     const path = new URL(res.headers.get("location")!, ORIGIN).pathname;
-    expect(await (await get(path)).text()).toContain("想定ボスの物理／魔法と攻撃");
+    // 何も入れなくても既定値で被ダメまで出す
+    const fresh = await (await get(path)).text();
+    expect(fresh).toContain("支援で ±0%");
+    expect(fresh).toContain("既定値で計算: Lv 140");
 
     const settings = { title: "", memo: "", attack_element: "火", attack_kind: "斬", boss_attack: "physical" };
     expect((await post(`${path}/settings`, { ...settings, enemy_def: "400", enemy_atk: "600", enemy_affinity: "weak" })).status).toBe(303);
