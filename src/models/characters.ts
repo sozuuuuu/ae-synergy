@@ -81,6 +81,8 @@ export type CharacterFilters = {
   armor?: string;
   alter?: string;
   sa?: string;
+  /** "1": 持っているキャラだけ / "0": 持っていないキャラだけ */
+  owned?: string;
   /** 複数選んだら、すべて持っているもの（AND） */
   personality?: string[];
 };
@@ -138,6 +140,8 @@ function filterSql(f: CharacterFilters) {
   }
   if (f.alter === "1") where.push("c.is_alter = 1");
   if (f.sa === "1") where.push("c.is_sa = 1");
+  if (f.owned === "1") where.push("NOT EXISTS (SELECT 1 FROM unowned_characters u WHERE u.character_id = c.id)");
+  if (f.owned === "0") where.push("EXISTS (SELECT 1 FROM unowned_characters u WHERE u.character_id = c.id)");
   // 属性は複数属性のキャラもいるので、代表属性ではなく属性パーソナリティで見る
   const element = inCondition("p.name", "el", f.element, ELEMENTS, params);
   if (element) {
@@ -258,4 +262,16 @@ export function charactersByIds(db: Db, ids: number[]): Map<number, CharacterSum
   const params = Object.fromEntries(ids.map((id, i) => [`i${i}`, id]));
   const rows = db.query<CharacterSummary, any>(`SELECT ${SUMMARY_COLUMNS} FROM characters c WHERE c.id IN (${ids.map((_, i) => `$i${i}`).join(", ")})`).all(params);
   return new Map(rows.map((row) => [row.id, row]));
+}
+
+/** 持っていないキャラの id（記録がなければ持っている扱い） */
+export function unownedIds(db: Db): Set<number> {
+  return new Set(db.query<{ character_id: number }, []>("SELECT character_id FROM unowned_characters").all().map((r) => r.character_id));
+}
+
+export const isOwned = (db: Db, id: number) => !db.query("SELECT 1 FROM unowned_characters WHERE character_id = $id").get({ id });
+
+export function setOwned(db: Db, id: number, owned: boolean) {
+  if (owned) db.query("DELETE FROM unowned_characters WHERE character_id = $id").run({ id });
+  else db.query("INSERT OR IGNORE INTO unowned_characters (character_id) SELECT id FROM characters WHERE id = $id").run({ id });
 }

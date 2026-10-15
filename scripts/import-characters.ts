@@ -3,6 +3,7 @@
 import { openDb } from "../src/db.ts";
 import { config } from "../src/config.ts";
 import { importCharacters, loadAnadenData } from "../src/models/character-import.ts";
+import { importEquipment, loadEquipmentData } from "../src/models/equipment.ts";
 
 const source = process.argv[2] ?? config.anadenData;
 console.log(`Importing characters from ${source} ...`);
@@ -10,3 +11,7 @@ const db = openDb(config.databasePath);
 const result = importCharacters(db, await loadAnadenData(source));
 const total = db.query<{ n: number }, []>("SELECT COUNT(*) AS n FROM characters").get()!.n;
 console.log(`Done: ${result.created} created, ${result.updated} updated, ${result.unchanged} unchanged (${total} in database)`);
+
+// 武器・防具も入れ替える（★の装備で埋まる枠の判定に使う）
+const equipment = importEquipment(db, await loadEquipmentData(config.anadenEquipment));
+console.log(`Equipment: ${equipment.weapons} weapons, ${equipment.armors} armors (${config.anadenEquipment})`);

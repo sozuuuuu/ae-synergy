@@ -22,9 +22,17 @@ declare module "anaden-mcp/src/damage.js" {
       special?: { seishin?: boolean | number; shingi?: boolean | number; gekokujo?: boolean | number; koshi?: boolean | number };
       elemAtkBuffs?: number[];
       weaponBuffs?: number[];
+      /** 装備の属性強化など（単純加算） */
+      equipElem?: number[];
+      /** 装備の下克上（エルピス 320・ムジマ 700 などの定数） */
+      equipGekokujo?: number[];
       critDmg?: number[];
       overcrit?: boolean;
       zone?: { rate?: number; ability?: number };
+      /** 歌唱の倍率（1.5 = 与ダメ50%UP） */
+      song?: number;
+      /** true: 通常ブレイク（1hit だけ2倍） / "all": 全hit 2倍 */
+      break?: boolean | "all";
       barrier?: number;
       single?: boolean;
     };

@@ -1,7 +1,9 @@
 import type { Db } from "../db.ts";
 import type { CharacterSummary } from "./characters.ts";
 import { loadCondMembers } from "./conditions.ts";
-import { type Enemy, parseEnemy } from "./estimate.ts";
+import { gearEffects, type Kind, resolveEquipment } from "./equipment.ts";
+import { planZone } from "./zones.ts";
+import { attackSkill, type Enemy, parseEnemy } from "./estimate.ts";
 import { ATTACK_ELEMENTS, ATTACK_KINDS, attackKindsOf, BOSS_NEEDS, defaultAttack, type PartyContext } from "./requirements.ts";
 
 export const SLOT_NAMES = { main: "前衛", sub: "後衛" } as const;
@@ -21,6 +23,9 @@ export type PartyRow = {
   boss_attack: string;
   boss_needs: string;
   enemy: string;
+  /** ★の装備（equipment.external_id）。武器は '' ならエルピス、'none' ならなし。防具は '' ならなし */
+  weapon: string;
+  armor: string;
   created_at: string;
   updated_at: string;
 };
@@ -169,7 +174,14 @@ export type SettingsInput = {
   bossNeeds: string[];
   /** 省略したら今の値のまま */
   enemy?: Enemy;
+  /** ★の装備（省略したら今のまま）。武器は '' / 'none' / external_id、防具は '' / external_id */
+  weapon?: string;
+  armor?: string;
 };
+
+/** 装備の設定として正しいか（その種類の装備が実在するか） */
+const validGear = (db: Db, kind: Kind, value: string) =>
+  value === "" || (kind === "weapon" && value === "none") || !!db.query("SELECT 1 FROM equipment WHERE external_id = $v AND kind = $kind").get({ v: value, kind });
 
 export function updateSettings(db: Db, party: Party, input: SettingsInput): { errors: string[] } {
   const errors: string[] = [];
@@ -177,11 +189,15 @@ export function updateSettings(db: Db, party: Party, input: SettingsInput): { er
   const memo = input.memo.replace(/\r\n/g, "\n").trim();
   if (title.length > LIMITS.title) errors.push(`パーティ名は${LIMITS.title}文字以内にしてください`);
   if (memo.length > LIMITS.memo) errors.push(`メモは${LIMITS.memo}文字以内にしてください`);
+  const weapon = input.weapon ?? party.weapon;
+  const armor = input.armor ?? party.armor;
+  if (!validGear(db, "weapon", weapon)) errors.push("武器が見つかりません");
+  if (!validGear(db, "armor", armor)) errors.push("防具が見つかりません");
   if (errors.length) return { errors };
   const pick = (value: string, allowed: readonly string[]) => (allowed.includes(value) ? value : "");
   db.query(
     `UPDATE parties SET title = $title, memo = $memo, attack_element = $attackElement, attack_kind = $attackKind,
-       boss_element = $bossElement, boss_attack = $bossAttack, boss_needs = $bossNeeds, enemy = $enemy,
+       boss_element = $bossElement, boss_attack = $bossAttack, boss_needs = $bossNeeds, enemy = $enemy, weapon = $weapon, armor = $armor,
        updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE id = $id`,
   ).run({
     id: party.id,
@@ -193,6 +209,8 @@ export function updateSettings(db: Db, party: Party, input: SettingsInput): { er
     bossAttack: pick(input.bossAttack, ["physical", "magic"]),
     bossNeeds: JSON.stringify(input.bossNeeds.filter((key) => BOSS_NEEDS.some((n) => n.key === key))),
     enemy: JSON.stringify(input.enemy ?? party.enemy),
+    weapon,
+    armor,
   });
   return { errors: [] };
 }
@@ -203,8 +221,8 @@ export function duplicateParty(db: Db, id: number): number | null {
   return db.transaction(() => {
     const copyId = db
       .query<{ id: number }, any>(
-        `INSERT INTO parties (title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy)
-         SELECT $title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy FROM parties WHERE id = $id RETURNING id`,
+        `INSERT INTO parties (title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy, weapon, armor)
+         SELECT $title, memo, attacker_id, attack_element, attack_kind, boss_element, boss_attack, boss_needs, enemy, weapon, armor FROM parties WHERE id = $id RETURNING id`,
       )
       .get({ id, title: `${displayTitle(party)}のコピー`.slice(0, LIMITS.title) })!.id;
     db.query("INSERT INTO party_members (party_id, character_id, slot, position) SELECT $copyId, character_id, slot, position FROM party_members WHERE party_id = $id")
@@ -217,22 +235,43 @@ export function deleteParty(db: Db, id: number) {
   db.query("DELETE FROM parties WHERE id = $id").run({ id });
 }
 
-/** 判定ルールに渡す文脈 */
-export function partyContext(db: Db, party: Party): PartyContext {
+/** 判定に要る分だけのパーティ（保存前の編成を試すときにも使う） */
+export type PartyShape = Pick<Party, "attacker_id" | "attack_element" | "attack_kind" | "boss_element" | "boss_attack" | "boss_needs" | "weapon" | "armor"> & {
+  members: Pick<Member, "id" | "slot" | "position" | "weapon" | "armor" | "ls_type">[];
+};
+
+/** ★の装備（設定から解決したもの） */
+export function partyGear(db: Db, party: PartyShape) {
+  const attacker = party.members.find((m) => m.id === party.attacker_id);
+  if (!attacker) return [];
+  return [resolveEquipment(db, "weapon", party.weapon, attacker.weapon), resolveEquipment(db, "armor", party.armor, attacker.armor)]
+    .filter((x) => x !== null);
+}
+
+/** 判定ルールに渡す文脈。zone を渡すとその陣を張る前提で判定する（自動編成で陣ごとに試すため） */
+export function partyContext(db: Db, party: PartyShape, options: { zone?: string } = {}): PartyContext {
   const attacker = party.members.find((m) => m.id === party.attacker_id) ?? null;
   const info = loadCondMembers(db, party.members.map((m) => m.id));
+  const members = party.members.flatMap((m) => {
+    const i = info.get(m.id);
+    return i ? [{ ...i, slot: m.slot, position: m.position }] : [];
+  });
   return {
     attacker: attacker ? { id: attacker.id, weapon: attacker.weapon, ls_type: attacker.ls_type, personalities: info.get(attacker.id)?.personalities ?? [],
-      kinds: attackKindsOf(db, attacker.id) } : null,
+      kinds: attackKindsOf(db, attacker.id),
+      // 攻撃種が未設定なら物理・魔法の両方を見るので、参照元も決めない
+      dep: party.attack_kind ? attackSkill(db, attacker.id, party.attack_element, party.attack_kind)?.dep : undefined } : null,
     attackElement: party.attack_element,
     attackKind: party.attack_kind,
     bossElement: party.boss_element,
     bossAttack: party.boss_attack,
     bossNeeds: party.boss_needs,
-    members: party.members.flatMap((m) => {
-      const i = info.get(m.id);
-      return i ? [{ ...i, slot: m.slot, position: m.position }] : [];
-    }),
+    gear: (() => {
+      const items = partyGear(db, party);
+      return { items, effects: attacker ? items.flatMap((item) => gearEffects(db, item, attacker)) : [] };
+    })(),
+    members,
+    zone: planZone(db, members, party.attack_element, party.attack_kind, options.zone),
   };
 }
 

@@ -3,7 +3,11 @@ import { staticPlugin } from "@elysiajs/static";
 import type { SafeHtml } from "@/jsx/jsx-runtime.ts";
 import type { Db } from "./db.ts";
 import { html, int, isSameOriginRequest, list, redirect, str, takeFlash } from "./lib/http.ts";
-import { charactersByIds, getCharacter, listEffectTypes, listPersonalities, searchCharacters, type CharacterFilters } from "./models/characters.ts";
+import { autofillParty, NEEDABLE } from "./models/autobuild.ts";
+import { equipmentOfType } from "./models/equipment.ts";
+import {
+  charactersByIds, getCharacter, isOwned, listEffectTypes, listPersonalities, searchCharacters, setOwned, unownedIds, type CharacterFilters,
+} from "./models/characters.ts";
 import {
   addMember, createParty, deleteParty, displayTitle, duplicateParty, getParty, listParties, moveMember,
   partyContext, removeMember, setAttacker, sharedPersonalities, updateSettings, type Party,
@@ -15,6 +19,9 @@ import { Layout, type Flash } from "./views/layout.tsx";
 import { PartyListPage, PartyPage, summarize } from "./views/parties.tsx";
 
 type Options = { publicOrigin?: string };
+
+const autoMessage = (n: number) =>
+  n > 0 ? `前衛に${n}人を自動で足しました（火力優先）。後衛（グラスタ持ち）は好きに置いてください` : "足すと良くなるキャラが見つかりませんでした（枠がもう埋まっています）";
 
 export function createApp(db: Db, options: Options = {}) {
   const page = (request: Request, title: string | undefined, body: SafeHtml, status = 200) => {
@@ -53,9 +60,13 @@ export function createApp(db: Db, options: Options = {}) {
           (b.effect.value ?? 0) - (a.effect.value ?? 0))
         .slice(0, 30);
     }
+    const attacker = party.members.find((m) => m.id === party.attacker_id);
+    const gearOptions = attacker
+      ? { weapons: equipmentOfType(db, "weapon", attacker.weapon), armors: attacker.armor ? equipmentOfType(db, "armor", attacker.armor) : [] }
+      : null;
     return page(request, displayTitle(party),
       <PartyPage party={party} coverage={coverage} need={need} candidates={candidates} dealt={dealt} taken={taken}
-        shared={sharedPersonalities(db, party.id)} errors={errors} />, status);
+        shared={sharedPersonalities(db, party.id)} errors={errors} gear={ctx.gear?.items ?? []} gearOptions={gearOptions} zone={ctx.zone} />, status);
   };
 
   return new Elysia()
@@ -93,6 +104,7 @@ export function createApp(db: Db, options: Options = {}) {
         armor: one("armor"),
         alter: one("alter"),
         sa: one("sa"),
+        owned: one("owned"),
         personality: all("personality"),
       };
       const partyId = int(query.get("party"));
@@ -100,20 +112,44 @@ export function createApp(db: Db, options: Options = {}) {
       const result = searchCharacters(db, filters, { page: Math.max(1, int(query.get("page")) ?? 1) });
       const personalities = listPersonalities(db).filter((p) => p.category === "other");
       return page(request, "キャラ検索", <CharacterSearchPage filters={filters} result={result} personalities={personalities}
-        effectTypes={listEffectTypes(db)} party={party} query={query} />);
+        effectTypes={listEffectTypes(db)} party={party} query={query} unowned={unownedIds(db)} />);
     })
 
     .get("/characters/:id", ({ request, params }) => {
       const id = int(params.id);
       const character = id ? getCharacter(db, id) : null;
       if (!character) return notFound(request);
-      return page(request, character.label, <CharacterPage character={character} parties={listParties(db, { character: character.id })} />);
+      return page(request, character.label, <CharacterPage character={character} parties={listParties(db, { character: character.id })} owned={isOwned(db, character.id)} />);
+    })
+
+    .post("/characters/:id/owned", ({ request, params, body }) => {
+      const id = int(params.id);
+      const character = id ? getCharacter(db, id) : null;
+      if (!character) return notFound(request);
+      setOwned(db, character.id, str((body as any)?.owned) === "1");
+      return redirect(`/characters/${character.id}`);
     })
 
     .post("/parties", ({ body }) => {
       const id = createParty(db, int((body as any)?.attacker_id) ?? 0);
       return id ? redirect(`/parties/${id}`, { type: "notice", message: "このキャラをアタッカー（★）にして組み始めました。支援役から始めたときは、★を外すかアタッカーに付け替えてください。" })
         : redirect("/characters", { type: "alert", message: "キャラクターが見つかりません" });
+    })
+
+    // ★にしたキャラから、前衛を自動で埋めたパーティを作る
+    .post("/parties/auto", ({ body }) => {
+      const id = createParty(db, int((body as any)?.attacker_id) ?? 0);
+      if (!id) return redirect("/characters", { type: "alert", message: "キャラクターが見つかりません" });
+      const { added } = autofillParty(db, getParty(db, id)!);
+      return redirect(`/parties/${id}`, { type: "notice", message: autoMessage(added.length) });
+    })
+
+    .post("/parties/:id/autofill", ({ request, params, body }) => {
+      const party = getParty(db, int(params.id) ?? 0);
+      if (!party) return notFound(request);
+      const need = list((body as any)?.need).filter((k) => NEEDABLE.some((n) => n.key === k));
+      const { added, error } = autofillParty(db, party, { need });
+      return back(party, error ? { type: "alert", message: error } : { type: "notice", message: autoMessage(added.length) });
     })
 
     .get("/parties/:id", ({ request, params }) => {
@@ -131,6 +167,8 @@ export function createApp(db: Db, options: Options = {}) {
       const { errors } = updateSettings(db, party, {
         title: str(b.title), memo: str(b.memo), attackElement: str(b.attack_element), attackKind: str(b.attack_kind),
         bossElement: str(b.boss_element), bossAttack: str(b.boss_attack), bossNeeds: list(b.boss_needs), enemy,
+        // ★がいないと装備の欄は出ないので、送られてこなければ今のまま
+        weapon: b.weapon === undefined ? undefined : str(b.weapon), armor: b.armor === undefined ? undefined : str(b.armor),
       });
       if (errors.length) return renderParty(request, party, null, errors, 422);
       return back(party, { type: "notice", message: "保存しました" });

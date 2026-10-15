@@ -2,6 +2,7 @@ import type { Db } from "../db.ts";
 import { normalize } from "../lib/text.ts";
 import { ELEMENTS, WEAPONS } from "./characters.ts";
 import { extractEffects } from "./effect-extract.ts";
+import { clearEffectTypeCache } from "./requirements.ts";
 
 /**
  * anaden-mcp が書き出す補強済みのキャラデータ（各効果に構造化した発動条件 _condition がつく）を読む。
@@ -52,6 +53,13 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
      ON CONFLICT(name) DO UPDATE SET category = excluded.category RETURNING id`,
   );
   const findCharacter = db.query<{ id: number; data: string }, any>("SELECT id, data FROM characters WHERE external_id = $external_id");
+  // anaden-gear はデータ更新で _id を振り直すことがあるので、_id で見つからなければ名前・クラス・スタイルが同じで、
+  // この取り込みでまだ対応づけていないキャラ（ラベルが退避されたまま）を同じキャラとみなす
+  const findSame = db.query<{ id: number; data: string }, any>(
+    `SELECT id, data FROM characters WHERE name = $name AND class_name IS $class_name AND style = $style
+       AND label LIKE '\\_\\_tmp\\_\\_%' ESCAPE '\\' ORDER BY id LIMIT 1`,
+  );
+  const setExternalId = db.query("UPDATE characters SET external_id = $external_id WHERE id = $id");
   const insertCharacter = db.query<{ id: number }, any>(
     `INSERT INTO characters (external_id, name, label, eng_name, class_name, true_name, style, rarity, weapon, armor, ls_type,
        element, gender, obtain, is_alter, is_sa, search_text, sort_key, data)
@@ -106,7 +114,11 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
         data: json,
       };
 
-      const existing = findCharacter.get({ external_id: attrs.external_id });
+      let existing = findCharacter.get({ external_id: attrs.external_id });
+      if (!existing) {
+        existing = findSame.get({ name: attrs.name, class_name: attrs.class_name, style: attrs.style });
+        if (existing) setExternalId.run({ external_id: attrs.external_id, id: existing.id });
+      }
       let id: number;
       if (existing) {
         id = existing.id;
@@ -143,5 +155,6 @@ export function importCharacters(db: Db, rows: unknown): ImportResult {
     }
   })();
 
+  clearEffectTypeCache(db);
   return result;
 }
