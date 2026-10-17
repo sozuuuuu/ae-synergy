@@ -353,3 +353,15 @@ describe("火力・被ダメの目安", () => {
     expect(parseEnemy("not json")).toEqual({});
   });
 });
+
+describe("効果の分解（対象のパーソナリティ）", () => {
+  test("「<剣><弓>パーソナリティの味方に以下の効果を付与」の後ろの効果は、descGroup で対象のパーソナリティを引き継ぐ", () => {
+    const [, buff] = extractEffects({
+      skills: [{ name: "号令", effects: [
+        { description: "前衛の<剣><弓>パーソナリティの味方に以下の効果を付与", types: "特殊", descGroup: "group1" },
+        { description: "腕力100%UP(3ターン)", types: "腕力UP", targets: "特定パーソナリティの味方", value: 100, descGroup: "group1" },
+      ] }],
+    });
+    expect(buff!.personalities).toBe("剣、弓");
+  });
+});

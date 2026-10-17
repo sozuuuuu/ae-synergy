@@ -50,9 +50,15 @@ const text = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").tri
 export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
   const out: ExtractedEffect[] = [];
 
-  const walk = (node: unknown, source: string, inherited: { targets: string }) => {
+  const walk = (node: unknown, source: string, inherited: { targets: string; personalities?: string[] }) => {
     if (Array.isArray(node)) {
-      node.forEach((child) => walk(child, source, inherited));
+      // 「前衛の<剣><弓><槍>パーソナリティの味方に以下の効果を付与」の後ろの効果は、対象のパーソナリティを持たず descGroup でつながっているだけ
+      const leads = new Map<string, string[]>();
+      for (const child of node) {
+        const description = text(child?.description);
+        if (child?.descGroup && /パーソナリティの味方に/.test(description)) leads.set(child.descGroup, [...description.matchAll(/<([^>]+)>/g)].map((m) => m[1]!));
+      }
+      node.forEach((child) => walk(child, source, { ...inherited, personalities: leads.get(child?.descGroup) ?? inherited.personalities }));
       return;
     }
     if (!node || typeof node !== "object") return;
@@ -71,14 +77,14 @@ export function extractEffects(row: Record<string, any>): ExtractedEffect[] {
         element: typeof n.element === "string" ? n.element : null,
         conditions: condition?.text ?? "",
         condition_clauses: JSON.stringify(condition?.clauses ?? []),
-        personalities: Array.isArray(n.personalities) ? n.personalities.join("、") : "",
+        personalities: (Array.isArray(n.personalities) && n.personalities.length ? n.personalities : inherited.personalities ?? []).join("、"),
         description: text(n.description),
         source,
       });
     }
     for (const [key, child] of Object.entries(n)) {
       if (key === "personalities" || key === "_condition" || !child || typeof child !== "object") continue;
-      walk(child, source, { targets });
+      walk(child, source, { targets, personalities: inherited.personalities });
     }
   };
 
