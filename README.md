@@ -33,7 +33,9 @@ bun run dev                    # http://127.0.0.1:3000
 `~/.cache/anaden-mcp/characters.enriched.json` を取り込む（場所は `ANADEN_DATA` で変更可）。anaden-gear から直接は取り込まない。
 
 - このファイルは anaden-mcp がキャラデータを更新したときと、`anaden export` を実行したときに書き出される
-- DB が空のまま起動すると自動で取り込む。データを更新するときは `bun run import:characters`（差分だけ反映）
+- 武器・防具は `~/.cache/anaden-mcp/equipment.export.json`（`ANADEN_EQUIPMENT` で変更可）。`bun run import:characters` でキャラと一緒に入れ替える
+- DB が空のまま起動すると自動で取り込む。データを更新するときは `bun run import:characters`（差分だけ反映）。
+  anaden-gear はデータ更新で `_id` を振り直すことがあるので、`_id` で見つからないキャラは名前・クラス・スタイルで対応づける
 - 条件の辞書（anaden-mcp の `data/conditions.json`）を直したら、`anaden export` → `bun run import:characters`
 
 ## コマンド
@@ -44,6 +46,8 @@ bun run dev                    # http://127.0.0.1:3000
 | `bun run start` | CSS をビルドして起動 |
 | `bun test` | テスト |
 | `bun run typecheck` | 型チェック |
+| `bun run build-party <アタッカー>` | 軸のキャラから自動でパーティを組む（下の「自動編成」） |
+| `bun src/mcp.ts` | 自動編成の MCP サーバー（stdio。下の「MCP」） |
 
 環境変数: `PORT`（既定 3000）、`HOST`（既定 127.0.0.1）、`DATABASE_PATH`（既定 `storage/ae-synergy.sqlite3`）、
 `PUBLIC_ORIGIN`（リバースプロキシ越しの公開 URL。Origin 検査に使う）
@@ -52,6 +56,36 @@ bun run dev                    # http://127.0.0.1:3000
 
 `src/models/requirements.ts` にルールがある。取り込み時にキャラの効果を「種別・対象・数値・条件・出典」の行に分解して
 `character_effects` に保存し、判定は実行時にこのルールで行うので、ルールを変えても再取り込みは不要。
+
+## 自動編成
+
+`src/models/autobuild.ts`。★（と固定メンバー）から、空いている席に1人ずつ足していく。足す候補は「まだ ✓ になっていない枠を埋められるキャラ」で、
+点の高い編成を数本だけ残して広げる（ビームサーチ）。後衛は行動しない（ふだんはグラスタ持ち。VC も枠に数えない）ので、組むのは前衛4人まで。
+足しても点が伸びなくなったら4人未満でも止める。
+
+- 全部の枠を埋めるのが目的ではない。点は与ダメの目安の倍率（log2）が主で、耐久・ボス対策は敵に合わせて指定した枠（need）だけを必ず満たす
+  （パーティの「想定ボスへの必須能力」も必須に含める）。指定しなかった枠は、火力が同じくらいのときの決め手として少しだけ数える。
+  臨機応変が要るときは必須。重みは `autobuild.ts` の先頭
+- 持っていないキャラ（`unowned_characters`。キャラ画面で切り替え、検索の「所持」で絞れる）は候補にしない。新しく実装されたキャラは持っている扱い
+- NS・AS・ES は同じキャラなので同時に入れない（異節は別キャラ扱い）
+- ZONE は1つしか張れないので、張れる陣ごとに試して一番点の高い陣にする。「〜陣展開時」の効果はその陣のときだけ数え、
+  開幕に別の陣を張るメンバー（例: 前衛で戦闘開始時に極・招雷陣を張るヴェレット(AS)）は減点する（`src/models/zones.ts`）
+- ★の装備（パーティの設定。武器の既定は武器種のエルピス、防具の既定はなし）の効果は★本人の効果として枠に数える（`src/models/equipment.ts`）。
+  装備で ✓ になる枠（エルピスなら下克上、物理か魔法のクリ率）は装備で簡単に付くので、その枠のキャラの効果は自動編成の火力にも点にも数えない。
+  装備の下克上・属性攻撃UP は、火力の目安ではスキルとは別枠（装備の下克上・装備の属性強化）で計算する。防具の発動条件（例: 槌装備者）は★の武器種で判定する
+- 画面: キャラ画面の「自動で組む」（新しいパーティ）と、パーティ画面の「前衛を自動で埋める」（今のメンバーと席はそのまま）
+- CLI: `bun run build-party "アルド(AS)" --with "ミーユ:後衛" --need heal,barrier,buff_reversal --json`（オプションは `scripts/build-party.ts` の先頭）。
+  `--weapon` `--armor` で★の装備を名前で指定できる
+
+## MCP
+
+`src/mcp.ts` は自動編成を MCP のツールにする（anaden-damage スキルはこれを使う）。DB はアプリと同じもの。
+
+```bash
+claude mcp add -s user ae-synergy -- C:/Users/sosuu/.bun/bin/bun.exe C:/Users/sosuu/ae-synergy/src/mcp.ts
+```
+
+Tools: `build_party`（CLI と同じ依頼を受けて組む。`save` で保存）、`set_owned`（持っている・持っていないの切り替え）、`list_unowned`
 
 ## 火力・被ダメの目安
 

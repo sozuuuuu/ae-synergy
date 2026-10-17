@@ -1,3 +1,6 @@
+import { NEEDABLE } from "../models/autobuild.ts";
+import { type Equipment, isGear } from "../models/equipment.ts";
+import type { ZonePlan } from "../models/zones.ts";
 import type { CharacterSummary } from "../models/characters.ts";
 import { AFFINITIES, type Dealt, ENEMY_FIELDS, type Taken, withDefaults } from "../models/estimate.ts";
 import { displayTitle, memberAt, SLOT_COUNTS, SLOT_NAMES, type Member, type Party, type Slot } from "../models/parties.ts";
@@ -113,8 +116,13 @@ export function formatDamage(n: number): string {
 }
 const formatGain = (gain: number) => `+${(gain * 100).toFixed(gain < 0.1 ? 1 : 0)}%`;
 
-export function PartyPage({ party, coverage, need, candidates, dealt, taken, shared, errors }: {
+export function PartyPage({ party, coverage, need, candidates, dealt, taken, shared, errors, gear, gearOptions, zone }: {
   party: Party;
+  /** 張る ZONE（1つだけ）と、開幕に別の陣を張るメンバー */
+  zone: ZonePlan | undefined;
+  /** ★の装備（解決済み）と、設定の選択肢（★がいなければ null） */
+  gear: Equipment[];
+  gearOptions: GearOptions;
   coverage: Coverage[];
   need: Requirement | null;
   candidates: Candidate[];
@@ -133,6 +141,8 @@ export function PartyPage({ party, coverage, need, candidates, dealt, taken, sha
           <p class="mt-1 text-sm text-muted">
             {attacker && <>アタッカー <span class="font-semibold text-gold">★ {attacker.label}</span> ・ </>}
             攻撃 {[party.attack_element, party.attack_kind].filter(Boolean).join("・") || "未設定"}
+            {attacker && <> ・ 装備 {gear.map((x) => x.name).join("・") || "なし"}</>}
+            {zone?.active && <> ・ ZONE {zone.active.tier}{zone.active.name}</>}
           </p>
         </div>
         <div class="flex shrink-0 gap-1.5">
@@ -141,6 +151,13 @@ export function PartyPage({ party, coverage, need, candidates, dealt, taken, sha
         </div>
       </div>
       <Errors errors={errors} />
+      {zone && zone.conflicts.length > 0 && (
+        <p class="mb-4 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm text-warn" role="status">
+          ZONE は1つしか張れません。張るのは{zone.active ? `${zone.active.tier}${zone.active.name}` : "なし"}ですが、
+          {zone.conflicts.map((c) => `${party.members.find((m) => m.id === c.characterId)?.label}（${c.zone.tier}${c.zone.name}）`).join("、")}
+          が開幕に別の陣を張ります。
+        </p>
+      )}
 
       <div class="grid gap-4 lg:grid-cols-2 lg:items-start">
         {/* 編成とメーター */}
@@ -166,6 +183,27 @@ export function PartyPage({ party, coverage, need, candidates, dealt, taken, sha
           <div class="mt-4 grid grid-cols-3 gap-3 border-t border-line pt-3">
             {GROUPS.filter((g) => summary[g].total > 0).map((g) => <Meter label={GROUP_NAMES[g]} s={summary[g]} />)}
           </div>
+          {attacker && party.members.filter((m) => m.slot === "main").length < SLOT_COUNTS.main && (
+            <form method="post" action={`/parties/${party.id}/autofill`} class="mt-3 space-y-2 border-t border-line pt-3">
+              <p class="text-xs text-faint">
+                今のメンバーはそのままで、空いている前衛を火力が一番伸びるように埋める。必ず満たしたい耐久の枠を選べる
+                {party.boss_needs.length > 0 && <>（ボス対策の {BOSS_NEEDS.filter((n) => party.boss_needs.includes(n.key)).map((n) => n.label).join("・")} も必須）</>}
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                {NEEDABLE.filter((n) => !BOSS_NEEDS.some((b) => b.key === n.key)).map((n) => (
+                  <label class="cursor-pointer">
+                    <input type="checkbox" name="need" value={n.key} class="peer sr-only" />
+                    <span class="inline-block rounded-full border border-line px-2.5 py-1 text-xs text-muted peer-checked:border-gold/70 peer-checked:bg-gold/15 peer-checked:text-gold peer-focus-visible:ring-2 peer-focus-visible:ring-gold">
+                      {n.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="btn-xs border border-gold/50 text-gold hover:bg-gold/10">前衛を自動で埋める</button>
+              </div>
+            </form>
+          )}
         </section>
 
         {/* 枠のタイルと候補 */}
@@ -196,7 +234,7 @@ export function PartyPage({ party, coverage, need, candidates, dealt, taken, sha
         {/* 条件・メモ・共通パーソナリティ */}
         <div class="space-y-4 lg:col-start-1">
           <EstimatePanel party={party} dealt={dealt} taken={taken} />
-          <SettingsForm party={party} />
+          <SettingsForm party={party} gearOptions={gearOptions} />
           {party.memo && (
             <section class="panel p-4">
               <h2 class="label-caps mb-2">メモ</h2>
@@ -259,7 +297,9 @@ function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | n
   const def = dealt?.result.hits[0]?.parts.def ?? 0;
   const { values: e, assumed } = withDefaults(party.enemy);
   // 攻撃・技の威力・防具は被ダメの実数にしか効かないので、実数を出さないときは既定値として挙げない
-  const shownAssumed = party.enemy.atk == null ? assumed.filter((f) => !["atk", "power", "armor"].includes(f.key)) : assumed;
+  // 武器の攻撃力・魔力は、★の武器から取れたときは既定値ではない
+  const shownAssumed = (party.enemy.atk == null ? assumed.filter((f) => !["atk", "power", "armor"].includes(f.key)) : assumed)
+    .filter((f) => !(f.key === "weapon" && dealt?.weapon.name));
   const magic = party.boss_attack === "magic";
   return (
     <section class="panel p-4" aria-label="火力と被ダメの目安">
@@ -295,7 +335,7 @@ function EstimatePanel({ party, dealt, taken }: { party: Party; dealt: Dealt | n
             </ul>
           )}
           <p class="mt-2 text-[11px] leading-relaxed text-faint">
-            守備値 {Math.round(def)} ・ 武器 {e.weapon} で計算。△の効果・装備やグラスタ・挺身・毒ペインは含めていません。
+            守備値 {Math.round(def)} ・ 武器{dealt.weapon.name ? ` ${dealt.weapon.name}` : ""} {dealt.skill.dep === "int" ? `魔力 ${dealt.weapon.mag}` : `攻撃 ${dealt.weapon.atk}`}{dealt.skill.dep === "str" && party.attack_kind === "魔法" ? "（腕力依存）" : dealt.skill.dep === "spd" ? "（速度依存）" : ""} で計算。△の効果・★以外の装備やグラスタ・挺身・毒ペインは含めていません。
           </p>
         </>
       )}
@@ -384,12 +424,15 @@ function CoverageTile({ party, coverage: c, selected, gain }: { party: Party; co
           <span class="mt-1 space-y-px">
             {shown.map((p) => (
               <span class="block text-[11px] leading-snug text-muted">
-                <span class={p.characterId === party.attacker_id ? "font-semibold text-gold" : "text-ink/85"}>{p.characterId === party.attacker_id && "★"}{names.get(p.characterId)}</span>
+                {isGear(p.effect) ? <span class="text-ink/85">{p.effect.source.replace(/^(武器|防具):/, "")}</span> : (
+                  <span class={p.characterId === party.attacker_id ? "font-semibold text-gold" : "text-ink/85"}>{p.characterId === party.attacker_id && "★"}{names.get(p.characterId)}</span>
+                )}
                 {p.effect.type !== c.req.label && <> {shortType(p.effect.type)}</>}
                 {[formatValue(p.effect.type, p.effect.value), turnsLabel(p.effect.turns)].filter(Boolean).map((part) => <> <span class="whitespace-nowrap text-ink/70">{part}</span></>)}
                 {p.fit.level === "partial" && <span class="text-warn"> △</span>}
                 {p.fit.level === "unmet" && <span class="text-faint" title="今の編成では条件を満たさない"> ✗</span>}
                 {p.fit.level === "sb" && <span class="text-faint" title="SB発動ターンだけの効果なので枠は埋めない"> SB</span>}
+                {p.fit.level === "vc" && <span class="text-faint" title="VC は後衛から交代したときだけなので枠は埋めない"> VC</span>}
               </span>
             ))}
             {c.providers.length > shown.length && <span class="block text-[11px] text-faint">他{c.providers.length - shown.length}人</span>}
@@ -400,7 +443,9 @@ function CoverageTile({ party, coverage: c, selected, gain }: { party: Party; co
   );
 }
 
-function SettingsForm({ party }: { party: Party }) {
+export type GearOptions = { weapons: Equipment[]; armors: Equipment[] } | null;
+
+function SettingsForm({ party, gearOptions }: { party: Party; gearOptions: GearOptions }) {
   const attack = [party.attack_element, party.attack_kind].filter(Boolean).join("・") || "未設定";
   const boss = [party.boss_element && `${party.boss_element}属性`, { physical: "物理", magic: "魔法" }[party.boss_attack],
     party.boss_needs.length > 0 && `必須${party.boss_needs.length}件`].filter(Boolean).join("・") || "未設定";
@@ -433,6 +478,29 @@ function SettingsForm({ party }: { party: Party }) {
             </select>
           </div>
         </fieldset>
+        {gearOptions && (
+          <fieldset>
+            <legend class="label-caps mb-1.5">★の装備</legend>
+            <p class="mb-2 text-xs text-faint">装備で埋まる枠は★本人の効果として数え、自動で組むときはその枠のキャラを評価しない</p>
+            <div class="flex flex-wrap gap-2">
+              <select name="weapon" class={`${select} max-w-full`} aria-label="武器">
+                <option value="" selected={party.weapon === ""}>武器: エルピス（既定）</option>
+                <option value="none" selected={party.weapon === "none"}>武器: なし</option>
+                {gearOptions.weapons.map((w) => (
+                  <option value={w.external_id} selected={party.weapon === w.external_id}>{w.name}{w.character_name ? `（${w.character_name}専用）` : ""}</option>
+                ))}
+              </select>
+              <select name="armor" class={`${select} max-w-full`} aria-label="防具">
+                <option value="" selected={party.armor === ""}>防具: なし</option>
+                {gearOptions.armors.map((a) => (
+                  <option value={a.external_id} selected={party.armor === a.external_id}>
+                    {a.name}{a.character_name ? `（${a.character_name}専用）` : ""}{a.act_condition ? `（${a.act_condition}）` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </fieldset>
+        )}
         <fieldset>
           <legend class="label-caps mb-1.5">想定ボス</legend>
           <div class="mb-3 flex flex-wrap gap-2">
@@ -537,6 +605,7 @@ function CandidateRow({ party, need, c, full }: { party: Party; need: Requiremen
           {c.fit.level === "partial" && <span class="rounded bg-warn/15 px-1.5 text-[11px] leading-5 font-semibold text-warn">条件付き</span>}
           {c.fit.level === "unmet" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted">条件未達</span>}
           {c.fit.level === "sb" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted" title={c.fit.note}>SB時のみ</span>}
+          {c.fit.level === "vc" && <span class="rounded bg-line px-1.5 text-[11px] leading-5 font-semibold text-muted" title={c.fit.note}>VCのみ</span>}
           <Tags c={c.character} compact />
         </div>
         <p class="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">

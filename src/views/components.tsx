@@ -81,6 +81,7 @@ export const formatDate = (iso: string | null) =>
 /** 効果量の表示（固定値は +N、それ以外は N%） */
 export const formatValue = (type: string, value: number | null) => {
   if (value == null || value <= 0) return "";
+  if (type === "下克上") return ""; // 装備の下克上の値は計算式の定数（敵Lv²/320 の 320）
   if (/固定値/.test(type)) return `+${value}`;
   if (value < 5 && /攻撃$|毒|ペイン/.test(type)) return "";
   return `${value}%`;

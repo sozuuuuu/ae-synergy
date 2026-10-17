@@ -3,6 +3,8 @@
 import type { Db } from "../db.ts";
 import { WEAPONS } from "./characters.ts";
 import { type Clause, type CondMember, evaluateCondition, type Guest, loadCondMembers } from "./conditions.ts";
+import { type Equipment, isGear } from "./equipment.ts";
+import { parseZone, type ZonePlan } from "./zones.ts";
 
 export type Group = "damage" | "durability" | "boss";
 export const GROUP_NAMES: Record<Group, string> = { damage: "火力", durability: "耐久", boss: "ボス対策" };
@@ -19,6 +21,8 @@ export type Requirement = {
   match: (type: string) => boolean;
   /** 一致はするが効きが弱いときの注記（例: 属性と合わない陣）。null なら問題なし */
   caveat?: (type: string) => string | null;
+  /** 出典で絞る（例: 歌唱・祈祷の「与ダメUP」だけ） */
+  sources?: (source: string) => boolean;
 };
 
 export const ATTACK_KINDS = ["斬", "突", "打", "魔法"] as const;
@@ -58,7 +62,8 @@ export const BOSS_NEEDS: Requirement[] = [
 
 export type PartyContext = {
   /** kinds: 習得スキルが元々持つ攻撃種（これ以外の攻撃種で殴るには臨機応変が要る） */
-  attacker: { id: number; weapon: string; ls_type: string | null; personalities: string[]; kinds: string[] } | null;
+  /** dep: 攻撃値の参照元（腕力依存の魔法なら str。ステータスバフの枠をこれで決める） */
+  attacker: { id: number; weapon: string; ls_type: string | null; personalities: string[]; kinds: string[]; dep?: "str" | "int" | "spd" } | null;
   attackElement: string;
   attackKind: string;
   bossElement: string;
@@ -66,6 +71,10 @@ export type PartyContext = {
   bossNeeds: string[];
   /** 発動条件の判定用（並び・パーソナリティ・展開できる ZONE） */
   members: CondMember[];
+  /** 張る ZONE（1つだけ）。なければ「〜陣展開時」は誰かが張れれば満たす扱い（候補の判定など） */
+  zone?: ZonePlan;
+  /** ★の装備と、その効果（★本人の効果として数える） */
+  gear?: { items: Equipment[]; effects: EffectRow[] };
 };
 
 export function requirementsFor(ctx: PartyContext): Requirement[] {
@@ -98,7 +107,9 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
       );
     }
     const weapon = attacker ? WEAPONS[attacker.weapon] ?? "" : "";
-    const stats = both("腕力", "知性");
+    // ステータスバフは攻撃値の参照元に効く（腕力依存の魔法なら腕力UP、速度依存なら速度UP）
+    const depStat = attacker?.dep ? ({ str: "腕力", int: "知性", spd: "速度" } as const)[attacker.dep] : null;
+    const stats = depStat ? [depStat] : both("腕力", "知性");
     const defs = both("耐久", "精神");
     const crit = both("物理", "魔法");
     reqs.push(
@@ -132,6 +143,18 @@ export function requirementsFor(ctx: PartyContext): Requirement[] {
       { key: "abandon", group: "damage", label: "ルナティック(捨身)", hint: "ダメージ1.7倍＋クリ率100%UP（毎行動HP20%自傷）", to: "attacker",
         match: oneOf("ルナティック(捨身)") },
       { key: "weak", group: "damage", label: "弱点時ダメージUP", hint: "弱点を突けるとき", to: "attacker", match: oneOf("弱点時ダメージUP") },
+      // 歌唱・祈祷はそれぞれ1種類だけ効く別枠。歌う・祈る本人が前衛で発動する
+      { key: "song", group: "damage", label: "歌唱・祈祷", hint: "与えるダメージUP（別枠の掛け算）", to: "attacker",
+        match: (t) => t === "与ダメUP" || (t.startsWith("与ダメUP(") && !!E && t.includes(E)),
+        sources: (s) => ["歌唱", "祈り", "祈祷"].includes(s) },
+      // 通常のブレイクは1hit だけ2倍。★の攻撃種（ウェポン）か属性（エレメンタル）に合うブレイクを溜める
+      { key: "break_hit", group: "damage", label: "ブレイク", hint: "攻撃種・属性に合うブレイクで1hit だけ2倍", to: "enemy",
+        match: (t) => {
+          const weapon = t.match(/^ウェポンブレイク\((.+)\)$/)?.[1];
+          if (weapon) return !K || weapon.includes(K === "魔法" ? "魔" : K);
+          const elem = t.match(/^エレメンタルブレイク\((.+)\)$/)?.[1];
+          return !!elem && !!E && elem.includes(E);
+        } },
     );
   }
 
@@ -184,27 +207,37 @@ export type EffectRow = {
 
 /**
  * full: そのまま効く / partial: 位置・条件次第や本人のみ / unmet: 今の編成では条件を満たさない /
- * sb: SB 発動ターンだけ効く（並べるが枠は埋めない） / null: 効かない
+ * sb: SB 発動ターンだけ効く / vc: VC（後衛から交代したときだけ。ふだんは使わない）。この2つは並べるが枠は埋めない / null: 効かない
  */
-export type Fit = { level: "full" | "partial" | "unmet" | "sb"; note: string };
+export type Fit = { level: "full" | "partial" | "unmet" | "sb" | "vc"; note: string };
 export const fitRank = (f: Fit) => (f.level === "full" ? 2 : f.level === "partial" ? 1 : 0);
 
 export function fitOf(req: Requirement, e: EffectRow, ctx: PartyContext, guest?: Guest): Fit | null {
-  if (!req.match(e.type)) return null;
+  if (!req.match(e.type) || (req.sources && !req.sources(e.source))) return null;
   const isAttacker = ctx.attacker?.id === e.character_id;
   const sb = sbOnly(e);
   // SB の条件は発動ターンかどうかだけなので、判定には使わず sb として扱う
   const clauses = sb ? [] : (JSON.parse(e.condition_clauses || "[]") as Clause[]);
-  const cond = clauses.length ? evaluateCondition(clauses, e.conditions, e.character_id, ctx.members, guest) : null;
+  const cond = clauses.length ? evaluateCondition(clauses, e.conditions, e.character_id, ctx.members, guest, ctx.zone) : null;
   const caveat = req.caveat?.(e.type) ?? "";
+  // 後衛は行動せず、ふだんはグラスタ持ちとして置くだけなので、効くのは「後衛で〜」が条件の効果だけと見る。
+  // VC は後衛から交代したときにしか出ず、交代は特別な理由があるときだけなので枠には数えない（並べるだけ）
+  const vc = /^VC Lv/.test(e.source);
+  const back = ctx.members.find((m) => m.id === e.character_id)?.slot === "sub";
+  const idle = back && !vc && !clauses.some((c) => "slot" in c && c.slot === "sub");
+  // ZONE は1つしか張れないので、メンバーの陣は張る ZONE と同じものだけが枠を埋める
+  const deployed = req.key === "zone" && ctx.zone && !idle && ctx.members.some((m) => m.id === e.character_id) ? parseZone(e.type) : null;
+  const otherZone = !!deployed && deployed.name !== ctx.zone?.active?.name;
   const result = (level: Fit["level"], note = ""): Fit => ({
-    level: sb ? "sb" : cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
-    note: [sb ? `${e.conditions || "SB発動時"}のみ` : "", caveat, note, cond?.note ?? ""].filter(Boolean).join(" / "),
+    level: vc ? "vc" : idle || otherZone ? "unmet" : sb ? "sb" : cond?.state === "unmet" ? "unmet" : level === "full" && (cond?.state === "unknown" || caveat) ? "partial" : level,
+    note: [vc ? "VC（後衛から交代したときだけ）" : idle ? "後衛（行動しない）" : otherZone ? `ZONE は1つだけ（張るのは${ctx.zone?.active?.name}）` : "", sb ? `${e.conditions || "SB発動時"}のみ` : "", caveat, note, cond?.note ?? ""]
+      .filter(Boolean).join(" / "),
   });
 
   switch (req.to) {
     case "enemy":
-      return e.scope === "enemy" ? result(e.targets.includes("単体") ? "partial" : "full", e.targets.includes("単体") ? "単体" : "") : null;
+      // 想定は隠しボスなどの1体の敵なので、単体のデバフも全体と同じに効く（★も同じ相手を殴る）
+      return e.scope === "enemy" ? result("full", e.targets.includes("単体") ? "単体" : "") : null;
     case "any":
       return result("full");
     case "attacker":
@@ -262,13 +295,15 @@ export function attackKindsOf(db: Db, characterId: number): string[] {
     .map((r) => ATTACK_TYPES[r.type]!);
 }
 
-let typeCache: string[] | null = null;
+// DB ごとに持つ（テストでは DB を毎回作り直す）。取り込みで種別が増えたら clearEffectTypeCache で捨てる
+const typeCache = new WeakMap<Db, string[]>();
 export function allEffectTypes(db: Db): string[] {
-  typeCache ??= db.query<{ type: string }, []>("SELECT DISTINCT type FROM character_effects").all().map((r) => r.type);
-  return typeCache;
+  let types = typeCache.get(db);
+  if (!types) typeCache.set(db, (types = db.query<{ type: string }, []>("SELECT DISTINCT type FROM character_effects").all().map((r) => r.type)));
+  return types;
 }
-export function clearEffectTypeCache() {
-  typeCache = null;
+export function clearEffectTypeCache(db: Db) {
+  typeCache.delete(db);
 }
 
 export function effectsForCharacters(db: Db, characterIds: number[], types: string[]): EffectRow[] {
@@ -293,21 +328,73 @@ const better = (a: Provider, b: Provider) => fitRank(a.fit) - fitRank(b.fit) || 
 export function evaluateCoverage(db: Db, ctx: PartyContext, memberIds: number[]): Coverage[] {
   const reqs = requirementsFor(ctx);
   const types = allEffectTypes(db).filter((t) => reqs.some((r) => r.match(t)));
-  const effects = effectsForCharacters(db, memberIds, types);
+  // 装備の効果の種別はキャラの効果の種別一覧（allEffectTypes）にないこともあるので、ルールで直接見る
+  const effects = [...effectsForCharacters(db, memberIds, types), ...(ctx.gear?.effects ?? []).filter((e) => reqs.some((r) => r.match(e.type)))];
+  const boosts = loadBoosts(db, memberIds);
   return reqs.map((req) => {
-    const best = new Map<number, Provider>();
-    for (const effect of effects) {
-      const fit = fitOf(req, effect, ctx);
+    // 装備は★本人とは別の供給元として並べる（装備で埋まる枠を見分けるため）
+    const best = new Map<string, Provider>();
+    for (const raw of effects) {
+      const fit = fitOf(req, raw, ctx);
       if (!fit) continue;
+      const effect = boosted(raw, fit, boosts, ctx);
       const p = { characterId: effect.character_id, fit, effect };
-      const current = best.get(effect.character_id);
-      if (!current || better(p, current) > 0) best.set(effect.character_id, p);
+      const key = `${effect.character_id}${isGear(effect) ? effect.source : ""}`;
+      const current = best.get(key);
+      if (!current || better(p, current) > 0) best.set(key, p);
     }
     const providers = [...best.values()].sort((a, b) => better(b, a));
     // 条件を満たさない供給元は ✗ として並べるだけで、枠は埋めない
     const status = providers.some((p) => p.fit.level === "full") ? "ok" : providers.some((p) => p.fit.level === "partial") ? "partial" : "missing";
     return { req, status, providers };
   });
+}
+
+type Boost = { characterId: number; source: string; target: string; rate: number; clauses: Clause[]; text: string };
+
+/**
+ * 「〜の効果量増加(2倍)」（例: いずれかの敵が毒状態の時、物理クリティカルダメージUPの効果量増加(2倍)）。
+ * 同じスキル（出典）の効果に掛かる。説明が別の行（種別「特殊」）にしか書かれていないこともあるので、説明文の形で拾う
+ */
+function loadBoosts(db: Db, ids: number[]): Boost[] {
+  if (ids.length === 0) return [];
+  const params = Object.fromEntries(ids.map((id, i) => [`i${i}`, id]));
+  const rows = db
+    .query<{ character_id: number; source: string; description: string; conditions: string; condition_clauses: string }, any>(
+      `SELECT character_id, source, description, conditions, condition_clauses FROM character_effects
+       WHERE character_id IN (${ids.map((_, i) => `$i${i}`).join(", ")}) AND description LIKE '%の効果量%増加(%倍)%'`,
+    )
+    .all(params);
+  const out: Boost[] = [];
+  for (const r of rows) {
+    const m = r.description.match(/([^、]+?)の効果量(?:と継続ターン数)?増加\((\d+(?:\.\d+)?)倍\)/);
+    if (!m) continue;
+    const boost = { characterId: r.character_id, source: r.source, target: m[1]!.trim(), rate: Number(m[2]), clauses: JSON.parse(r.condition_clauses || "[]"), text: r.conditions };
+    if (!out.some((b) => b.characterId === boost.characterId && b.source === boost.source && b.target === boost.target)) out.push(boost);
+  }
+  return out;
+}
+
+const STAT_UP = /^(腕力|知性|速度|耐久|精神|幸運|全ステータス)UP/;
+function boostTargets(target: string, e: EffectRow): boolean {
+  if (target === "バフ") return e.scope !== "enemy" && !/DOWN/.test(e.type);
+  if (target === "デバフ") return e.scope === "enemy" && /DOWN/.test(e.type);
+  if (target === "ステータスUP") return STAT_UP.test(e.type);
+  return e.type === target || e.type.startsWith(target);
+}
+
+/** 条件を満たす「効果量増加」を掛けた効果（掛からなければそのまま） */
+function boosted(e: EffectRow, fit: Fit, boosts: Boost[], ctx: PartyContext): EffectRow {
+  if (e.value == null) return e;
+  let rate = 1;
+  for (const b of boosts) {
+    if (b.characterId !== e.character_id || b.source !== e.source || !boostTargets(b.target, e)) continue;
+    const cond = b.clauses.length ? evaluateCondition(b.clauses, b.text, b.characterId, ctx.members, undefined, ctx.zone).state : "met";
+    if (cond !== "met") continue;
+    rate *= b.rate;
+    fit.note = [fit.note, `効果量×${b.rate}${b.text ? `（${b.text}）` : ""}`].filter(Boolean).join(" / ");
+  }
+  return rate === 1 ? e : { ...e, value: e.value * rate };
 }
 
 /** 枠を埋められるキャラの候補（メンバー以外）。そのまま効くもの・効果量の大きいものから */

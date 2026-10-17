@@ -9,8 +9,9 @@ import { elementStyle, ElementMark, MultilineText, Pagination, PostButton, Tags 
 type SearchResult = { characters: (CharacterSummary & { matches: string[] })[]; total: number; page: number; pages: number };
 
 /** 検索結果。party があれば「このパーティに追加」、なければ「このキャラから組む」を出す */
-export function CharacterSearchPage({ filters, result, personalities, effectTypes, party, query }: {
+export function CharacterSearchPage({ filters, result, personalities, effectTypes, party, query, unowned }: {
   filters: CharacterFilters;
+  unowned: Set<number>;
   result: SearchResult;
   personalities: { name: string; count: number }[];
   effectTypes: { type: string; count: number }[];
@@ -79,6 +80,7 @@ export function CharacterSearchPage({ filters, result, personalities, effectType
                 options={personalities.filter((p) => !filters.personality?.includes(p.name)).map((p) => [p.name, `${p.name}（${p.count}）`])} />
               <Check name="alter" checked={filters.alter === "1"} label="異節" />
               <Check name="sa" checked={filters.sa === "1"} label="星の夢（SA）" />
+              <Select cls={select} name="owned" value={filters.owned} label="所持：すべて" options={[["1", "持っている"], ["0", "持っていない"]]} />
             </span>
           </Row>
         </fieldset>
@@ -113,6 +115,7 @@ export function CharacterSearchPage({ filters, result, personalities, effectType
               <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <a href={`/characters/${c.id}`} class="font-semibold hover:text-gold">{c.label}</a>
                 <Tags c={c} />
+                {unowned.has(c.id) && <span class="text-[11px] text-faint">未所持</span>}
               </div>
               {c.class_name && <div class="mt-0.5 truncate text-xs text-faint">{c.class_name}</div>}
               {c.matches.length > 0 && (
@@ -194,7 +197,7 @@ function Select({ name, value, label, options, cls }: { name: string; value?: st
   );
 }
 
-export function CharacterPage({ character: c, parties }: { character: Character; parties: Party[] }) {
+export function CharacterPage({ character: c, parties, owned }: { character: Character; parties: Party[]; owned: boolean }) {
   const stats = c.data.stats ?? {};
   const statColumns = ([["lvMax", "最大"], ["stellar", "星の夢"]] as const).filter(([key]) => stats[key]);
   return (
@@ -208,7 +211,14 @@ export function CharacterPage({ character: c, parties }: { character: Character;
             <p class="mt-0.5 mb-2 text-sm text-muted">{[c.class_name, c.eng_name, c.true_name && `真名 ${c.true_name}`].filter(Boolean).join(" ・ ")}</p>
             <Tags c={c} />
           </div>
-          <PostButton action="/parties" fields={{ attacker_id: c.id }} label="このキャラから組む" class="btn-gold" />
+          <div class="flex flex-col items-end gap-1.5">
+            <PostButton action="/parties" fields={{ attacker_id: c.id }} label="このキャラから組む" class="btn-gold" />
+            <PostButton action="/parties/auto" fields={{ attacker_id: c.id }} label="自動で組む" title="このキャラを★にして、前衛を持っているキャラで埋める（後衛はあとで好きに置く）"
+              class="btn-xs border border-gold/50 text-gold hover:bg-gold/10" />
+            <PostButton action={`/characters/${c.id}/owned`} fields={{ owned: owned ? "0" : "1" }} label={owned ? "持っている ✓" : "持っていない"}
+              title={owned ? "持っていないことにする（自動で組むときの候補から外す）" : "持っていることにする"}
+              class={`btn-xs border border-line ${owned ? "text-muted hover:text-ink" : "text-faint line-through hover:text-ink"}`} />
+          </div>
         </div>
         <div class="mt-4 flex flex-wrap gap-1.5">
           {c.personalities.map((p) => (

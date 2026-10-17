@@ -15,4 +15,6 @@ export const config = {
   publicOrigin: env.PUBLIC_ORIGIN,
   /** キャラデータ。anaden-mcp が書き出す、発動条件を構造化した補強済みデータだけを正とする */
   anadenData: env.ANADEN_DATA ?? join(homedir(), ".cache", "anaden-mcp", "characters.enriched.json"),
+  /** 武器・防具。anaden-mcp が書き出すもの */
+  anadenEquipment: env.ANADEN_EQUIPMENT ?? join(homedir(), ".cache", "anaden-mcp", "equipment.export.json"),
 };
